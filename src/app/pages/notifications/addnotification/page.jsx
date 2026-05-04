@@ -116,6 +116,7 @@ const AddNewNotification = () => {
           />
         </div>
       </div>
+      {/* message preview */}
 
       {/* <div className="grid grid-cols-2 relative">
         <div className="mt-6">
