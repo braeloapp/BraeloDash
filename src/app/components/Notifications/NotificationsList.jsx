@@ -1,12 +1,21 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { getData } from "@/app/API/method";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getData, postData } from "@/app/API/method";
+import { getApiErrorMessage } from "@/lib/apiResponse";
+import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+
+const DELETE_NOTIFICATION_ENDPOINT = "/admin-panel/notification/delete";
 
 const NotificationsList = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [notificationToDelete, setNotificationToDelete] = useState(null);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     pageSize: 10,
@@ -23,16 +32,20 @@ const NotificationsList = () => {
       console.log("API Response:", data);
 
       if (data?.data?.results) {
-        const formattedNotifications = data.data.results.map((notif, index) => ({
-          id: index + 1,
-          title: notif.title || "No Title",
-          message: notif.body || "No Message",
-          dateReceived: notif.created_at || new Date().toISOString(),
-          type: notif.type || "General Notification",
-          status: notif.is_read ? "Read" : "Unread",
-          image: "/b5.png",
-          description: notif.body || "No Description",
-        }));
+        const formattedNotifications = data.data.results.map((notif, index) => {
+          const apiId = notif.id ?? notif._id ?? null;
+          return {
+            rowKey: apiId != null ? String(apiId) : `row-${page}-${index}`,
+            apiId,
+            title: notif.title || "No Title",
+            message: notif.body || "No Message",
+            dateReceived: notif.created_at || new Date().toISOString(),
+            type: notif.type || "General Notification",
+            status: notif.is_read ? "Read" : "Unread",
+            image: "/b5.png",
+            description: notif.body || "No Description",
+          };
+        });
         
         setNotifications(formattedNotifications);
         
@@ -60,8 +73,36 @@ const NotificationsList = () => {
     fetchNotifications(1);
   }, []);
 
-  const deleteNotification = (id) => {
-    setNotifications(notifications.filter(notification => notification.id !== id));
+  const openDeleteDialog = (notification) => {
+    setNotificationToDelete(notification);
+    setDeleteDialogVisible(true);
+  };
+
+  const hideDeleteDialog = () => {
+    setDeleteDialogVisible(false);
+    setNotificationToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    const apiId = notificationToDelete?.apiId;
+    if (apiId == null || apiId === "") {
+      toast.error("Cannot delete: notification id is missing.");
+      return;
+    }
+    try {
+      setDeleteInProgress(true);
+      await postData(DELETE_NOTIFICATION_ENDPOINT, {
+        notification_id: String(apiId),
+      });
+      toast.success("Notification deleted successfully");
+      hideDeleteDialog();
+      await fetchNotifications(pagination.currentPage);
+    } catch (err) {
+      console.error(err);
+      toast.error(getApiErrorMessage(err, "Failed to delete notification"));
+    } finally {
+      setDeleteInProgress(false);
+    }
   };
 
   const formatDate = (dateString) => {
@@ -70,6 +111,17 @@ const NotificationsList = () => {
 
   return (
     <div className="p-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <ConfirmDeleteDialog
+        visible={deleteDialogVisible}
+        onHide={hideDeleteDialog}
+        onConfirm={handleConfirmDelete}
+        title="Are you sure you want to delete this notification?"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirmLoading={deleteInProgress}
+      />
+
       <h2 className="text-xl font-bold mb-4">Notifications</h2>
       
       {loading ? (
@@ -81,7 +133,7 @@ const NotificationsList = () => {
           <div className="space-y-4">
             {notifications.map((notification) => (
               <div
-                key={notification.id}
+                key={notification.rowKey}
                 className="bg-white p-4 rounded-lg shadow-md flex justify-between items-start gap-4 overflow-hidden"
               >
                 <div className="flex min-w-0 flex-1 items-start gap-4">
@@ -109,8 +161,9 @@ const NotificationsList = () => {
                     {formatDate(notification.dateReceived)}
                   </p>
                   <button
-                    onClick={() => deleteNotification(notification.id)}
-                    className="bg-[#CD9403] text-white px-3 py-1 rounded-lg transition mt-2"
+                    type="button"
+                    onClick={() => openDeleteDialog(notification)}
+                    className="bg-[#CD9403] text-white px-3 py-1 rounded-lg transition mt-2 hover:opacity-90"
                   >
                     Delete
                   </button>

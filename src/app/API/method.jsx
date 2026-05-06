@@ -1,5 +1,6 @@
 // Api/methods.jsx
 import axios from 'axios';
+import { extractResultsList } from '@/lib/apiResponse';
 
 const API_BASE_URL = 'https://braelo-v1-bdaqhdc4c7d9fdb7.canadacentral-01.azurewebsites.net';
 
@@ -102,11 +103,13 @@ export const postBusiData = async (endpoint, data) => {
   }
 };
 
+/** GET without auth — used where the API returns a public list (e.g. business banners). */
 export const getBanData = async (endpoint) => {
   try {
     const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+    const list = extractResultsList(response.data);
     return {
-      data: response.data.data.results,
+      data: list,
       status: response.status,
       error: null
     };

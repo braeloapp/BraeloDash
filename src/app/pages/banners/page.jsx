@@ -5,8 +5,14 @@ import { Column } from "primereact/column";
 import { getBodyStyle, getHeaderStyle } from "@/app/components/Users/UserData";
 import BackButton from "@/app/components/BackButton";
 import { useRouter } from "next/navigation";
-import { getBanData, updateListData, deleteData } from "@/app/API/method";
-import { toast } from "react-toastify";
+import { getBanData, postData, updateListData } from "@/app/API/method";
+import { getApiErrorMessage } from "@/lib/apiResponse";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+
+const BANNER_LIST_ENDPOINT = "/auth/business/banner";
+const BANNER_DELETE_ENDPOINT = "/admin-panel/business/banner/delete";
 
 export default function BannerManagement() {
   const [banners, setBanners] = useState([]);
@@ -14,6 +20,7 @@ export default function BannerManagement() {
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const router = useRouter();
 
@@ -87,18 +94,27 @@ export default function BannerManagement() {
     setRows(event.rows);
   };
 
-  const transformBannerData = (data) =>
-    data.map((item) => ({
-      _id: item._id || "",
-      user_id: item.user_id || "",
-      business_email: item.business_email || "",
-      business_name: item.business_name || "",
-      business_category: item.business_category || "",
-      business_subcategory: item.business_subcategory || "",
-      business_banner: Array.isArray(item.business_banner)
-        ? item.business_banner
-        : [item.business_banner || ""],
-    }));
+  const transformBannerData = (results) =>
+    results.map((item) => {
+      const mongoId = item.id ?? item._id ?? "";
+      const uid = item.user_id;
+      const userIdDisplay = Array.isArray(uid)
+        ? uid.join(", ")
+        : uid ?? "";
+      return {
+        _id: mongoId,
+        user_id: userIdDisplay,
+        business_email: item.business_email ?? "",
+        business_name: item.business_name ?? "",
+        business_category: item.business_category ?? "",
+        business_subcategory: item.business_subcategory ?? "",
+        business_banner: Array.isArray(item.business_banner)
+          ? item.business_banner
+          : item.business_banner
+            ? [item.business_banner]
+            : [],
+      };
+    });
 
   // Using useCallback to memoize the fetch function
   const fetchBanners = useCallback(async () => {
@@ -106,24 +122,23 @@ export default function BannerManagement() {
       setLoading(true);
       setError(null);
 
-      const response = await getBanData("/auth/business/banner");
-      if (!response || response.error || response.status !== 200) {
+      /** No Bearer header — same as pre-change behavior; /auth/business/banner returns full list for unauthenticated GET. */
+      const response = await getBanData(BANNER_LIST_ENDPOINT);
+      if (response.error || response.status !== 200) {
         throw new Error(response?.error || "Failed to fetch banners");
       }
 
-      if (!Array.isArray(response.data)) {
-        throw new Error("Invalid data structure received from server");
-      }
-
-      const transformedData = transformBannerData(response.data);
+      const results = Array.isArray(response.data) ? response.data : [];
+      const transformedData = transformBannerData(results);
       setBanners(transformedData);
 
       if (transformedData.length === 0) {
         toast.info("No banners found");
       }
     } catch (err) {
-      setError(err.message || "Failed to load banners");
-      toast.error(err.message || "Failed to load banners");
+      const msg = getApiErrorMessage(err, err.message || "Failed to load banners");
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -192,29 +207,27 @@ export default function BannerManagement() {
 
   const deleteBanner = async () => {
     if (!selectedBanner) return;
+    const bannerId = selectedBanner._id;
+    if (!bannerId) {
+      toast.error("Missing banner id");
+      return;
+    }
 
     try {
-      setLoading(true);
-      const bannerId = selectedBanner._id;
-
-      await deleteData("/admin-panel/business/banner/delete", {
-        banner_id: bannerId,
+      setDeleteSubmitting(true);
+      await postData(BANNER_DELETE_ENDPOINT, {
+        banner_id: String(bannerId),
       });
-
       setDeleteModalVisible(false);
       setSelectedBanner(null);
       await fetchBanners();
       toast.success("Banner deleted successfully");
     } catch (err) {
-      const msg =
-        err.response?.data?.message ||
-        err.response?.data?.detail ||
-        err.message ||
-        "Failed to delete banner";
-      setError(typeof msg === "string" ? msg : "Failed to delete banner");
-      toast.error(typeof msg === "string" ? msg : "Failed to delete banner");
+      const msg = getApiErrorMessage(err, "Failed to delete banner");
+      setError(msg);
+      toast.error(msg);
     } finally {
-      setLoading(false);
+      setDeleteSubmitting(false);
     }
   };
 
@@ -251,6 +264,7 @@ export default function BannerManagement() {
   const actionTemplate = (rowData) => (
     <div className="flex gap-2">
       <button
+        type="button"
         onClick={() => editBanner(rowData)}
         className="border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
         disabled={loading}
@@ -258,9 +272,10 @@ export default function BannerManagement() {
         Edit
       </button>
       <button
+        type="button"
         onClick={() => confirmDelete(rowData)}
         className="border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-        disabled={loading}
+        disabled={loading || deleteSubmitting}
       >
         Delete
       </button>
@@ -273,6 +288,7 @@ export default function BannerManagement() {
 
   return (
     <div className="p-6">
+      <ToastContainer position="top-right" autoClose={3000} />
       <style jsx global>{paginatorStyles}</style>
       <div className="flex justify-between p-5 border-b">
         <div className="flex items-center gap-2">
@@ -441,49 +457,19 @@ export default function BannerManagement() {
         </div>
       )}
 
-      {/* Delete Modal */}
-      {isDeleteModalVisible && selectedBanner && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Confirm Delete</h2>
-            <div className="mb-4">
-              <p className="mb-2">You are about to delete:</p>
-              <div className="border rounded-md p-3">
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="w-16 h-16 flex-shrink-0">
-                    <img
-                      src={selectedBanner.business_banner?.[0] || "https://via.placeholder.com/80"}
-                      alt="Banner"
-                      className="w-full h-full object-cover rounded"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-medium">{selectedBanner.business_name}</p>
-                    <p className="text-sm text-gray-600">{selectedBanner.business_email}</p>
-                  </div>
-                </div>
-                <p className="text-sm text-red-600 mt-2">This action cannot be undone.</p>
-              </div>
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setDeleteModalVisible(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300 transition"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={deleteBanner}
-                className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 transition"
-                disabled={loading}
-              >
-                {loading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteDialog
+        visible={isDeleteModalVisible}
+        onHide={() => {
+          if (deleteSubmitting) return;
+          setDeleteModalVisible(false);
+          setSelectedBanner(null);
+        }}
+        onConfirm={deleteBanner}
+        title="Are you sure you want to delete this banner?"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirmLoading={deleteSubmitting}
+      />
     </div>
   );
 }
