@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import BackButton from "@/app/components/BackButton";
 import { postBusiData } from "@/app/API/method";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getApiErrorMessage } from "@/lib/apiResponse";
 
 const AddBanner = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +14,10 @@ const AddBanner = () => {
     business_email: "",
     business_category: "",
     business_subcategory: "",
+    url: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -28,8 +30,6 @@ const AddBanner = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
-    setSuccess(false);
 
     try {
       // Prepare data for submission
@@ -39,6 +39,7 @@ const AddBanner = () => {
       submissionData.append("business_email", formData.business_email);
       submissionData.append("business_category", formData.business_category);
       submissionData.append("business_subcategory", formData.business_subcategory);
+      submissionData.append("url", formData.url);
 
       // Make API call
       const response = await postBusiData("/admin-panel/banner", submissionData, {
@@ -48,7 +49,7 @@ const AddBanner = () => {
       });
 
       if (response.success) {
-        setSuccess(true);
+        toast.success("Banner created successfully");
         // Reset form after successful submission
         setFormData({
           business_banner: null,
@@ -56,12 +57,13 @@ const AddBanner = () => {
           business_email: "",
           business_category: "",
           business_subcategory: "",
+          url: "",
         });
       } else {
-        setError(response.message || "Failed to add banner");
+        toast.error(response.message || "Failed to add banner");
       }
     } catch (err) {
-      setError(err.message || "An error occurred while adding the banner");
+      toast.error(getApiErrorMessage(err, "An error occurred while adding the banner"));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,21 +71,10 @@ const AddBanner = () => {
 
   return (
     <>
+      <ToastContainer position="top-right" autoClose={3000} />
       <BackButton />
       <div className="max-w-md mx-auto p-4 border rounded shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Add Banner</h1>
-        
-        {success && (
-          <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">
-            Banner added successfully!
-          </div>
-        )}
-        
-        {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Banner Image */}
@@ -166,6 +157,23 @@ const AddBanner = () => {
               onChange={handleChange}
               className="w-full p-2 border rounded"
               placeholder="Enter business subcategory"
+              required
+            />
+          </div>
+
+          {/* URL */}
+          <div>
+            <label htmlFor="url" className="block font-medium mb-1">
+              URL
+            </label>
+            <input
+              type="url"
+              id="url"
+              name="url"
+              value={formData.url}
+              onChange={handleChange}
+              className="w-full p-2 border rounded"
+              placeholder="Enter URL"
               required
             />
           </div>
