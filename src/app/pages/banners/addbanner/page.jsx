@@ -48,7 +48,9 @@ const AddBanner = () => {
         // },
       });
 
-      if (response.success) {
+      const okStatus = response?.status === 201 || response?.status === 200;
+      const okFlag = response?.success === true;
+      if (okStatus || okFlag) {
         toast.success("Banner created successfully");
         // Reset form after successful submission
         setFormData({
