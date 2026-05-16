@@ -1,4 +1,4 @@
-import { getGoogleMapsScriptUrl } from "@/lib/googleMaps";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -33,21 +33,9 @@ const RealEstate = () => {
     hasPrev: false,
   });
   const [autocomplete, setAutocomplete] = useState(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const { isLoaded: mapLoaded } = useGoogleMaps();
 
   useEffect(() => {
-    // Load Google Maps script
-    if (typeof window !== "undefined" && !window.google) {
-      const script = document.createElement("script");
-      script.src = getGoogleMapsScriptUrl();
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setMapLoaded(true);
-      document.head.appendChild(script);
-    } else {
-      setMapLoaded(true);
-    }
-
     fetchData();
 
     return () => {

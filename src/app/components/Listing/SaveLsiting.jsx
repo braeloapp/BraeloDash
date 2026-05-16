@@ -1,4 +1,4 @@
-import { getGoogleMapsScriptUrl } from "@/lib/googleMaps";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -122,21 +122,10 @@ const SaveListing = ({ user_id }) => {
     totalItems: 0
   });
   const [autocomplete, setAutocomplete] = useState(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const { isLoaded: mapLoaded } = useGoogleMaps();
   const [currentFormFields, setCurrentFormFields] = useState([]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && !window.google) {
-      const script = document.createElement("script");
-      script.src = getGoogleMapsScriptUrl();
-      script.async = true;
-      script.defer = true;
-      script.onload = () => setMapLoaded(true);
-      document.head.appendChild(script);
-    } else {
-      setMapLoaded(true);
-    }
-
     fetchData();
 
     return () => {

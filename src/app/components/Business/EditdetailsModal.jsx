@@ -1,5 +1,5 @@
 "use client";
-import { getGoogleMapsScriptUrl } from "@/lib/googleMaps";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -28,25 +28,10 @@ const EditdetailsModal = ({ isOpen, onClose, businessData, onUpdateSuccess }) =>
   const [bannerPreview, setBannerPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const { isLoaded: mapLoaded } = useGoogleMaps(isOpen);
   const logoInputRef = useRef(null);
   const bannerInputRef = useRef(null);
   const imagesInputRef = useRef(null);
-
-  // Load Google Maps API
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const script = document.createElement("script");
-    script.src = getGoogleMapsScriptUrl();
-    script.async = true;
-    script.onload = () => setMapLoaded(true);
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, [isOpen]);
 
   // Initialize form with business data
   useEffect(() => {

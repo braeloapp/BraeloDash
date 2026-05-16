@@ -1,6 +1,6 @@
 "use client";
 // pages/listing/addlisting/[slug]/[name]/page.jsx (Form Page)
-import { getGoogleMapsScriptUrl } from "@/lib/googleMaps";
+import { loadGoogleMaps } from "@/lib/googleMaps";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import BackButton from "@/app/components/BackButton";
@@ -80,25 +80,20 @@ const Form = () => {
     }
   }, [slug, name]);
 
-  // Initialize Google Maps autocomplete
+  // Initialize Google Maps autocomplete (shared loader — one script per app)
   useEffect(() => {
     const locationField = document.getElementById("location");
-    if (locationField && !autocompleteRef.current) {
-      if (!window.google) {
-        const script = document.createElement("script");
-        script.src = getGoogleMapsScriptUrl();
-        script.async = true;
-        script.defer = true;
-        script.onload = initializeAutocomplete;
-        document.head.appendChild(script);
-      } else {
-        initializeAutocomplete();
-      }
-    }
+    if (!locationField || autocompleteRef.current) return;
+
+    let cancelled = false;
 
     function initializeAutocomplete() {
+      if (cancelled || autocompleteRef.current) return;
+      const input = document.getElementById("location");
+      if (!input) return;
+
       autocompleteRef.current = new window.google.maps.places.Autocomplete(
-        document.getElementById("location"),
+        input,
         { types: ["geocode"], fields: ["formatted_address", "geometry"] }
       );
 
@@ -116,6 +111,12 @@ const Form = () => {
         }
       });
     }
+
+    loadGoogleMaps().then(initializeAutocomplete);
+
+    return () => {
+      cancelled = true;
+    };
   }, [commonFields]);
 
   const handleSubmit = async (e) => {

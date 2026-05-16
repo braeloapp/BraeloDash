@@ -1,5 +1,11 @@
 "use client";
-import { getGoogleMapsScriptUrl } from "@/lib/googleMaps";
+import { useGoogleMaps } from "@/hooks/useGoogleMaps";
+import {
+  getBusinessSaveFailure,
+  isBusinessCreateSuccess,
+  businessSaveErrorMessage,
+} from "@/lib/businessApi";
+import { getApiErrorMessage } from "@/lib/apiResponse";
 import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -110,33 +116,6 @@ const categories = [
   },
 ];
 
-/** API may return HTTP 200 with { status: 400, message, error } — treat as failure */
-function getBusinessSaveFailure(payload) {
-  if (!payload || typeof payload !== "object") return null;
-  const candidates = [payload, payload.data].filter(
-    (x) => x && typeof x === "object"
-  );
-  for (const obj of candidates) {
-    const status = obj.status;
-    if (typeof status === "number" && status >= 400) return obj;
-    if (typeof status === "string") {
-      const n = Number(status);
-      if (!Number.isNaN(n) && n >= 400) return obj;
-    }
-    if (typeof obj.error === "string" && obj.error.trim()) return obj;
-    if (obj.success === false) return obj;
-  }
-  return null;
-}
-
-function businessSaveErrorMessage(obj) {
-  if (!obj) return "Error creating business.";
-  if (typeof obj.error === "string" && obj.error.trim()) return obj.error.trim();
-  if (typeof obj.message === "string" && obj.message.trim())
-    return obj.message.trim();
-  return "Error creating business.";
-}
-
 const AddNewBusiness = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -144,29 +123,17 @@ const AddNewBusiness = () => {
   const [bannerPreview, setBannerPreview] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const { isLoaded: mapLoaded } = useGoogleMaps();
   const logoInputRef = useRef(null);
   const bannerInputRef = useRef(null);
   const imagesInputRef = useRef(null);
   const formikRef = useRef(null);
 
-  // Load Google Maps API
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push("/login"); // Redirect to login if no token
-      return;
+      router.push("/login");
     }
-
-    const script = document.createElement("script");
-    script.src = getGoogleMapsScriptUrl();
-    script.async = true;
-    script.onload = () => setMapLoaded(true);
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
   }, [router]);
 
   useEffect(() => {
@@ -328,21 +295,30 @@ const AddNewBusiness = () => {
             coordinates: [fallbackCoordinates.lng, fallbackCoordinates.lat],
           })
         );
+        formData.append("latitude", String(fallbackCoordinates.lat));
+        formData.append("longitude", String(fallbackCoordinates.lng));
 
-        // Make API call using postData
-        const payload = await postBusiData("/auth/business", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const payload = await postBusiData("/auth/business", formData);
 
-        const failure = getBusinessSaveFailure(payload);
-
-        if (failure) {
-          const msg = businessSaveErrorMessage(failure);
+        if (isBusinessCreateSuccess(payload)) {
+          toast.success(
+            (typeof payload?.message === "string" && payload.message.trim()) ||
+              "Business created successfully!",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            }
+          );
+          setTimeout(() => router.push("/pages/business"), 800);
+        } else {
+          const failure = getBusinessSaveFailure(payload);
+          const msg = businessSaveErrorMessage(failure ?? payload);
           const unauthorized =
-            failure.status === 401 || payload?.status === 401;
+            failure?.status === 401 || payload?.status === 401;
           if (unauthorized) {
             toast.error("Session expired. Please log in again.", {
               position: "top-right",
@@ -360,17 +336,7 @@ const AddNewBusiness = () => {
               draggable: true,
             });
           }
-          console.error("Error creating business:", payload);
-        } else {
-          toast.success("Business created successfully!", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-          });
-          console.log("Business created successfully:", payload);
+          console.error("Error creating business:", { payload, failure });
         }
       } catch (err) {
         if (err?.response?.status === 401) {
@@ -382,12 +348,10 @@ const AddNewBusiness = () => {
           router.push("/login");
           return;
         }
-        const d = err?.response?.data;
-        const message =
-          (typeof d?.error === "string" && d.error.trim()) ||
-          (typeof d?.message === "string" && d.message.trim()) ||
-          err?.message ||
-          "Network error. Please try again.";
+        const message = getApiErrorMessage(
+          err,
+          "Network error. Please try again."
+        );
         toast.error(message, {
           position: "top-right",
           autoClose: 3000,

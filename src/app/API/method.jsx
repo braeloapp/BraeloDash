@@ -91,14 +91,24 @@ export const updateListData = async (endpoint, data) => {
   }
 };
 
-export const postBusiData = async (endpoint, data) => {
+export const postBusiData = async (endpoint, data, config = {}) => {
   try {
+    const token = localStorage.getItem("token");
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      ...(config.headers || {}),
+    };
+    // Let axios set multipart boundary when sending FormData
+    if (!(data instanceof FormData)) {
+      headers["Content-Type"] = headers["Content-Type"] ?? "multipart/form-data";
+    }
     const response = await axios.post(`${API_BASE_URL}${endpoint}`, data, {
-      headers: getHeaders()
+      ...config,
+      headers,
     });
     return response.data;
   } catch (error) {
-    console.error('POST Error:', error);
+    console.error("POST Error:", error);
     throw error;
   }
 };
