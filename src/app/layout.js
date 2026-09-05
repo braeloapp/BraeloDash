@@ -1,4 +1,5 @@
 import localFont from "next/font/local";
+import ErrorTracking from "./components/ErrorTracking";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <ErrorTracking />
         {children}
       </body>
     </html>

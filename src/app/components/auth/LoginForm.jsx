@@ -7,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LoginApi } from "@/app/API/method";
 import { persistAdminSession } from "@/lib/adminAuth";
+import { validateLoginForm } from "@/lib/loginValidation";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function ImageSection() {
@@ -63,12 +64,9 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Please enter a valid email address");
-      return;
-    }
-    if (!password) {
-      toast.error("Password is required");
+    const validation = validateLoginForm(email, password);
+    if (!validation.ok) {
+      toast.error(validation.message);
       return;
     }
     if (isLoading) return;
