@@ -1,8 +1,9 @@
 // Api/methods.jsx
 import axios from 'axios';
 import { extractResultsList } from '@/lib/apiResponse';
+import { getApiBaseUrl } from '@/lib/apiConfig';
 
-const API_BASE_URL = 'https://braelo-v1-bdaqhdc4c7d9fdb7.canadacentral-01.azurewebsites.net';
+const API_BASE_URL = getApiBaseUrl();
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');

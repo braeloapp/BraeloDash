@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiSettings } from "react-icons/fi";
+import { getApiBaseUrl } from "@/lib/apiConfig";
 
 const sidebarItems = [
   { to: "/pages/dashboard", icon: "/a1.png", label: "Dashboard" },
@@ -40,7 +41,7 @@ const NavBar = () => {
 
       try {
         const response = await fetch(
-          "https://braelo-v1-bdaqhdc4c7d9fdb7.canadacentral-01.azurewebsites.net/auth/user/profile",
+          `${getApiBaseUrl()}/auth/user/profile`,
           {
             headers: {
               "Content-Type": "application/json",
