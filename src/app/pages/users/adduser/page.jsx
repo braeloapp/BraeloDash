@@ -1,21 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import BackButton from "@/app/components/BackButton";
 import { postData } from "@/app/API/method";
+import { getApiErrorMessage } from "@/lib/apiResponse";
 
 const AddUser = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const canCreateStaff =
+    typeof window !== "undefined" &&
+    localStorage.getItem("admin_role") === "super_admin";
+
+  const roleOptions = useMemo(() => {
+    const options = [{ value: "user", label: "User" }];
+    if (canCreateStaff) {
+      options.unshift({ value: "admin", label: "Admin" });
+    }
+    return options;
+  }, [canCreateStaff]);
+
   const formik = useFormik({
     initialValues: {
       fullName: "",
       email: "",
       phoneNumber: "",
       password: "",
-      date: "",
       role: "user",
     },
     validationSchema: Yup.object({
@@ -25,46 +40,43 @@ const AddUser = () => {
         .required("Email is required"),
       phoneNumber: Yup.string()
         .required("Phone Number is required")
-        .matches(/^[0-9]+$/, "Phone Number must be digits"),
+        .matches(/^[0-9+]+$/, "Phone Number must be digits"),
       password: Yup.string()
         .required("Password is required")
         .min(6, "Password must be at least 6 characters"),
-      date: Yup.date().required("Date is required"),
       role: Yup.string().required("Role is required"),
     }),
     onSubmit: async (values, { resetForm }) => {
-      const apiUrl = "/admin-panel/signup";
-
-      const userData = {
-        email: values.email,
-        password: values.password,
-        name: values.fullName,
-        role: values.role === "admin" ? "true" : "false",
-      };
-
+      if (submitting) return;
+      setSubmitting(true);
       try {
-        const response = await postData(apiUrl, userData);
-        console.log("User created successfully:", response);
-
+        await postData("/admin-panel/signup", {
+          email: values.email,
+          password: values.password,
+          name: values.fullName,
+          phone_number: values.phoneNumber,
+          role: values.role,
+        });
         resetForm();
-        alert("User created successfully!");
+        toast.success("User created successfully");
       } catch (error) {
-        console.error("Error creating user:", error);
-        alert("Failed to create user. Please try again.");
+        toast.error(getApiErrorMessage(error, "Failed to create user"));
+      } finally {
+        setSubmitting(false);
       }
     },
   });
 
   return (
     <>
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-xl mx-auto mt-10 p-5 bg-white shadow-md rounded-md">
         <div className="flex items-center gap-2 mb-5">
           <BackButton />
           <h2 className="text-2xl font-semibold text-center">Add User</h2>
         </div>
-        
+
         <form onSubmit={formik.handleSubmit}>
-          {/* Full Name */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="fullName">
               Full Name
@@ -88,7 +100,6 @@ const AddUser = () => {
             )}
           </div>
 
-          {/* Email */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="email">
               Email
@@ -112,7 +123,6 @@ const AddUser = () => {
             )}
           </div>
 
-          {/* Phone Number */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="phoneNumber">
               Phone Number
@@ -136,7 +146,6 @@ const AddUser = () => {
             )}
           </div>
 
-          {/* Password */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="password">
               Password
@@ -182,31 +191,6 @@ const AddUser = () => {
             )}
           </div>
 
-          {/* Date */}
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="date">
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              name="date"
-              value={formik.values.date}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={`w-full p-2 border rounded-md ${
-                formik.touched.date && formik.errors.date
-                  ? "border-red-500"
-                  : "border-gray-300"
-              }`}
-              required
-            />
-            {formik.touched.date && formik.errors.date && (
-              <p className="text-red-500">{formik.errors.date}</p>
-            )}
-          </div>
-
-          {/* Role */}
           <div className="mb-4">
             <label className="block text-gray-700 font-bold mb-2" htmlFor="role">
               Role
@@ -220,19 +204,26 @@ const AddUser = () => {
               className="w-full p-2 border rounded-md"
               required
             >
-              <option value="admin">Admin</option>
-              <option value="subadmin">Subadmin</option>
-              <option value="user">User</option>
+              {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
+            {!canCreateStaff && (
+              <p className="text-xs text-gray-500 mt-1">
+                Only a Super Admin can create staff accounts.
+              </p>
+            )}
           </div>
 
-          {/* Submit Button */}
           <div className="text-center">
             <button
               type="submit"
-              className="bg-[#CD9403] text-white font-bold py-2 px-4 rounded hover:bg-blue-600"
+              disabled={submitting}
+              className="bg-[#CD9403] text-white font-bold py-2 px-4 rounded hover:bg-[#b37f02] disabled:opacity-60"
             >
-              Submit
+              {submitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>

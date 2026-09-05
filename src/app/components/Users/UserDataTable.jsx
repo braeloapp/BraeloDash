@@ -11,6 +11,7 @@ import { postData } from "@/app/API/method";
 import Image from "next/image";
 
 const DELETE_API_URL = "/admin-panel/user/deactivate";
+const REACTIVATE_API_URL = "/admin-panel/user/reactivate";
 
 export default function UserTable({ data, loading, onRefresh }) {
   const [selectedRows, setSelectedRows] = useState([]);
@@ -126,8 +127,21 @@ export default function UserTable({ data, loading, onRefresh }) {
   };
   
   const handleViewProfile = (rowData) => {
-    sessionStorage.setItem('currentUserData', JSON.stringify(rowData));
-    router.push('/pages/users/userdetail');
+    if (rowData?.id == null) {
+      showToast("error", "User id is missing");
+      return;
+    }
+    router.push(`/pages/users/userdetail?id=${rowData.id}`);
+  };
+
+  const reactivateUser = async (user) => {
+    try {
+      await postData(REACTIVATE_API_URL, { user_id: user.id });
+      showToast("success", "User reactivated successfully");
+      onRefresh();
+    } catch (error) {
+      showToast("error", "Failed to reactivate user");
+    }
   };
 
   const ActionButton = (rowData) => (
@@ -141,14 +155,26 @@ export default function UserTable({ data, loading, onRefresh }) {
         onClick={() => handleViewProfile(rowData)} 
         className="cursor-pointer hover:opacity-80 transition"
       />
-      <Image
-        src="/g2.png"
-        alt="delete"
-        width={24}
-        height={24}
-        onClick={() => confirmDelete(rowData)}
-        className="cursor-pointer hover:opacity-80 transition"
-      />
+      {rowData.is_active ? (
+        <Image
+          src="/g2.png"
+          alt="deactivate"
+          title="Deactivate user"
+          width={24}
+          height={24}
+          onClick={() => confirmDelete(rowData)}
+          className="cursor-pointer hover:opacity-80 transition"
+        />
+      ) : (
+        <button
+          type="button"
+          title="Reactivate user"
+          onClick={() => reactivateUser(rowData)}
+          className="text-xs border border-black px-2 py-1 rounded hover:bg-gray-100"
+        >
+          Reactivate
+        </button>
+      )}
     </div>
   );
 

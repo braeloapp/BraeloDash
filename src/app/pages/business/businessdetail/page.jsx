@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import BusinessTabbar from "@/app/components/Listing/BusinessTabbar";
 import BackButton from "@/app/components/BackButton";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTimes } from "react-icons/fa";
-import { postBusiData } from "@/app/API/method";
+import { postBusiData, getData } from "@/app/API/method";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 
@@ -26,6 +26,8 @@ const categories = [
 
 const BusinessDetails = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const businessId = searchParams.get("id");
   const [isChatModalOpen, setChatModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [businessData, setBusinessData] = useState(null);
@@ -56,44 +58,70 @@ const BusinessDetails = () => {
   const bannerInputRef = useRef(null);
   const imagesInputRef = useRef(null);
 
-  useEffect(() => {
-    const storedData = sessionStorage.getItem("currentBusinessData");
-    if (storedData) {
-      const data = JSON.parse(storedData);
-      setBusinessData(data);
-      setLoading(false);
-      // Initialize edit form
-      setEditForm({
-        business_name: data.BusinessName || "",
-        business_address: data.Coordinates || "",
-        business_number: data["Phone Number"] || "",
-        business_email: data.Email || "",
-        business_website: data.website || "",
-        business_goals: data.Description || "",
-        business_category: data.BusinessType || "",
-        business_subcategory: "",
-        business_logo: null,
-        business_banner: null,
-        business_images: [],
-      });
-      setLogoPreview(data.business_logo?.[0] || "");
-      setBannerPreview(data.business_banner?.[0] || "");
-      setImagesPreview(data.business_images || []);
-    }
-  }, []);
+  const applyBusiness = (data) => {
+    const mapped = {
+      id: data.id,
+      documentId: data.id,
+      BusinessName: data.business_name || data.BusinessName,
+      Email: data.business_email || data.Email,
+      "Phone Number": data.business_number || data["Phone Number"],
+      website: data.business_website || data.website,
+      BusinessType: data.business_category || data.BusinessType,
+      Status: data.is_active === false ? "Inactive" : (data.Status || "Active"),
+      Coordinates: data.business_address || data.Coordinates,
+      Description: data.business_goals || data.Description,
+      business_logo: data.business_logo,
+      business_banner: data.business_banner,
+      user_id: data.user_id,
+    };
+    setBusinessData(mapped);
+    setEditForm({
+      business_name: mapped.BusinessName || "",
+      business_address: mapped.Coordinates || "",
+      business_number: mapped["Phone Number"] || "",
+      business_email: mapped.Email || "",
+      business_website: mapped.website || "",
+      business_goals: mapped.Description || "",
+      business_category: mapped.BusinessType || "",
+      business_subcategory: "",
+      business_logo: null,
+      business_banner: null,
+      business_images: [],
+    });
+    setLogoPreview(
+      Array.isArray(mapped.business_logo)
+        ? mapped.business_logo[0] || ""
+        : mapped.business_logo || ""
+    );
+    setBannerPreview(
+      Array.isArray(mapped.business_banner)
+        ? mapped.business_banner[0] || ""
+        : mapped.business_banner || ""
+    );
+  };
 
   useEffect(() => {
-    const handleDataUpdate = () => {
-      const updatedData = sessionStorage.getItem("currentBusinessData");
-      if (updatedData) {
-        setBusinessData(JSON.parse(updatedData));
+    const loadBusiness = async () => {
+      if (!businessId) {
+        setError({ message: "Business id is required" });
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const response = await getData(`/admin-panel/business/${businessId}`);
+        applyBusiness(response?.data || {});
+        setError(null);
+      } catch (err) {
+        setError({
+          message: err.response?.data?.message || "Failed to load business",
+        });
+      } finally {
+        setLoading(false);
       }
     };
-    window.addEventListener("businessData", handleDataUpdate);
-    return () => {
-      window.removeEventListener("businessData", handleDataUpdate);
-    };
-  }, [businessData]);
+    loadBusiness();
+  }, [businessId]);
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();

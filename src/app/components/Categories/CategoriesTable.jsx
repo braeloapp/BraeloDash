@@ -1,258 +1,131 @@
 "use client";
 
-import React, { useState,useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Image } from "primereact/image";
-import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import { useRouter } from "next/navigation";
-import { CategoriesData } from "./CategoriesData";
-import { getHeaderStyle } from "../Users/UserData";
-import { getBodyStyle } from "../Users/UserData";
-import EditModal from "./EditModal";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { getHeaderStyle, getBodyStyle } from "../Users/UserData";
+import { fetchAdminTaxonomy, patchAdminTaxonomy } from "@/lib/taxonomy";
+import { getApiErrorMessage } from "@/lib/apiResponse";
+
 const CategoriesTable = () => {
-  const [categories, setCategories] = useState(
-    CategoriesData.map((category) => ({ ...category, isSelected: false }))
-  );
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
-  const [selectAll, setSelectAll] = useState(false);
-  const router = useRouter();
-  const [first, setFirst] = useState(0); // Starting row for pagination
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [savingKey, setSavingKey] = useState(null);
+  const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
-  const [categoryPendingDelete, setCategoryPendingDelete] = useState(null);
-  const onPage = (event) => {
-    setFirst(event.first); // Update starting row for current page
-    setRows(event.rows);
+  const router = useRouter();
+
+  const loadTaxonomy = async () => {
+    try {
+      setLoading(true);
+      setCategories(await fetchAdminTaxonomy());
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to load taxonomy"));
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const confirmRemoveCategory = (category) => {
-    setCategoryPendingDelete(category);
+  useEffect(() => {
+    loadTaxonomy();
+  }, []);
+
+  const toggleActive = async (category) => {
+    try {
+      setSavingKey(category.key);
+      const next = await patchAdminTaxonomy({
+        kind: "category",
+        key: category.key,
+        is_active: !category.is_active,
+      });
+      setCategories(next);
+      toast.success("Category updated");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to update category"));
+    } finally {
+      setSavingKey(null);
+    }
   };
 
-  const executeDeleteCategory = () => {
-    if (!categoryPendingDelete) return;
-    setCategories((prev) =>
-      prev.filter((cat) => cat.id !== categoryPendingDelete.id)
-    );
-    setCategoryPendingDelete(null);
-  };
-  const viewSubcategories = (category) => {
-    router.push(`/pages/categories/${category.id}/subcategories`);
-  };
-
-  const openEditModal = (category) => {
-    setSelectedCategory(category);
-    setEditModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setEditModalOpen(false);
-    setSelectedCategory(null);
-  };
-
-  const imageTemplate = (rowData) => {
-    return <Image src={rowData.image} alt={rowData.name} width="100" />;
-  };
-
-  const toggleStatusTemplate = (rowData) => {
-    const handleToggle = () => {
-      const updatedCategories = categories.map((cat) =>
-        cat.id === rowData.id
-          ? { ...cat, status: cat.status === "Active" ? "Inactive" : "Active" }
-          : cat
-      );
-      setCategories(updatedCategories);
-    };
-
-    return (
-      <label className="inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          checked={rowData.status === "Active"}
-          onChange={handleToggle}
-          className="sr-only peer"
-        />
-        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:bg-[#CD9403]">
-          <div
-            className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
-              rowData.status === "Active" ? "translate-x-5" : ""
-            }`}
-          ></div>
-        </div>
-        <span className="ms-3 text-sm ">
-          {rowData.status === "Active" ? "Active" : "Inactive"}
-        </span>
-      </label>
-    );
-  };
-
-  const totalSubcategoriesTemplate = (rowData) => {
-    return <span>{rowData.subcategories.length}</span>;
-  };
-
-  const actionTemplate = (rowData) => {
-    return (
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => confirmRemoveCategory(rowData)}
-          className="flex items-center  border border-black px-4 py-2 rounded-lg"
-          title="Delete"
-        >
-          Delete
-        </button>
-        <button
-          onClick={() => openEditModal(rowData)}
-          className="flex items-center  border border-black px-4 py-2 rounded-lg"
-          title="Edit"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => viewSubcategories(rowData)}
-          className="flex items-center  border border-black px-4 py-2 rounded-lg"
-          title="View Subcategories"
-        >
-          View
-        </button>
-      </div>
-    );
-  };
-
-  const selectCheckboxTemplate = (rowData) => {
-    const handleRowSelect = () => {
-      setCategories((prevCategories) =>
-        prevCategories.map((cat) =>
-          cat.id === rowData.id ? { ...cat, isSelected: !cat.isSelected } : cat
-        )
-      );
-    };
-
-    return (
-      <label className="inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          checked={rowData.isSelected}
-          onChange={handleRowSelect}
-          className="sr-only peer"
-        />
+  const statusTemplate = (rowData) => (
+    <label className="inline-flex items-center cursor-pointer">
+      <input
+        type="checkbox"
+        checked={rowData.is_active}
+        disabled={savingKey === rowData.key}
+        onChange={() => toggleActive(rowData)}
+        className="sr-only peer"
+      />
+      <div className="relative w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#CD9403]">
         <div
-          className={`w-5 h-5 flex items-center justify-center border-2 border-gray-300 rounded ${
-            rowData.isSelected ? "bg-yellow-500" : "bg-white"
+          className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${
+            rowData.is_active ? "translate-x-5" : ""
           }`}
-        >
-          {rowData.isSelected && (
-            <span className="text-white text-xs font-bold">✔</span>
-          )}
-        </div>
-      </label>
-    );
-  };
-
-  const handleSelectAll = () => {
-    setSelectAll((prev) => !prev);
-    setCategories((prevCategories) =>
-      prevCategories.map((cat) => ({ ...cat, isSelected: !selectAll }))
-    );
-  };
+        />
+      </div>
+      <span className="ms-3 text-sm">
+        {rowData.is_active ? "Active" : "Inactive"}
+      </span>
+    </label>
+  );
 
   return (
     <div className="p-5 table-scroll-wrapper">
-      <ConfirmDeleteDialog
-        visible={categoryPendingDelete !== null}
-        onHide={() => setCategoryPendingDelete(null)}
-        onConfirm={executeDeleteCategory}
-        title={
-          categoryPendingDelete
-            ? `Are you sure you want to delete “${categoryPendingDelete.name}”?`
-            : "Delete this category?"
-        }
-      />
-
-      {isEditModalOpen && (
-        <EditModal
-          isOpen={isEditModalOpen}
-          onClose={closeEditModal}
-          subcategory={selectedCategory}
-          onSubmit={(updatedCategory) => {
-            setCategories((prevCategories) =>
-              prevCategories.map((cat) =>
-                cat.id === updatedCategory.id ? updatedCategory : cat
-              )
-            );
-            closeEditModal();
-          }}
-        />
-      )}
-
+      <ToastContainer position="top-right" autoClose={3000} />
       <DataTable
         value={categories}
         paginator
-        first={first} // Controlled pagination
+        first={first}
         rows={rows}
-        onPage={onPage}
-        rowsPerPageOptions={[5, 10, 20]}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
-        currentPageReportTemplate="Showing 1 to 10 of 50 entries"
+        onPage={(event) => {
+          setFirst(event.first);
+          setRows(event.rows);
+        }}
+        loading={loading}
+        emptyMessage="No categories found"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         className="custom-paginator"
       >
         <Column
-          header={
-            <label className="inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="sr-only peer"
-              />
-              <div
-                className={`w-5 h-5 border-2 border-gray-300 rounded ${
-                  selectAll ? "bg-yellow-500" : "bg-white"
-                }`}
-              >
-                {selectAll && <span className="text-white">✔</span>}
-              </div>
-            </label>
-          }
-          body={selectCheckboxTemplate}
+          field="key"
+          header="Key"
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
         />
         <Column
-          field="id"
-          header="ID"
-          headerStyle={getHeaderStyle()}
-          bodyStyle={getBodyStyle()}
-        />
-        <Column
-          body={imageTemplate}
-          header="Icon"
-          headerStyle={getHeaderStyle()}
-          bodyStyle={getBodyStyle()}
-        />
-        <Column
-          field="name"
+          field="label"
           header="Category Name"
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
         />
         <Column
-          body={totalSubcategoriesTemplate}
           header="Total Subcategories"
+          body={(row) => row.subcategories?.length || 0}
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
         />
         <Column
-          field="status"
-          body={toggleStatusTemplate}
           header="Status"
+          body={statusTemplate}
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
         />
         <Column
-          body={actionTemplate}
           header="Actions"
+          body={(rowData) => (
+            <button
+              onClick={() =>
+                router.push(`/pages/categories/${encodeURIComponent(rowData.key)}/subcategories`)
+              }
+              className="flex items-center border border-black px-4 py-2 rounded-lg"
+            >
+              View
+            </button>
+          )}
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
         />

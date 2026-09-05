@@ -24,6 +24,7 @@ const BusinessPage = () => {
         if (response && response.data) {
           const mappedData = response.data.results.map(item => ({
             ID: item.id,
+            documentId: item.id,
             BusinessName: item.business_name,
             Email: item.business_email,
             "Phone Number": item.business_number,
@@ -118,8 +119,9 @@ const BusinessPage = () => {
       const response = await getData('/admin-panel/business');
       if (response && response.data) {
         const mappedData = response.data.results.map(item => ({
-          ID: item.id,
-          BusinessName: item.business_name,
+            ID: item.id,
+            documentId: item.id,
+            BusinessName: item.business_name,
           Email: item.business_email,
           "Phone Number": item.business_number,
           website: item.business_website,

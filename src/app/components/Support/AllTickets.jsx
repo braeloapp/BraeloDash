@@ -30,6 +30,8 @@ const AllTickets = () => {
   const [creationDate, setCreationDate] = useState("");
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [emailUser, setEmailUser] = useState(null);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [replySending, setReplySending] = useState(false);
 
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [first, setFirst] = useState(0);
@@ -308,6 +310,7 @@ const AllTickets = () => {
         className="flex items-center border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
         onClick={() => {
           setEmailUser(rowData);
+          setReplyMessage("");
           setIsEmailModalOpen(true);
         }}
         disabled={loading}
@@ -552,6 +555,21 @@ const AllTickets = () => {
                   <strong>Last Updated:</strong> {selectedTicket.updated_at}
                 </p>
               )}
+              {(selectedTicket.replies || []).length > 0 && (
+                <div>
+                  <strong>Replies:</strong>
+                  <ul className="mt-2 space-y-2">
+                    {selectedTicket.replies.map((reply) => (
+                      <li key={reply.id || reply.created_at} className="border rounded p-2">
+                        <p className="text-xs text-gray-500">
+                          {reply.author_type} · {reply.author_name}
+                        </p>
+                        <p>{reply.message}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
             <button
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
@@ -565,31 +583,51 @@ const AllTickets = () => {
       {isEmailModalOpen && emailUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-md">
-            <h2 className="text-xl font-semibold mb-4">
-              Start Chat with Business
-            </h2>
-            <p className="mb-4">
-              Click below to send an email to:{" "}
-              <strong>{emailUser.email}</strong>
+            <h2 className="text-xl font-semibold mb-4">Reply to ticket</h2>
+            <p className="mb-2 text-sm text-gray-600">
+              {emailUser.email} — {emailUser.subject}
             </p>
+            <textarea
+              value={replyMessage}
+              onChange={(e) => setReplyMessage(e.target.value)}
+              rows={5}
+              className="w-full border border-gray-300 rounded-md p-2 mb-4"
+              placeholder="Write the in-app reply the user will see"
+            />
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsEmailModalOpen(false)}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                disabled={replySending}
               >
                 Cancel
               </button>
-              <a
-                href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(
-                  emailUser.email
-                )}&su=Hello&body=Hi%20there!%20I%20wanted%20to%20connect%20with%20you.`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                disabled={replySending || !replyMessage.trim()}
+                onClick={async () => {
+                  try {
+                    setReplySending(true);
+                    await postData("/admin-panel/support/reply", {
+                      ticket_id: emailUser.id,
+                      message: replyMessage.trim(),
+                    });
+                    showToast("Reply sent");
+                    setIsEmailModalOpen(false);
+                    setReplyMessage("");
+                    fetchSupportRequests();
+                  } catch (error) {
+                    showToast(
+                      error.response?.data?.message || "Failed to send reply",
+                      "error"
+                    );
+                  } finally {
+                    setReplySending(false);
+                  }
+                }}
+                className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02] disabled:opacity-60"
               >
-                <button className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02]">
-                  Open in Gmail
-                </button>
-              </a>
+                {replySending ? "Sending..." : "Send reply"}
+              </button>
             </div>
           </div>
         </div>

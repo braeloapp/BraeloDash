@@ -1,16 +1,10 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import CategoriesTable from "@/app/components/Categories/CategoriesTable";
 import BackButton from "@/app/components/BackButton";
 
 const Categories = () => {
-  const router = useRouter();
-
-  const handleAddCategory = () => {
-    router.push("/pages/categories/addcategory");
-  };
 
   return (
     <div>
@@ -19,12 +13,11 @@ const Categories = () => {
           <BackButton />
           <h1 className="text-[#78828A] text-[24px] font-[500]">Categories</h1>
         </div>
-        <button
-          className="px-4 py-2 bg-[#CD9403] text-white rounded-lg font-plus"
-          onClick={handleAddCategory}
-        >
-          Add New Category
-        </button>
+        <p className="text-sm text-gray-500 max-w-md text-right">
+          Taxonomy keys come from the backend listing contract. Admins can
+          activate, deactivate, and relabel them. New listing types require a
+          backend release.
+        </p>
       </div>
       <div>
         <CategoriesTable />

@@ -28,14 +28,11 @@ const PrivacyContent = () => {
         </div>
       </div>
 
-      <div className="mt-5 flex justify-end  w-11/12">
-        <button className="border px-6 py-2 rounded-md text-white bg-gray-400 flex items-center">
-          Paste text
-        </button>
-
-        <button className="border px-[60px] py-2  rounded-md text-white bg-gray-600">
-          Save
-        </button>
+      <div className="mt-5 w-11/12">
+        <p className="text-sm text-gray-500">
+          Legal copy is currently static. A publishable legal CMS is not enabled
+          in this release, so save actions are disabled.
+        </p>
       </div>
     </>
   );

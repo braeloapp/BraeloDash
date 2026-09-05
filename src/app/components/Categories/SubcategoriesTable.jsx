@@ -1,242 +1,101 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { CategoriesData } from "./CategoriesData";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import BackButton from "../BackButton";
-import Image from "next/image";
-import EditModal from "./EditModal";
-import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import { fetchAdminTaxonomy, patchAdminTaxonomy } from "@/lib/taxonomy";
+import { getApiErrorMessage } from "@/lib/apiResponse";
 
 const SubcategoriesTable = () => {
-  const { id } = useParams(); // Get category ID from URL
-  const router = useRouter();
+  const { id } = useParams();
+  const categoryKey = decodeURIComponent(id || "");
+  const [category, setCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [savingKey, setSavingKey] = useState(null);
 
-  const category = CategoriesData.find((cat) => cat.id === parseInt(id));
-  const [subcategories, setSubcategories] = useState(
-    category?.subcategories || []
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [loading, setLoading] = useState({});
-  const [activeStates, setActiveStates] = useState(
-    subcategories.reduce(
-      (acc, curr) => ({ ...acc, [curr.id]: curr.status === "Active" }),
-      {}
-    )
-  );
-  const [selectedRows, setSelectedRows] = useState({});
-  const [subcategoryToDelete, setSubcategoryToDelete] = useState(null);
+  const load = async () => {
+    try {
+      setLoading(true);
+      const categories = await fetchAdminTaxonomy();
+      setCategory(
+        categories.find((item) => item.key === categoryKey) || null
+      );
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to load subcategories"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Prevent body scroll when component is mounted
-    document.body.classList.add("no-scroll");
-    return () => {
-      document.body.classList.remove("no-scroll");
-    };
-  }, []);
+    load();
+  }, [categoryKey]);
 
-  const handleAddSubcategory = () => {
-    router.push("/pages/categories/addsubcategory"); // Navigate to add subcategory form
-  };
-
-  const handleEditClick = (subcategory) => {
-    setSelectedSubcategory(subcategory);
-    setIsModalOpen(true);
-  };
-
-  const openDeleteSubcategory = (subcategoryId) => {
-    setSubcategoryToDelete(subcategoryId);
-  };
-
-  const confirmDeleteSubcategory = () => {
-    if (subcategoryToDelete == null) return;
-    setSubcategories((prev) =>
-      prev.filter((subcategory) => subcategory.id !== subcategoryToDelete)
-    );
-    setSubcategoryToDelete(null);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    setSelectedSubcategory(null);
-  };
-
-  const handleFormSubmit = (updatedSubcategory) => {
-    setSubcategories((prev) =>
-      prev.map((subcategory) =>
-        subcategory.id === updatedSubcategory.id
-          ? updatedSubcategory
-          : subcategory
-      )
-    );
-    handleModalClose();
-  };
-
-  const handleToggleChange = (id) => {
-    setLoading((prev) => ({ ...prev, [id]: true }));
-    setTimeout(() => {
-      setLoading((prev) => ({ ...prev, [id]: false }));
-      setActiveStates((prev) => ({ ...prev, [id]: !prev[id] }));
-    }, 2000);
-  };
-
-  const handleSelectAll = () => {
-    const allSelected =
-      Object.keys(selectedRows).length === subcategories.length;
-    const newSelectedRows = allSelected
-      ? {}
-      : Object.fromEntries(
-          subcategories.map((subcategory) => [subcategory.id, true])
-        );
-    setSelectedRows(newSelectedRows);
-  };
-
-  const handleRowSelect = (id) => {
-    setSelectedRows((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleActive = async (subcategory) => {
+    try {
+      setSavingKey(subcategory.key);
+      const next = await patchAdminTaxonomy({
+        kind: "subcategory",
+        key: subcategory.key,
+        parent_key: categoryKey,
+        is_active: !subcategory.is_active,
+      });
+      setCategory(next.find((item) => item.key === categoryKey) || null);
+      toast.success("Subcategory updated");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to update subcategory"));
+    } finally {
+      setSavingKey(null);
+    }
   };
 
   return (
-    <>
-      <div className="p-5">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <BackButton />
-            <h1 className="text-[#78828A] text-[24px] font-[500]">
-              {category?.name || "Subcategories"}
-            </h1>
-          </div>
-          <button
-            className="px-4 py-2 bg-[#CD9403] text-white rounded-lg"
-            onClick={handleAddSubcategory}
-          >
-            Add Subcategory
-          </button>
-        </div>
-
-        <div className="mt-8">
-          {subcategories.length > 0 ? (
-            <table className="min-w-full bg-white border rounded-lg shadow">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="p-3 text-left">
-                    <input
-                      type="checkbox"
-                      checked={
-                        Object.keys(selectedRows).length ===
-                        subcategories.length
-                      }
-                      onChange={handleSelectAll}
-                      className="w-5 h-5 cursor-pointer"
-                    />
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    ID
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    Icon
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    Title
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    Date Created
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    Status
-                  </th>
-                  <th className="p-3 text-left font-semibold text-gray-600">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {subcategories.map((subcategory) => (
-                  <tr key={subcategory.id} className="border-t">
-                    <td className="p-3">
-                      <input
-                        type="checkbox"
-                        checked={!!selectedRows[subcategory.id]}
-                        onChange={() => handleRowSelect(subcategory.id)}
-                        className="w-5 h-5 cursor-pointer"
-                      />
-                    </td>
-                    <td className="p-3">{subcategory.id}</td>
-                    <td className="p-3">
-                      <Image
-                        src={subcategory.image}
-                        alt={subcategory.name}
-                        width={64} // Setting width
-                        height={64} // Setting height
-                        className="object-cover rounded border p-2"
-                      />
-                    </td>
-                    <td className="p-3 font-medium">{subcategory.name}</td>
-                    <td className="p-3">{subcategory.Datecreated}</td>
-                    <td className="p-3">
-                      <label className="inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={activeStates[subcategory.id]}
-                          onChange={() => handleToggleChange(subcategory.id)}
-                        />
-                        <div className="relative w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-[#CD9403]">
-                          {loading[subcategory.id] && (
-                            <div className="absolute inset-0 flex justify-center items-center">
-                              <div className="h-4 w-4 border-2 border-[#CD9403] rounded-full animate-spin"></div>
-                            </div>
-                          )}
-                          <div className="absolute top-[2px] left-[2px] w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-full" />
-                        </div>
-                        <span className="ml-3 text-sm font-light">
-                          {activeStates[subcategory.id] ? "Active" : "Inactive"}
-                        </span>
-                      </label>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEditClick(subcategory)}
-                          className="border border-black px-4 py-2 rounded-lg"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openDeleteSubcategory(subcategory.id)}
-                          className="border border-black px-4 py-2 rounded-lg"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p>No subcategories available.</p>
-          )}
-        </div>
+    <div className="p-5">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="flex items-center gap-2 mb-4">
+        <BackButton />
+        <h1 className="text-[#78828A] text-[24px] font-[500]">
+          {category?.label || categoryKey} subcategories
+        </h1>
       </div>
-
-      <ConfirmDeleteDialog
-        visible={subcategoryToDelete !== null}
-        onHide={() => setSubcategoryToDelete(null)}
-        onConfirm={confirmDeleteSubcategory}
-        title="Are you sure you want to delete this subcategory?"
-      />
-
-      {selectedSubcategory && (
-        <EditModal
-          isOpen={isModalOpen}
-          onClose={handleModalClose}
-          subcategory={selectedSubcategory}
-          onSubmit={handleFormSubmit}
-          isSubcategoryModal={true}
-        />
+      {loading ? (
+        <p>Loading subcategories...</p>
+      ) : !category ? (
+        <p>Category not found.</p>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full border">
+            <thead>
+              <tr className="bg-gray-50 text-left text-sm text-gray-500">
+                <th className="p-3">Key</th>
+                <th className="p-3">Label</th>
+                <th className="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {category.subcategories.map((subcategory) => (
+                <tr key={subcategory.key} className="border-t">
+                  <td className="p-3">{subcategory.key}</td>
+                  <td className="p-3">{subcategory.label}</td>
+                  <td className="p-3">
+                    <button
+                      disabled={savingKey === subcategory.key}
+                      onClick={() => toggleActive(subcategory)}
+                      className={`px-3 py-1 rounded text-white ${
+                        subcategory.is_active ? "bg-[#06B64C]" : "bg-[#C7233F]"
+                      }`}
+                    >
+                      {subcategory.is_active ? "Active" : "Inactive"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 

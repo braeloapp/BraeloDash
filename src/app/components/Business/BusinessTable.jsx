@@ -22,8 +22,12 @@ const BusinessTable = ({
   const [deactivating, setDeactivating] = useState(false);
 
   const handleViewProfile = (rowData) => {
-    sessionStorage.setItem('currentBusinessData', JSON.stringify(rowData));
-    router.push('/pages/business/businessdetail');
+    const businessId = rowData.documentId || rowData.ID || rowData.id;
+    if (!businessId) {
+      toast.error("Business id is missing");
+      return;
+    }
+    router.push(`/pages/business/businessdetail?id=${businessId}`);
   };
 
   const openDeactivateDialog = (businessId) => {

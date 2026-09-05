@@ -97,6 +97,9 @@ const ReportedUser = () => {
   const [loading, setLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
   const [actionLoadingId, setActionLoadingId] = useState(null);
+  const [moderationTarget, setModerationTarget] = useState(null);
+  const [moderationAction, setModerationAction] = useState("warn");
+  const [moderationNotes, setModerationNotes] = useState("");
   const exportRef = useRef(null);
   const [showExportOptions, setShowExportOptions] = useState(false);
 
@@ -185,7 +188,7 @@ const ReportedUser = () => {
     setRows(event.rows);
   };
 
-  const handleReportAction = async (rowData) => {
+  const handleReportAction = async (rowData, actionType, notes = "") => {
     const rid = rowData.report_id ?? rowData.id;
     const uid = rowData.user_id;
     if (rid == null || uid == null || uid === "") {
@@ -197,8 +200,12 @@ const ReportedUser = () => {
       await postData(REPORTS_ENDPOINT, {
         report_id: String(rid),
         user_id: typeof uid === "string" ? uid : String(uid),
+        action_type: actionType,
+        notes,
       });
       toast.success("Action completed successfully");
+      setModerationTarget(null);
+      setModerationNotes("");
       await fetchReports(searchQuery, statusFilter, dateFilter, first, rows);
     } catch (err) {
       console.error(err);
@@ -345,13 +352,19 @@ const ReportedUser = () => {
         onChange={(e) => {
           const v = e.target.value;
           if (v === "view") showReportDetails(rowData);
-          if (v === "action") void handleReportAction(rowData);
+          if (v === "warn" || v === "ban" || v === "ignore") {
+            setModerationTarget(rowData);
+            setModerationAction(v);
+            setModerationNotes("");
+          }
         }}
         className="border rounded-md p-1 text-sm max-w-[11rem]"
       >
         <option value="">Actions</option>
         <option value="view">View Details</option>
-        <option value="action">Take action</option>
+        <option value="warn">Warn</option>
+        <option value="ban">Ban</option>
+        <option value="ignore">Ignore</option>
       </select>
     );
   };
@@ -433,7 +446,7 @@ const ReportedUser = () => {
             <option value="All">All Statuses</option>
             <option value="Pending">Pending</option>
             <option value="Resolved">Resolved</option>
-            <option value="Rejected">Rejected</option>
+            <option value="Ignored">Ignored</option>
           </select>
 
           {/* Search Input */}
@@ -607,6 +620,46 @@ const ReportedUser = () => {
                     <p>{selectedReport.updatedAt}</p>
                   </div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+        {moderationTarget && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-lg font-semibold mb-2">
+                Confirm {moderationAction} for {moderationTarget.reportedTo}
+              </h2>
+              <p className="text-sm text-gray-600 mb-3">
+                First warn flags the account. A second warn bans the user.
+              </p>
+              <textarea
+                value={moderationNotes}
+                onChange={(e) => setModerationNotes(e.target.value)}
+                rows={4}
+                className="w-full border rounded-md p-2 mb-4"
+                placeholder="Resolution notes"
+              />
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setModerationTarget(null)}
+                  className="px-4 py-2 bg-gray-200 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  disabled={actionLoadingId === moderationTarget.id}
+                  onClick={() =>
+                    handleReportAction(
+                      moderationTarget,
+                      moderationAction,
+                      moderationNotes
+                    )
+                  }
+                  className="px-4 py-2 bg-[#CD9403] text-white rounded disabled:opacity-60"
+                >
+                  Confirm
+                </button>
               </div>
             </div>
           </div>

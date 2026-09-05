@@ -14,9 +14,9 @@ import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 
 const Userdetail = () => {
-  // const searchParams = useSearchParams();
-  // const router = useRouter();
-  // const userId = searchParams.get('id');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const userId = searchParams.get("id");
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -26,23 +26,26 @@ const Userdetail = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const storedData = sessionStorage.getItem("currentUserData");
-    if (storedData) {
-      setUserData(JSON.parse(storedData));
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleDataUpdate = () => {
-      const updatedData = sessionStorage.getItem("currentUserData");
-      setUserData(JSON.parse(updatedData));
+    const loadUser = async () => {
+      if (!userId) {
+        setError({ message: "User id is required" });
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const response = await getData(`/admin-panel/users/${userId}`);
+        setUserData(response?.data || null);
+        setError(null);
+      } catch (err) {
+        setError({ message: err.response?.data?.message || "Failed to load user" });
+        setUserData(null);
+      } finally {
+        setLoading(false);
+      }
     };
-    window.addEventListener("userData", handleDataUpdate);
-    return () => {
-      window.removeEventListener("userData", handleDataUpdate);
-    };
-  }, [userData]);
+    loadUser();
+  }, [userId]);
 
   const OpeModal = () => {
     setEditModalOpen(!isModalOpen);
@@ -119,10 +122,9 @@ const Userdetail = () => {
         "Role": userData.is_superuser ? 'Admin' : 'Client',
         "Created At": new Date(userData.created_at).toLocaleString() || 'N/A',
         "Last Updated": new Date(userData.updated_at).toLocaleString() || 'N/A',
-        "Deleted At": userData.deleted_at ? new Date(userData.deleted_at).toLocaleString() : 'N/A',
-        "Device Token": userData.device_token || 'N/A',
-        "OTP": userData.otp || 'N/A',
-        "OTP Created At": userData.otp_created_at || 'N/A'
+        "Role": userData.is_superuser ? 'Admin' : (userData.is_staff ? 'Admin' : 'Client'),
+        "Warned": userData.is_warned ? 'Yes' : 'No',
+        "Banned": userData.is_banned ? 'Yes' : 'No',
       }
     ]);
     
@@ -333,18 +335,6 @@ const Userdetail = () => {
           </div>
           <div>
             <h1 className="text-[16px] font-[700] font-plus text-[#75818D]">
-              OTP:{" "}
-              <span className="font-[400] text-[#a0a8b1] ml-1 ">
-                {userData.otp || "N/A"}
-              </span>
-            </h1>
-            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
-              OTP Created At:{" "}
-              <span className="font-[400] text-[#a0a8b1] ml-1 mt-3 ">
-                {userData.otp_created_at || "N/A"}
-              </span>
-            </h1>
-            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
               Created At:
               <span className="font-[400] text-[#a0a8b1] ml-1 mt-3">
                 {new Date(userData.created_at).toLocaleString() || "N/A"}
@@ -357,23 +347,21 @@ const Userdetail = () => {
               </span>
             </h1>
             <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
-              Deleted At:
-              <span className="font-[400] text-[#a0a8b1] ml-1 mt-3 ">
-                {userData.deleted_at
-                  ? new Date(userData.deleted_at).toLocaleString()
-                  : "N/A"}
-              </span>
-            </h1>
-            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
-              Device Token:{" "}
-              <span className="font-[400] text-[#a0a8b1] ml-1 mt-3">
-                {userData.device_token || "N/A"}
-              </span>
-            </h1>
-            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
               Role:
               <span className="font-[400] text-[#a0a8b1] ml-1">
-                {userData.is_superuser === true ? "Admin" : "Client"}
+                {userData.is_superuser || userData.is_staff ? "Admin" : "Client"}
+              </span>
+            </h1>
+            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
+              Warned:
+              <span className="font-[400] text-[#a0a8b1] ml-1">
+                {userData.is_warned ? "Yes" : "No"}
+              </span>
+            </h1>
+            <h1 className="text-[16px] font-[700] font-plus text-[#75818D] mt-3">
+              Banned:
+              <span className="font-[400] text-[#a0a8b1] ml-1">
+                {userData.is_banned ? "Yes" : "No"}
               </span>
             </h1>
           </div>
