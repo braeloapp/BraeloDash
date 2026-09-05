@@ -13,7 +13,7 @@ const FeedbackCard = () => {
     const fetchFeedback = async () => {
       setLoading(true);
       try {
-        let url = "/report/feedback";
+        let url = "/admin-panel/feedback";
         if (selectedReaction) {
           url += `?feedback=${selectedReaction}`;
         }

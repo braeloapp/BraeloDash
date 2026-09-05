@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FiSettings } from "react-icons/fi";
 import { getApiBaseUrl } from "@/lib/apiConfig";
+import { adminRoleLabel, clearAdminSession, persistAdminSession } from "@/lib/adminAuth";
 
 const sidebarItems = [
   { to: "/pages/dashboard", icon: "/a1.png", label: "Dashboard" },
@@ -27,6 +28,7 @@ const NavBar = () => {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [userName, setUserName] = useState("");
+  const [roleLabel, setRoleLabel] = useState("Administrator");
   const settingsDropdownRef = useRef(null);
   const searchContainerRef = useRef(null);
   const router = useRouter();
@@ -35,13 +37,14 @@ const NavBar = () => {
     const fetchUserName = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        setUserName("Admin");
+        clearAdminSession();
+        router.replace("/");
         return;
       }
 
       try {
         const response = await fetch(
-          `${getApiBaseUrl()}/auth/user/profile`,
+          `${getApiBaseUrl()}/admin-panel/me`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -51,7 +54,7 @@ const NavBar = () => {
         );
 
         if (response.status === 401 || response.status === 403) {
-          localStorage.removeItem("token");
+          clearAdminSession();
           setUserName("Admin");
           router.replace("/");
           return;
@@ -63,7 +66,14 @@ const NavBar = () => {
         }
 
         const data = await response.json();
-        setUserName(data?.name || data?.data?.name || "Admin");
+        const profile = data?.data || data;
+        setUserName(profile?.name || "Admin");
+        setRoleLabel(adminRoleLabel(profile?.role));
+        persistAdminSession({
+          token,
+          role: profile?.role,
+          name: profile?.name,
+        });
       } catch {
         setUserName("Admin");
       }
@@ -186,6 +196,7 @@ const NavBar = () => {
                   <div
                     className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
                     onClick={() => {
+                      clearAdminSession();
                       router.push("/");
                       setSettingsDropdownOpen(false);
                     }}
@@ -219,7 +230,7 @@ const NavBar = () => {
                 <p className="text-custom-24.65 font-medium leading-6 tracking-custom-0.005 text-left text-[#78828A]">
                   {userName}
                 </p>
-                <p className="text-[11px] text-[#78828A]">Administrator</p>
+                <p className="text-[11px] text-[#78828A]">{roleLabel}</p>
               </div>
             </div>
           </div>

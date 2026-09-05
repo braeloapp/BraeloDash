@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { LoginApi } from "@/app/API/method";
+import { persistAdminSession } from "@/lib/adminAuth";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function ImageSection() {
@@ -85,7 +86,16 @@ export default function LoginForm() {
         throw new Error("Token not found in response");
       }
 
-      localStorage.setItem("token", token);
+      const profile = response.data?.data || response.data;
+      persistAdminSession({
+        token,
+        role: profile?.is_superuser
+          ? "super_admin"
+          : profile?.is_staff
+            ? "admin"
+            : "admin",
+        name: profile?.name,
+      });
       toast.success("Login successful!");
       router.push("/pages/dashboard");
     } catch (error) {

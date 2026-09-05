@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import NavBar from "../components/Navbar";
+import AuthGate from "../components/auth/AuthGate";
 
 const Layout = ({ children }) => {
   useEffect(() => {
@@ -10,6 +11,7 @@ const Layout = ({ children }) => {
   }, []);
 
   return (
+    <AuthGate>
     <div className="admin-panel">
       <div className="flex h-screen z-10">
         <div className="">
@@ -22,6 +24,7 @@ const Layout = ({ children }) => {
         </div>
       </div>
     </div>
+    </AuthGate>
   );
 };
 
