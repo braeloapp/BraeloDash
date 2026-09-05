@@ -7,6 +7,7 @@ import ChatModal from "@/app/components/ChatModal";
 import EditUserdetailModal from "@/app/components/Users/EditUserdetailModal";
 import ListingTabbar from "@/app/components/Listing/ListingTabbar";
 import BackButton from "@/app/components/BackButton";
+import PageState from "@/app/components/ux/PageState";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -138,10 +139,8 @@ const Userdetail = () => {
   if (loading) {
     return (
       <div className="p-5">
-        <div className="flex justify-between">
-          <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
-          <div className="animate-pulse">Loading user data...</div>
-        </div>
+        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+        <PageState status="loading" title="Loading user data..." />
       </div>
     );
   }
@@ -149,18 +148,13 @@ const Userdetail = () => {
   if (error) {
     return (
       <div className="p-5">
-        <div className="flex justify-between">
-          <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
-          <div className="text-red-500">
-            Error: {error.message}
-            <button
-              onClick={() => router.back()}
-              className="ml-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Go Back
-            </button>
-          </div>
-        </div>
+        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+        <PageState
+          status="error"
+          title="Unable to load user"
+          description={error.message}
+          onRetry={() => router.refresh()}
+        />
       </div>
     );
   }
@@ -168,10 +162,8 @@ const Userdetail = () => {
   if (!userData) {
     return (
       <div className="p-5">
-        <div className="flex justify-between">
-          <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
-          <div>No user data available</div>
-        </div>
+        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+        <PageState status="empty" title="No user data available" />
       </div>
     );
   }

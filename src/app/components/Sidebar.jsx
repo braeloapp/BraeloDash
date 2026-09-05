@@ -31,7 +31,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="flex flex-col w-64 bg-[#3a4248] h-screen scroll">
+    <nav className="flex flex-col w-64 bg-[#3a4248] h-screen overflow-y-auto" aria-label="Admin">
       <div className="bg-[#3a4248] ">
         <div className="">
           {/* Logo Section */}
@@ -55,23 +55,26 @@ const Sidebar = () => {
           <div className="p-5">
             <h1 className="text-white text-lg font-bold">Platform</h1>
             {sidebarItems.map((item) => (
-              <Link key={item.label} href={item.to} passHref>
-                <div className={getTabClass(item.to)}>
-                  <Image
-                    src={item.icon}
-                    alt={item.label}
-                    width={24}
-                    height={24}
-                    className="mr-2"
-                  />
-                  <span className="text-white">{item.label}</span>
-                </div>
+              <Link
+                key={item.label}
+                href={item.to}
+                className={getTabClass(item.to)}
+                aria-current={pathname.startsWith(item.to) ? "page" : undefined}
+              >
+                <Image
+                  src={item.icon}
+                  alt=""
+                  width={24}
+                  height={24}
+                  className="mr-2"
+                />
+                <span className="text-white">{item.label}</span>
               </Link>
             ))}
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 

@@ -63,6 +63,15 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    if (!password) {
+      toast.error("Password is required");
+      return;
+    }
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
@@ -113,23 +122,25 @@ export default function LoginForm() {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen grid grid-cols-12">
-        <div className="col-span-6 flex items-center justify-center">
-          <div className="space-y-8">
+      <div className="min-h-screen grid grid-cols-1 md:grid-cols-12">
+        <div className="col-span-1 md:col-span-6 flex items-center justify-center px-6 py-10">
+          <div className="space-y-8 w-full max-w-[320px]">
             <h1 className="text-[25px] font-bold text-[#232F30] font-plus">
               Braelo Power Admin
             </h1>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="flex flex-col space-y-6">
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
-                  className="w-[300px] px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  autoComplete="username"
+                  aria-label="Email"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
                 />
-                <div className="relative w-[300px] isolate">
+                <div className="relative w-full isolate">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
@@ -164,7 +175,7 @@ export default function LoginForm() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className={`w-[300px] flex items-center justify-center bg-black text-white text-[17px] font-normal px-6 py-3 rounded-md font-plus ${
+                  className={`w-full flex items-center justify-center bg-black text-white text-[17px] font-normal px-6 py-3 rounded-md font-plus ${
                     isLoading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -201,7 +212,9 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <ImageSection />
+        <div className="hidden md:block md:col-span-6">
+          <ImageSection />
+        </div>
       </div>
     </>
   );
