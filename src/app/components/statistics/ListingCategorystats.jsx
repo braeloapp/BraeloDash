@@ -12,24 +12,11 @@ import {
   Legend,
 } from "chart.js";
 import { getData } from "@/app/API/method";
+import { categoryEntries, normalizeAdminStats } from "@/lib/adminStats";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const LISTINGS_COLOR = "#CD9403";
-const SUBCATEGORIES_COLOR = "#FFCC35";
-
-// Static mapping to readable category names and dummy subcategories
-const categoryMap = {
-  VehicleListing: { name: "Vehicles", subcategories: 10 },
-  RealEstateListing: { name: "Real Estate", subcategories: 9 },
-  EventsListing: { name: "Events", subcategories: 3 },
-  JobsListing: { name: "Jobs", subcategories: 5 },
-  ElectronicsListing: { name: "Electronics", subcategories: 5 },
-  FurnitureListing: { name: "Furniture", subcategories: 5 },
-  FashionListing: { name: "Fashion", subcategories: 4 },
-  KidsListing: { name: "Kids", subcategories: 8 },
-  SportsHobbyListing: { name: "Sports & Hobby", subcategories: 6 },
-};
 
 const ListingCategorystats = () => {
   const [chartData, setChartData] = useState(null);
@@ -37,18 +24,11 @@ const ListingCategorystats = () => {
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await getData("/admin-panel/collections");
-        const apiData = response?.data ?? response ?? {};
+        const response = await getData("/admin-panel/statistics");
+        const stats = normalizeAdminStats(response);
+        const entries = categoryEntries(stats.listings.by_category);
 
-        const filteredEntries = Object.entries(categoryMap)
-          .filter(([key]) => apiData[key] !== 0 && apiData[key] !== undefined)
-          .map(([key, value]) => ({
-            name: value.name,
-            Listings: apiData[key],
-            Subcategories: value.subcategories,
-          }));
-
-        if (filteredEntries.length === 0) {
+        if (entries.length === 0) {
           setChartData({
             labels: ["No listing data"],
             datasets: [
@@ -57,33 +37,21 @@ const ListingCategorystats = () => {
                 data: [0],
                 backgroundColor: LISTINGS_COLOR,
               },
-              {
-                label: "Total Subcategories",
-                data: [0],
-                backgroundColor: SUBCATEGORIES_COLOR,
-              },
             ],
           });
           return;
         }
 
-        const dynamicChartData = {
-          labels: filteredEntries.map((entry) => entry.name),
+        setChartData({
+          labels: entries.map((entry) => entry.name),
           datasets: [
             {
               label: "Total Listings",
-              data: filteredEntries.map((entry) => entry.Listings),
+              data: entries.map((entry) => entry.listings),
               backgroundColor: LISTINGS_COLOR,
             },
-            {
-              label: "Total Subcategories",
-              data: filteredEntries.map((entry) => entry.Subcategories),
-              backgroundColor: SUBCATEGORIES_COLOR,
-            },
           ],
-        };
-
-        setChartData(dynamicChartData);
+        });
       } catch (error) {
         console.error("Failed to fetch listings:", error);
         setChartData({
@@ -93,11 +61,6 @@ const ListingCategorystats = () => {
               label: "Total Listings",
               data: [0],
               backgroundColor: "#d1d5db",
-            },
-            {
-              label: "Total Subcategories",
-              data: [0],
-              backgroundColor: "#e5e7eb",
             },
           ],
         });
@@ -113,14 +76,13 @@ const ListingCategorystats = () => {
       legend: { position: "top" },
       title: {
         display: true,
-        text: "Listings and Categories Distribution",
+        text: "Listings by Category",
         font: { size: 24 },
         color: "#78828A",
       },
     },
     scales: {
-      x: { stacked: true },
-      y: { stacked: true, beginAtZero: true },
+      y: { beginAtZero: true },
     },
   };
 

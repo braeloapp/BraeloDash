@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,33 +11,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getData } from "@/app/API/method";
+import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
 
-// Register the necessary components for Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
-
-// Dummy data for user statistics
-const userData = [
-  { month: "Jan", users: 50 },
-  { month: "Feb", users: 100 },
-  { month: "Mar", users: 200 },
-  { month: "Apr", users: 180 },
-  { month: "May", users: 220 },
-  { month: "Jun", users: 200 },
-];
-
-// Format data for Chart.js
-const data = {
-  labels: userData.map((entry) => entry.month),
-  datasets: [
-    {
-      label: "Users",
-      data: userData.map((entry) => entry.users),
-      backgroundColor: "#CD9403",
-      borderColor: "#CD9403",
-      borderWidth: 1,
-    },
-  ],
-};
 
 const options = {
   responsive: true,
@@ -71,10 +50,36 @@ const options = {
 };
 
 const UserStatistics = () => {
+  const [stats, setStats] = useState(emptyAdminStats());
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await getData("/admin-panel/statistics");
+        setStats(normalizeAdminStats(response));
+      } catch (error) {
+        console.error("Error fetching user statistics:", error);
+      }
+    };
+    load();
+  }, []);
+
+  const data = {
+    labels: stats.growth.labels.length ? stats.growth.labels : ["No data"],
+    datasets: [
+      {
+        label: "Users",
+        data: stats.growth.users.length ? stats.growth.users : [0],
+        backgroundColor: "#CD9403",
+        borderColor: "#CD9403",
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <div className="w-full h-96">
-     
-      <Bar  data={data} options={options} />
+      <Bar data={data} options={options} />
     </div>
   );
 };

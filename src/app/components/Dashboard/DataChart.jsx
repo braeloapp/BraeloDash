@@ -10,25 +10,19 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getData } from "@/app/API/method"; // Adjust path as needed
+import { getData } from "@/app/API/method";
+import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const CollectionChart = () => {
-  const [listSync, setListSync] = useState(0);
-  const [businesses, setBusinesses] = useState(0);
-  const [users, setUsers] = useState(0);
+  const [stats, setStats] = useState(emptyAdminStats());
 
   useEffect(() => {
     const fetchCollectionData = async () => {
       try {
-        const response = await getData("/admin-panel/collections");
-        const data = response?.data;
-        if (data) {
-          setListSync(data.ListSync || 0);
-          setBusinesses(data.Business || 0);
-          setUsers(data.User || 0);
-        }
+        const response = await getData("/admin-panel/statistics");
+        setStats(normalizeAdminStats(response));
       } catch (error) {
         console.error("Error fetching collection data:", error);
       }
@@ -42,7 +36,11 @@ const CollectionChart = () => {
     datasets: [
       {
         label: "Count",
-        data: [listSync, businesses, users],
+        data: [
+          stats.listings.total || 0,
+          stats.businesses.total || 0,
+          stats.users.total || 0,
+        ],
         backgroundColor: ["#F3A000", "#FFE8BA", "#C98903"],
         borderColor: ["#C98903", "#C98903", "#C98903"],
         borderWidth: 1,

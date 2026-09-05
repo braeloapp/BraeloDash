@@ -1,27 +1,50 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import { getData } from "@/app/API/method";
+import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
 
 const DashboardCards = () => {
+  const [stats, setStats] = useState(emptyAdminStats());
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await getData("/admin-panel/statistics");
+        setStats(normalizeAdminStats(response));
+      } catch (error) {
+        console.error("Error fetching admin statistics:", error);
+      }
+    };
+    load();
+  }, []);
+
   const cardData = [
     {
       id: 1,
       title: "Total Listing",
+      value: stats.listings.total,
       img: "/r1.png",
-      to: "/Listing",
     },
-    { id: 2, title: "Total Users", img: "/ads.svg", to: "/User" },
-    // {
-    //   id: 3,
-    //   title: "Total Tickets",
-    //   img: "/Loading, Plus, Circle, Add.svg",
-    //   to: "/Support",
-    // },
-    // {
-    //   id: 4,
-    //   title: "Total Businesses",
-    //   img: "/postimg.svg",
-    //   to: "/Business",
-    // },
+    {
+      id: 2,
+      title: "Total Users",
+      value: stats.users.total,
+      img: "/ads.svg",
+    },
+    {
+      id: 3,
+      title: "Support Requests",
+      value: stats.support_requests.total,
+      img: "/ads.svg",
+    },
+    {
+      id: 4,
+      title: "Total Businesses",
+      value: stats.businesses.total,
+      img: "/r1.png",
+    },
   ];
 
   return (
@@ -37,12 +60,15 @@ const DashboardCards = () => {
           >
             <div className="flex flex-col justify-center items-center gap-5">
               <Image
-                src={card.img} 
+                src={card.img}
                 alt="image"
-                width={40} 
-                height={40} 
+                width={40}
+                height={40}
                 className="bg-[#EE9E03] p-2 rounded-full flex items-center"
               />
+              <h5 className="text-center text-[22px] font-semibold tracking-tight text-[#495057] flex items-center">
+                {card.value ?? 0}
+              </h5>
               <h5 className="text-center text-[16px]  font-semibold tracking-tight text-[#495057] flex items-center">
                 {card.title}
               </h5>

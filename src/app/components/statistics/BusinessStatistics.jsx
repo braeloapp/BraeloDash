@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,8 +12,9 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getData } from "@/app/API/method";
+import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
 
-// Register the necessary components for Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -21,31 +24,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-// Dummy data for business statistics
-const businessData = [
-  { month: "Jan", growth: 2400 },
-  { month: "Feb", growth: 1398 },
-  { month: "Mar", growth: 9800 },
-  { month: "Apr", growth: 3908 },
-  { month: "May", growth: 4800 },
-  { month: "Jun", growth: 3490 },
-];
-
-// Format data for Chart.js
-const data = {
-  labels: businessData.map((entry) => entry.month),
-  datasets: [
-    {
-      label: "Business Growth",
-      data: businessData.map((entry) => entry.growth),
-      borderColor: "#CD9403",
-      backgroundColor: "rgba(205, 148, 3, 0.2)",
-      fill: true, // Fills the area under the line
-      tension: 0.4, // Smooth curves
-    },
-  ],
-};
 
 const options = {
   responsive: true,
@@ -73,7 +51,7 @@ const options = {
     y: {
       title: {
         display: true,
-        text: "Growth",
+        text: "New businesses",
       },
       beginAtZero: true,
     },
@@ -81,9 +59,36 @@ const options = {
 };
 
 const BusinessStatistics = () => {
+  const [stats, setStats] = useState(emptyAdminStats());
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const response = await getData("/admin-panel/statistics");
+        setStats(normalizeAdminStats(response));
+      } catch (error) {
+        console.error("Error fetching business statistics:", error);
+      }
+    };
+    load();
+  }, []);
+
+  const data = {
+    labels: stats.growth.labels.length ? stats.growth.labels : ["No data"],
+    datasets: [
+      {
+        label: "Business Growth",
+        data: stats.growth.businesses.length ? stats.growth.businesses : [0],
+        borderColor: "#CD9403",
+        backgroundColor: "rgba(205, 148, 3, 0.2)",
+        fill: true,
+        tension: 0.4,
+      },
+    ],
+  };
+
   return (
     <div className="w-full h-96">
-      
       <Line data={data} options={options} />
     </div>
   );
