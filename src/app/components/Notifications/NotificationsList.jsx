@@ -28,7 +28,7 @@ const NotificationsList = () => {
   const fetchNotifications = async (page = 1) => {
     try {
       setLoading(true);
-      const data = await getData(`/admin-panel/notificatons?page=${page}`);
+      const data = await getData(`/admin-panel/notifications?page=${page}`);
       console.log("API Response:", data);
 
       if (data?.data?.results) {
