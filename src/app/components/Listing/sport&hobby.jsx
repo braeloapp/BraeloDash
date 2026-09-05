@@ -327,7 +327,7 @@ const Sports = () => {
       form.append("size", formData.size || '');
       form.append("brand", formData.brand || '');
       form.append("from_business", formData.from_business || 'false');
-      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[31.4494997,74.284469]}');
+      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[74.284469,31.4494997]}');
       
       // Handle keywords
       if (formData.keywords) {

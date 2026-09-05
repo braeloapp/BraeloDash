@@ -109,7 +109,13 @@ const BusinessDetails = () => {
       formData.append("business_goals", editForm.business_goals);
       formData.append("business_category", editForm.business_category);
       formData.append("business_subcategory", editForm.business_subcategory);
-      formData.append("user_id", "1");
+      const ownerUserId = businessData?.businessId ?? businessData?.user_id;
+      if (!ownerUserId) {
+        toast.error("Cannot update business: missing owner user id");
+        setLoading(false);
+        return;
+      }
+      formData.append("user_id", String(ownerUserId));
 
       if (editForm.business_logo) {
         formData.append("business_logo", editForm.business_logo);

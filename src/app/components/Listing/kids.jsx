@@ -99,8 +99,8 @@ const Kids = () => {
     try {
       const geocoder = new window.google.maps.Geocoder();
       const latLng = {
-        lat: coordinates[0],
-        lng: coordinates[1]
+        lat: coordinates[1],
+        lng: coordinates[0]
       };
 
       return new Promise((resolve) => {
@@ -132,8 +132,8 @@ const Kids = () => {
         setLoading(true);
         const geocoder = new window.google.maps.Geocoder();
         const latLng = {
-          lat: coordinates.coordinates[0],
-          lng: coordinates.coordinates[1],
+          lat: coordinates.coordinates[1],
+          lng: coordinates.coordinates[0],
         };
 
         geocoder.geocode({ location: latLng }, (results, status) => {
@@ -371,7 +371,7 @@ const Kids = () => {
       form.append("donation", formData.donation || 'NO');
       form.append("age_range", formData.age_range || '');
       form.append("from_business", formData.from_business ? 'true' : 'false');
-      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[31.4494997,74.284469]}');
+      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[74.284469,31.4494997]}');
       
       // Handle keywords
       if (formData.keywords) {

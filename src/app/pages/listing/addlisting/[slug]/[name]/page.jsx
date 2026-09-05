@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import BackButton from "@/app/components/BackButton";
 import { FormData as FormStructure } from "@/app/components/Listing/FormData";
+import { chipFieldName, chipFieldValue } from "@/lib/listingChips";
 import { postBusiData } from "@/app/API/method";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -66,18 +67,24 @@ const Form = () => {
 
   // Load form structure
   useEffect(() => {
-    if (slug && name && FormStructure[slug] && FormStructure[slug][name]) {
-      const category = FormStructure[slug];
-      setCommonFields(category.commonFields || []);
-      const subCategoryData = category[name] || {};
-      setSpecificFields(subCategoryData.fields || []);
+    if (!slug || !name || !FormStructure[slug]) return;
+    const category = FormStructure[slug];
+    const subKey = Object.keys(category).find(
+      (key) => key.toLowerCase() === String(name).toLowerCase()
+    );
+    if (!subKey) return;
+    setCommonFields(category.commonFields || []);
+    const subCategoryData = category[subKey] || {};
+    setSpecificFields(subCategoryData.fields || []);
 
-      const processedChips = (subCategoryData.chips || []).map((chipGroup) => ({
-        ...chipGroup,
-        required: chipGroup.label === "Condition",
-      }));
-      setChips(processedChips);
-    }
+    const processedChips = (subCategoryData.chips || []).map((chipGroup) => ({
+      ...chipGroup,
+      required:
+        chipGroup.label === "Condition" ||
+        chipGroup.label === "condition" ||
+        chipGroup.name === "condition",
+    }));
+    setChips(processedChips);
   }, [slug, name]);
 
   // Initialize Google Maps autocomplete (shared loader — one script per app)
@@ -161,8 +168,8 @@ const Form = () => {
 
       chips.forEach((chipGroup) => {
         formPayload.append(
-          chipGroup.label,
-          selectedChips[chipGroup.label] || ""
+          chipFieldName(chipGroup),
+          chipFieldValue(selectedChips[chipGroup.label] || "")
         );
       });
 

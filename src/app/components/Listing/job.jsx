@@ -334,7 +334,7 @@ const Jobs = () => {
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
-          '{"type":"Point","coordinates":[31.4494997,74.284469]}'
+          '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
       // Handle keywords

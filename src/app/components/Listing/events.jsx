@@ -99,8 +99,8 @@ const Events = () => {
     try {
       const geocoder = new window.google.maps.Geocoder();
       const latLng = {
-        lat: coordinates[0],
-        lng: coordinates[1],
+        lat: coordinates[1],
+        lng: coordinates[0],
       };
 
       return new Promise((resolve) => {
@@ -124,7 +124,7 @@ const Events = () => {
     const originalData = card.originalData || {};
 
     // Parse coordinates
-    let coordinates = { type: "Point", coordinates: [31.4494997,74.284469] };
+    let coordinates = { type: "Point", coordinates: [74.284469, 31.4494997] };
     try {
       if (originalData.listing_coordinates) {
         coordinates =
@@ -338,7 +338,7 @@ const Events = () => {
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
-          '{"type":"Point","coordinates":[31.4494997,74.284469]}'
+          '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
       // Handle keywords

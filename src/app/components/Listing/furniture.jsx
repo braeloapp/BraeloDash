@@ -374,7 +374,7 @@ const Furniture = () => {
       form.append("negotiable", formData.negotiable || 'NO');
       form.append("donation", formData.donation || 'NO');
       form.append("from_business", formData.from_business || 'true');
-      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[31.4494997,74.284469]}');
+      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[74.284469,31.4494997]}');
       
       // Handle keywords
       if (formData.keywords) {

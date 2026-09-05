@@ -9,7 +9,7 @@ export const FormData = {
       { label: "Model", type: "text", name: "model" },
       { label: "Year", type: "number", name: "year" },
       { label: "Color", type: "text", name: "color" },
-      { label: "Fuel Type", type: "text", name: "fuelType" },
+      { label: "Fuel Type", type: "text", name: "fuel_type" },
       { label: "Description", type: "textarea", name: "description" },
       { label: "keywords", type: "text", name: "keywords" },
     ],
@@ -17,7 +17,7 @@ export const FormData = {
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
-        { label: "Number of Doors", options: ["1/3", "4", "3"] },
+        { label: "Number of Doors", options: ["1/3", "4/5"] },
         { label: "Purpose", options: ["Sale", "Rental"] },
         { label: "negotiable", options: ["YES", "NO"] },
       ],
@@ -31,7 +31,7 @@ export const FormData = {
       ],
     },
     Truck: {
-      fields: [{ label: "Load Capcity", type: "text", name: "loadcapcity" }],
+      fields: [{ label: "Load Capacity", type: "text", name: "Load_capacity" }],
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
@@ -40,7 +40,7 @@ export const FormData = {
       ],
     },
     Bike: {
-      fields: [{ label: "Type", type: "text", name: "type" }],
+      fields: [{ label: "Type", type: "text", name: "bike_type" }],
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
@@ -49,7 +49,7 @@ export const FormData = {
       ],
     },
     Boat: {
-      fields: [{ label: "Length", type: "text", name: "length" }],
+      fields: [{ label: "Length", type: "text", name: "boat_length" }],
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
@@ -58,7 +58,7 @@ export const FormData = {
       ],
     },
     Van: {
-      fields: [{ label: "Passenger Capacity", type: "text", name: "length" }],
+      fields: [{ label: "Passenger Capacity", type: "text", name: "passenger_capacity" }],
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
@@ -75,7 +75,7 @@ export const FormData = {
       ],
     },
     partsandaccessories: {
-      fields: [{ label: "Part Name", type: "text", name: "partname" }],
+      fields: [{ label: "Part Name", type: "text", name: "part_name" }],
       chips: [
         { label: "condition", options: ["NEW", "USED"] },
         { label: "negotiable", options: ["YES", "NO"] },
@@ -83,15 +83,15 @@ export const FormData = {
     },
     Rentals: {
       fields: [
-        { label: "Vehicle Type", type: "text", name: "vehicletype" },
-        { label: "Rental Duration", type: "text", name: "duration" },
+        { label: "Vehicle Type", type: "text", name: "vehicle_type" },
+        { label: "Rental Duration", type: "text", name: "rental_duration" },
       ],
       chips: [
         { label: "Transmission", options: ["Manual", "Automatic"] },
         { label: "condition", options: ["NEW", "USED"] },
         { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "For Sale", options: ["Yes", "NO"] },
-        { label: "Rentals", options: ["Yes", "NO"] },
+        { label: "For Sale", options: ["YES", "NO"] },
+        { label: "Rentals", options: ["YES", "NO"] },
         { label: "negotiable", options: ["YES", "NO"] },
       ],
     },
@@ -820,8 +820,8 @@ export const FormData = {
     },
     activities: {
       fields: [
-        { label: "Type of Activity", type: "text", name: "activity" },
-        { label: "Equipment Required", type: "text", name: "required" },
+        { label: "Type of Activity", type: "text", name: "activity_type" },
+        { label: "Equipment Required", type: "text", name: "equipment_required" },
       ],
       chips: [
         { label: "donation", options: ["YES", "NO"] },
@@ -870,7 +870,7 @@ export const FormData = {
       ],
     },
     outdooractivities: {
-      fields: [{ label: "Activity Type", type: "text", name: "processor" }],
+      fields: [{ label: "Activity Type", type: "text", name: "activity_type" }],
       chips: [
         { label: "condition", options: ["NEW", "USED"] },
         { label: "negotiable", options: ["YES", "NO"] },
