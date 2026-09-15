@@ -287,17 +287,17 @@ export default function BannerManagement() {
   };
 
   return (
-    <div className="p-6">
+    <div>
       <ToastContainer position="top-right" autoClose={3000} />
       <style jsx global>{paginatorStyles}</style>
-      <div className="flex justify-between p-5 border-b">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="text-[#78828A] text-[24px] font-[500]">All Banners</h1>
+          <h1 className="page-title">All Banners</h1>
         </div>
         <button
           onClick={handleNewListing}
-          className="px-4 py-2 bg-[#CD9403] text-white rounded-lg hover:bg-[#b78302] transition"
+          className="btn-primary"
         >
           Add Banner
         </button>

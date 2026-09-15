@@ -14,7 +14,7 @@ const ListingTabbar = ({userId}) => {
   };
 
   const buttonClasses = (index) =>
-    `px-[10px] py-2 mx-2 font-semibold  transition ease-in-out duration-300 ${
+    `whitespace-nowrap px-[10px] py-2 mx-1 sm:mx-2 font-semibold  transition ease-in-out duration-300 ${
       activeButton === index
         ? "border-b-2 border-[#EE9E03] text-[#78828A]  font-[600]"
         : "text-[#ACB6BE] text-[16px] font-[500] "
@@ -22,7 +22,7 @@ const ListingTabbar = ({userId}) => {
 
   return (
     <>
-      <div className="flex justify-between p-5">
+      <div className="flex gap-1 overflow-x-auto p-3 sm:justify-between sm:p-5">
         <button className={buttonClasses(1)} onClick={() => handleClick(1)}>
           Total Listings
         </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AppLoader from "./AppLoader";
 
 export default function PageState({
   status = "empty",
@@ -9,33 +10,24 @@ export default function PageState({
   onRetry,
   retryLabel = "Retry",
 }) {
+  if (status === "loading") {
+    return <AppLoader label={title || "Loading..."} />;
+  }
+
   const isError = status === "error";
-  const heading =
-    title ||
-    (status === "loading"
-      ? "Loading..."
-      : isError
-        ? "Unable to load this page"
-        : "Nothing to show");
+  const heading = title || (isError ? "Unable to load this page" : "Nothing to show");
 
   return (
     <div
-      className="flex flex-col items-center justify-center w-full min-h-[240px] py-12 px-6 text-center"
+      className="flex w-full min-h-[240px] flex-col items-center justify-center px-6 py-12 text-center"
       role={isError ? "alert" : "status"}
       aria-live="polite"
     >
-      {status === "loading" ? (
-        <div
-          className="h-10 w-10 animate-spin rounded-full border-2 border-[#D8B039] border-t-transparent"
-          aria-hidden
-        />
-      ) : (
-        <div className="mb-4 rounded-2xl bg-[#F6F8FB] p-6 text-[#ACB6BE]">
-          <p className="text-sm uppercase tracking-wide">
-            {isError ? "Error" : "Empty"}
-          </p>
-        </div>
-      )}
+      <div className="mb-4 rounded-2xl bg-[#F6F8FB] p-6 text-[#ACB6BE]">
+        <p className="text-sm uppercase tracking-wide">
+          {isError ? "Error" : "Empty"}
+        </p>
+      </div>
       <p className="mt-4 text-lg font-semibold text-[#78828A]">{heading}</p>
       {description ? (
         <p className="mt-2 max-w-md text-sm leading-relaxed text-[#ACB6BE]">

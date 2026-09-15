@@ -63,7 +63,7 @@ const data = [
 const DeletedListing = () => {
   return (
     <div className="opacity-50">
-    <div className="grid grid-cols-4 gap-3 p-5">
+    <div className="listing-card-grid p-5">
       {data.map((card, index) => (
         <ListingCard
           key={index}

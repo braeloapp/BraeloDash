@@ -176,18 +176,18 @@ const BusinessHeader = ({
 
   return (
     <div>
-      <div className="flex justify-between border-b p-5">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton/>
-          <h1 className="text-[#78828A] text-[24px] font-[500] flex items-center">
+          <h1 className="page-title">
             Business Overview
           </h1>
         </div>
-        <div className="flex justify-between py-4 items-center">
-          <div className="flex gap-2">
+        <div className="page-actions">
+          <div className="flex flex-wrap gap-2">
             <button 
               onClick={handleNewBusiness}
-              className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md"
+              className="btn-primary"
             >
               Add Business
             </button>
@@ -242,12 +242,12 @@ const BusinessHeader = ({
           </div>
         </div>
       </div>
-      <div className="flex gap-4 p-5 flex-wrap">
-        <div className="flex-1 min-w-[200px]">
+      <div className="filter-row">
+        <div className="min-w-[160px]">
           <select
             value={status}
             onChange={handleStatusChange}
-            className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
+            className="field-control"
           >
             {statusOptions.map((option) => (
               <option 
@@ -261,20 +261,20 @@ const BusinessHeader = ({
           </select>
         </div>
         
-        <div className="flex-1 min-w-[250px]">
+        <div className="filter-grow">
           <input
             type="text"
             placeholder="Search By Name, Email or Phone"
             onChange={handleSearch}
-            className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            className="field-control"
           />
         </div>
         
-        <div className="flex-1 min-w-[200px]">
+        <div className="min-w-[160px]">
           <input
             type="date"
             onChange={(e) => onDateChange(e.target.value)}
-            className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            className="field-control"
           />
         </div>
       </div>

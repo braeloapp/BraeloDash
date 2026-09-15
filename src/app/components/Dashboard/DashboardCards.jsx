@@ -48,30 +48,28 @@ const DashboardCards = () => {
   ];
 
   return (
-    <div className="mt-5">
-      <h1 className="text-[#78828A] text-[24px] font-[500] flex items-center">
-        Dashboard
-      </h1>
-      <div className="grid  xl:grid-cols-4 gap-5 mt-5">
+    <div>
+      <h1 className="page-title">Dashboard</h1>
+      <div className="mt-3 grid grid-cols-4 gap-3">
         {cardData.map((card) => (
           <div
             key={card.id}
-            className=" p-6 bg-[#feefcb] border border-gray-100 rounded-lg shadow"
+            className="rounded-2xl border border-[#F3E2B8] bg-[#feefcb] p-3 shadow-card sm:p-5"
           >
-            <div className="flex flex-col justify-center items-center gap-5">
+            <div className="flex flex-col items-center justify-center gap-3">
               <Image
                 src={card.img}
-                alt="image"
+                alt=""
                 width={40}
                 height={40}
-                className="bg-[#EE9E03] p-2 rounded-full flex items-center"
+                className="rounded-full bg-[#EE9E03] p-2"
               />
-              <h5 className="text-center text-[22px] font-semibold tracking-tight text-[#495057] flex items-center">
+              <h5 className="text-center text-[22px] font-semibold tracking-tight text-[#495057]">
                 {card.value ?? 0}
               </h5>
-              <h5 className="text-center text-[16px]  font-semibold tracking-tight text-[#495057] flex items-center">
+              <p className="text-center text-[13px] font-medium text-[#78828A] sm:text-[16px]">
                 {card.title}
-              </h5>
+              </p>
             </div>
           </div>
         ))}

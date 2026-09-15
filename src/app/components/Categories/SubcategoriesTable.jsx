@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import BackButton from "../BackButton";
 import { fetchAdminTaxonomy, patchAdminTaxonomy } from "@/lib/taxonomy";
 import { getApiErrorMessage } from "@/lib/apiResponse";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 const SubcategoriesTable = () => {
   const { id } = useParams();
@@ -60,7 +61,7 @@ const SubcategoriesTable = () => {
         </h1>
       </div>
       {loading ? (
-        <p>Loading subcategories...</p>
+        <AppLoader label="Loading subcategories..." />
       ) : !category ? (
         <p>Category not found.</p>
       ) : (

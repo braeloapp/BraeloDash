@@ -4,18 +4,17 @@ import BackButton from "@/app/components/BackButton";
 
 const PrivacyPolicy = () => {
   return (
-<>
-      <div className="flex items-center gap-2 p-5">
-        <BackButton />
-        <h1 className="text-[#78828A] text-[24px] font-[500]">
-          Privacy Policy
-        </h1>
-        
+    <>
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
+          <BackButton />
+          <h1 className="page-title">Privacy Policy</h1>
+        </div>
       </div>
-      <div className=" px-[76px] py-2 ">
+      <div className="px-1 py-2 sm:px-6">
         <PrivacyContent />
       </div>
-      </>
+    </>
   );
 };
 

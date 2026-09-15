@@ -49,15 +49,20 @@ const AllListingTabbar = () => {
   return (
     <>
       <Swiper
-        slidesPerView={7}
+        slidesPerView="auto"
         navigation
         loop={false}
         modules={[Navigation]}
-        className=""
+        className="listing-tabs"
+        breakpoints={{
+          320: { slidesPerView: 2.4, spaceBetween: 8 },
+          640: { slidesPerView: 4, spaceBetween: 12 },
+          1024: { slidesPerView: 7, spaceBetween: 16 },
+        }}
       >
         {buttons.map((label, index) => (
-          <SwiperSlide key={index}>
-            <div className="px-10">
+          <SwiperSlide key={index} className="!w-auto">
+            <div className="px-2 sm:px-4">
             <button
               className={buttonClasses(index + 1)}
               onClick={() => handleClick(index + 1)}

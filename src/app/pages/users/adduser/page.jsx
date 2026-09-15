@@ -70,10 +70,10 @@ const AddUser = () => {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="max-w-xl mx-auto mt-10 p-5 bg-white shadow-md rounded-md">
-        <div className="flex items-center gap-2 mb-5">
+      <div className="mx-auto mt-2 w-full max-w-xl rounded-2xl border border-[#EEF1F4] bg-white p-4 shadow-card sm:mt-6 sm:p-6">
+        <div className="mb-5 flex min-w-0 items-center gap-2">
           <BackButton />
-          <h2 className="text-2xl font-semibold text-center">Add User</h2>
+          <h2 className="page-title">Add User</h2>
         </div>
 
         <form onSubmit={formik.handleSubmit}>

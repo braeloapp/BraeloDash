@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { getData, postData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 const DELETE_NOTIFICATION_ENDPOINT = "/admin-panel/notification/delete";
 
@@ -125,7 +126,7 @@ const NotificationsList = () => {
       <h2 className="text-xl font-bold mb-4">Notifications</h2>
       
       {loading ? (
-        <p className="text-gray-500">Loading notifications...</p>
+        <AppLoader label="Loading notifications..." />
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : notifications.length > 0 ? (

@@ -9,6 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { postData } from "@/app/API/method";
 import Image from "next/image";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 const DELETE_API_URL = "/admin-panel/user/deactivate";
 const REACTIVATE_API_URL = "/admin-panel/user/reactivate";
@@ -215,9 +216,7 @@ export default function UserTable({ data, loading, onRefresh }) {
       <style jsx global>{paginatorStyles}</style>
       <ToastContainer />
       {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#CD9403]"></div>
-        </div>
+        <AppLoader />
       ) : (
         <div className="table-scroll-wrapper">
           <DataTable
@@ -232,7 +231,7 @@ export default function UserTable({ data, loading, onRefresh }) {
             //rowsPerPageOptions={[5, 10, 20]}
             //paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            tableStyle={{ minWidth: "150rem" }}
+            tableStyle={{ minWidth: "56rem" }}
             loading={loading}
             paginatorClassName="user-paginator"
             className="p-datatable-striped"

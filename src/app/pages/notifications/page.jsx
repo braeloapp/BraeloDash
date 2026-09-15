@@ -9,13 +9,13 @@ const Notifications = () => {
 
   return (
     <div className="relative">
-      <div className="flex justify-between p-5 border-b">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-        <h1 className="text-[#78828A] text-[24px] font-[500]">Notifications</h1>
+        <h1 className="page-title">Notifications</h1>
         </div>
         <button
-          className="px-4 py-2 bg-[#CD9403] text-white rounded-lg font-plus"
+          className="btn-primary"
           onClick={() => router.push("/pages/notifications/addnotification")}
         >
           Add New Notification

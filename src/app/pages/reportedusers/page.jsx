@@ -386,19 +386,18 @@ const ReportedUser = () => {
   return (
     <div className="w-full">
       {/* Header Section */}
-      <div className="flex justify-between border-b py-4 p-5">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="text-[#78828A] text-[24px] font-[500]">
+          <h1 className="page-title">
             Reported Users
           </h1>
         </div>
-        <div className="flex gap-2 justify-end">
-          {/* Export Button with Dropdown */}
+        <div className="page-actions">
           <div className="relative" ref={exportRef}>
             <button
               onClick={() => setShowExportOptions(!showExportOptions)}
-              className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-3 py-2 focus:outline-none"
+              className="field-control min-w-[140px] pl-10 pr-3"
             >
               <Image
                 src="/images/export.png"
@@ -436,12 +435,14 @@ const ReportedUser = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
 
-          {/* Status Filter */}
+      <div className="filter-row">
           <select
             value={statusFilter}
             onChange={handleStatusChange}
-            className="py-2 px-2 rounded-lg text-sm text-gray-500 bg-transparent border border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-200"
+            className="field-control min-w-[140px]"
           >
             <option value="All">All Statuses</option>
             <option value="Pending">Pending</option>
@@ -449,12 +450,11 @@ const ReportedUser = () => {
             <option value="Ignored">Ignored</option>
           </select>
 
-          {/* Search Input */}
-          <div className="relative">
+          <div className="filter-grow relative">
             <input
               type="text"
               placeholder="Search By Name"
-              className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              className="field-control pr-10"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -472,12 +472,11 @@ const ReportedUser = () => {
             )}
           </div>
 
-          {/* Date Filter */}
-          <div className="relative">
+          <div className="relative min-w-[160px]">
             <input
               type="date"
               placeholder="Select date"
-              className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              className="field-control"
               value={dateFilter}
               onChange={handleDateChange}
             />
@@ -494,7 +493,6 @@ const ReportedUser = () => {
               </button>
             )}
           </div>
-        </div>
       </div>
 
       {/* Main Content */}
@@ -514,7 +512,7 @@ const ReportedUser = () => {
             scrollHeight="400px"
             rowsPerPageOptions={[5, 10, 20, 50]}
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            tableStyle={{ minWidth: "100rem" }}
+            tableStyle={{ minWidth: "56rem" }}
             className="custom-paginator"
             loading={loading}
             emptyMessage="No reports found"

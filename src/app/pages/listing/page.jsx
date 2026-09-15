@@ -23,12 +23,12 @@ const Listing = () => {
 
   return (
     <div>
-      <div className="flex justify-between p-5 border-b ">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="text-[#78828A] text-[24px] font-[500]">Listing</h1>
+          <h1 className="page-title">Listing</h1>
         </div>
-        <div className="flex gap-2">
+        <div className="page-actions">
           {/* <div className="max-w-sm">
             <select
               id="Massive Actions"
@@ -59,7 +59,7 @@ const Listing = () => {
 
           <button
             onClick={handleNewListing}
-            className="px-4 py-1 bg-[#CD9403] text-white rounded-lg font-plus"
+            className="btn-primary"
           >
             Add New Listing
           </button>

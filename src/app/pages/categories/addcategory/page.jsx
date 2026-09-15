@@ -51,13 +51,15 @@ const AddCategory = () => {
     <>
       <form
         onSubmit={formik.handleSubmit}
-        className="p-6 bg-white border rounded shadow-md"
+        className="rounded-2xl border border-[#EEF1F4] bg-white p-4 shadow-card sm:p-6"
       >
-        <div className="flex items-center gap-2">
+        <div className="page-header mb-4 px-0">
+          <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="text-[#78828A] text-[24px] font-[500]">
+          <h1 className="page-title">
              Add Category
           </h1>
+          </div>
         </div>
         <div className="mb-4">
           <label className="block mb-1">Category Name</label>

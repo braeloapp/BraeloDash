@@ -61,11 +61,13 @@ const HalfPieChart = () => {
   };
 
   return (
-    <div className="w-[100%] p-5 bg-[#F8F9FA] rounded-md">
-      <h2 className="text-center mb-4 text-xl font-semibold">
+    <div className="flex h-full w-full flex-col rounded-2xl bg-[#F8F9FA] p-4 sm:p-5">
+      <h2 className="mb-2 text-center text-lg font-semibold text-[#495057] sm:text-xl">
         Listing & Moderation Status
       </h2>
-      <Doughnut data={data} options={options} />
+      <div className="mx-auto flex w-full max-w-[320px] flex-1 items-center">
+        <Doughnut data={data} options={{ ...options, maintainAspectRatio: true }} />
+      </div>
     </div>
   );
 };

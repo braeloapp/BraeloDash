@@ -19,13 +19,15 @@ const categories = [
 const Categories = () => {
   return (
     <div>
-      <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
         <BackButton />
-        <h1 className="text-[#78828A] text-[24px] font-[500]">
+        <h1 className="page-title">
           All Categories
         </h1>
+        </div>
       </div>
-      <div className="grid grid-cols-5 gap-5 mt-8">
+      <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {categories.map((category) => (
           <Link 
             key={category.slug} 
@@ -34,7 +36,7 @@ const Categories = () => {
               query: { endpoint: category.endpoint , category: category.category }, // Pass the endpoint and category as query parameters
             }}
           >
-            <div className="bg-[#ffcc35] px-6 py-4 hover:bg-gray-300 transition-all duration-300 rounded-md flex items-center">
+            <div className="flex items-center rounded-xl bg-[#ffcc35] px-5 py-4 transition-all duration-300 hover:bg-[#D8B039]">
               <span className="text-white hover:text-black flex items-center space-x-2 text-md">
                 <span>{category.name}</span>
                 <svg

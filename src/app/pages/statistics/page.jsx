@@ -8,10 +8,10 @@ import BackButton from "@/app/components/BackButton";
 const Statistics = () => {
   return (
     <>
-      <div className="p-5">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton/>
-          <h3 className="text-[#78828A] text-[24px] font-[500] ">
+          <h3 className="page-title">
           Statistics
       </h3>
         </div>

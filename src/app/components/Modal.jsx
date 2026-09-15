@@ -6,8 +6,8 @@ const Modal = ({ isOpen, closeModal, imageSrc, text, label1, label2 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-50 bg-opacity-20 z-50">
-      <div className="bg-white p-4 rounded-lg shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#232F30]/45 p-4">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-panel">
         {/* Close button section */}
         <div className="flex justify-end mb-4">
           {/* Add a close button if needed */}

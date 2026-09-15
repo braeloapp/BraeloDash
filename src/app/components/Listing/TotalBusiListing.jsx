@@ -14,6 +14,7 @@ import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import AppLoader from "@/app/components/ux/AppLoader";
 import { Update_data } from "./Data";
 
 const CATEGORY_ENDPOINTS = {
@@ -571,11 +572,7 @@ const TotalBusiListing = ({ user_id }) => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
+    return <AppLoader />;
   }
 
   return (
@@ -584,7 +581,7 @@ const TotalBusiListing = ({ user_id }) => {
         {data.length === 0 ? (
           <ListingEmptyState />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="listing-card-grid">
             {data.map((card, index) => (
               <ListingCard
                 key={index}

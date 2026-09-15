@@ -21,7 +21,7 @@ const BackButton = ({
 
   return (
     <button
-      className={`bg-[#d8b039] rounded-full p-2 flex items-center gap-2 ${buttonStyle}`}
+      className={`inline-flex shrink-0 items-center rounded-full bg-[#d8b039] p-2 transition hover:bg-[#CD9403] ${buttonStyle}`}
       onClick={handleBackClick}
     >
       <FiArrowLeft className={`text-white ${iconStyle}`} size={iconSize} />

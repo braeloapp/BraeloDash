@@ -8,12 +8,12 @@ const Categories = () => {
 
   return (
     <div>
-      <div className="flex justify-between p-5 border-b">
-      <div className="flex items-center gap-2">
+      <div className="page-header">
+      <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="text-[#78828A] text-[24px] font-[500]">Categories</h1>
+          <h1 className="page-title">Categories</h1>
         </div>
-        <p className="text-sm text-gray-500 max-w-md text-right">
+        <p className="max-w-md text-sm text-[#ACB6BE] sm:text-right">
           Taxonomy keys come from the backend listing contract. Admins can
           activate, deactivate, and relabel them. New listing types require a
           backend release.

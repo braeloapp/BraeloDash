@@ -3,26 +3,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { FiSettings } from "react-icons/fi";
+import { FiMenu, FiSettings } from "react-icons/fi";
 import { getApiBaseUrl } from "@/lib/apiConfig";
 import { adminRoleLabel, clearAdminSession, persistAdminSession } from "@/lib/adminAuth";
+import { sidebarItems } from "./navItems";
 
-const sidebarItems = [
-  { to: "/pages/dashboard", icon: "/a1.png", label: "Dashboard" },
-  { to: "/pages/users", icon: "/a2.png", label: "Users" },
-  { to: "/pages/business", icon: "/a3.png", label: "Business" },
-  { to: "/pages/listing", icon: "/a4.png", label: "Listing" },
-  { to: "/pages/categories", icon: "/a5.png", label: "Categories" },
-  { to: "/pages/support", icon: "/a7.png", label: "Support" },
-  { to: "/pages/notifications", icon: "/a8.png", label: "Notifications" },
-  { to: "/pages/statistics", icon: "/a9.png", label: "Statistics" },
-  { to: "/pages/reportedusers", icon: "/a11.png", label: "Reported Users" },
-  { to: "/pages/privacypolicy", icon: "/a12.png", label: "Privacy Policy" },
-  { to: "/pages/feedback", icon: "/fd.svg", label: "Feedback" },
-  { to: "/pages/banners", icon: "/banner.svg", label: "Banner" },
-];
-
-const NavBar = () => {
+const NavBar = ({ onMenuClick }) => {
   const [settingsDropdownOpen, setSettingsDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchSuggestions, setSearchSuggestions] = useState([]);
@@ -43,15 +29,12 @@ const NavBar = () => {
       }
 
       try {
-        const response = await fetch(
-          `${getApiBaseUrl()}/admin-panel/me`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${getApiBaseUrl()}/admin-panel/me`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.status === 401 || response.status === 403) {
           clearAdminSession();
@@ -81,7 +64,7 @@ const NavBar = () => {
 
     fetchUserName();
   }, [router]);
-  
+
   const toggleSettingsDropdown = () => {
     setSettingsDropdownOpen((prev) => !prev);
   };
@@ -128,16 +111,25 @@ const NavBar = () => {
   }, []);
 
   return (
-    <div className="border-b rounded-l-lg">
-      <div className="grid grid-cols-12 gap-4 p-5">
-        <div className="col-span-8 relative" ref={searchContainerRef}>
-          <div className="flex items-center border rounded-full p-2 mt-1 bg-[#F6F8FB]">
+    <header className="sticky top-0 z-30 shrink-0 border-b border-[#EEF1F4] bg-white/95 backdrop-blur">
+      <div className="flex items-center gap-3 px-3 py-3 sm:px-5 sm:py-4">
+        <button
+          type="button"
+          onClick={onMenuClick}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#EEF1F4] bg-[#F6F8FB] text-[#3a4248] md:hidden"
+          aria-label="Open menu"
+        >
+          <FiMenu size={20} />
+        </button>
+
+        <div className="relative min-w-0 flex-1" ref={searchContainerRef}>
+          <div className="flex items-center rounded-full border border-[#EEF1F4] bg-[#F6F8FB] px-3 py-2.5">
             <Image
               src="/images/Seacrh.png"
-              alt="Search Icon"
-              width={24}
-              height={24}
-              className="mr-2"
+              alt=""
+              width={18}
+              height={18}
+              className="mr-2 shrink-0 opacity-70"
             />
             <input
               type="text"
@@ -145,98 +137,106 @@ const NavBar = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={() => searchQuery && setShowSuggestions(true)}
-              className="w-full bg-[#F6F8FB] border-none focus:outline-none"
-              placeholder="Search menu items..."
+              className="w-full min-w-0 bg-transparent text-sm text-[#232F30] placeholder:text-[#ACB6BE] focus:outline-none focus:ring-0 focus:shadow-none"
+              placeholder="Search menu..."
+              aria-label="Search menu items"
             />
           </div>
 
           {showSuggestions && searchSuggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 bg-white shadow-lg rounded-lg z-50 mt-1 max-h-60 overflow-y-auto border border-gray-200">
+            <div className="absolute left-0 right-0 z-50 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-[#EEF1F4] bg-white shadow-panel">
               {searchSuggestions.map((item) => (
-                <div
+                <button
+                  type="button"
                   key={item.to}
-                  className="px-4 py-3 hover:bg-gray-100 cursor-pointer flex items-center border-b border-gray-100 last:border-b-0"
+                  className="flex w-full items-center border-b border-[#EEF1F4] px-4 py-3 text-left last:border-b-0 hover:bg-[#F6F8FB]"
                   onClick={() => handleSearchNavigation(item)}
                 >
-                  <div className="w-6 h-6 relative mr-3">
+                  <div className="relative mr-3 h-6 w-6">
                     <Image
                       src={item.icon}
-                      alt={item.label}
+                      alt=""
                       fill
                       className="object-contain"
                     />
                   </div>
-                  <span className="text-gray-800">{item.label}</span>
-                </div>
+                  <span className="text-sm text-[#3a4248]">{item.label}</span>
+                </button>
               ))}
             </div>
           )}
         </div>
 
-        <div className="col-span-4">
-          <div className="flex justify-end gap-2 items-center">
-            <div className="relative" ref={settingsDropdownRef}>
-              <div
-                className="text-3xl cursor-pointer rounded-full p-2 hover:bg-gray-200"
-                onClick={toggleSettingsDropdown}
-              >
-                <FiSettings />
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <div className="relative" ref={settingsDropdownRef}>
+            <button
+              type="button"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#3a4248] hover:bg-[#F6F8FB]"
+              onClick={toggleSettingsDropdown}
+              aria-label="Settings"
+            >
+              <FiSettings size={20} />
+            </button>
+            {settingsDropdownOpen && (
+              <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-[#EEF1F4] bg-white text-[#232F30] shadow-panel">
+                <button
+                  type="button"
+                  className="block w-full border-b border-[#EEF1F4] px-4 py-3 text-left text-sm hover:bg-[#F6F8FB]"
+                  onClick={() => {
+                    router.push("/pages/adminprofile");
+                    setSettingsDropdownOpen(false);
+                  }}
+                >
+                  Profile Setting
+                </button>
+                <button
+                  type="button"
+                  className="block w-full px-4 py-3 text-left text-sm hover:bg-[#F6F8FB]"
+                  onClick={() => {
+                    clearAdminSession();
+                    router.push("/");
+                    setSettingsDropdownOpen(false);
+                  }}
+                >
+                  Logout
+                </button>
               </div>
-              {settingsDropdownOpen && (
-                <div className="absolute top-full right-0 bg-white text-black rounded-lg shadow-lg z-50 w-48 mt-2 border border-gray-200">
-                  <div
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                    onClick={() => {
-                      router.push("/pages/adminprofile");
-                      setSettingsDropdownOpen(false);
-                    }}
-                  >
-                    Profile Setting
-                  </div>
-                  <div
-                    className="px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      clearAdminSession();
-                      router.push("/");
-                      setSettingsDropdownOpen(false);
-                    }}
-                  >
-                    Logout
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
+          </div>
 
-            <div className="rounded-full p-2 bg-red-100 w-12 h-12 flex items-center justify-center cursor-pointer hover:bg-red-200">
+          <button
+            type="button"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#feefcb] hover:bg-[#FFCC35]/40"
+            onClick={() => router.push("/pages/notifications")}
+            aria-label="Notifications"
+          >
+            <Image
+              src="/images/notification.png"
+              alt=""
+              width={20}
+              height={20}
+            />
+          </button>
+
+          <div className="flex items-center gap-3">
+            <div className="relative h-11 w-11 overflow-hidden rounded-full bg-[#F6F8FB]">
               <Image
-                src="/images/notification.png"
-                alt="Notification Icon"
-                width={24}
-                height={24}
-                onClick={() => router.push("/pages/notifications")}
+                src="/images/profile (1).png"
+                fill
+                alt=""
+                className="object-cover"
               />
             </div>
-
-            <div className="flex gap-5 items-center">
-              <div className="w-12 h-12 relative">
-                <Image
-                  src="/images/profile (1).png"
-                  fill
-                  alt="Profile Image"
-                  className="object-cover rounded-full"
-                />
-              </div>
-              <div>
-                <p className="text-custom-24.65 font-medium leading-6 tracking-custom-0.005 text-left text-[#78828A]">
-                  {userName}
-                </p>
-                <p className="text-[11px] text-[#78828A]">{roleLabel}</p>
-              </div>
+            <div className="hidden min-w-0 lg:block">
+              <p className="truncate text-sm font-medium text-[#78828A]">
+                {userName}
+              </p>
+              <p className="truncate text-[11px] text-[#ACB6BE]">{roleLabel}</p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

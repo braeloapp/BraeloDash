@@ -1,49 +1,39 @@
+"use client";
 import React from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 
-const Banner= () => {
+const Banner = () => {
+  const router = useRouter();
+
   return (
-    <div>
-      <div className=" ">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 relative">
-            <div className="w-full rounded-[22px] bg-[#EE9E03] flex items-center relative px-[10px] ">
-              <div to="/edit" className="absolute top-4 right-4">
-                <button
-                  type="button"
-                  className="bg-[#F5C12B] border-none rounded-[22px] w-full text-[#634802] flex items-center px-8 py-2"
-                >
-                  <img
-                    className=""
-                    src="/media-library-folder.1.svg"
-                    alt="edit btn-logo"
-                  />
-                  <span className="mt-1 ml-2 font-semibold">Edit</span>
-                </button>
-              </div>
-              <div className="flex flex-1 items-center justify-center">
-                <div className="flex flex-col items-start w-1/3 mt-5 ">
-                  <p className="mb-2 text-white text-[25px] w-[300px]">
-                    Advertise your company on Braelo!
-                  </p>
-                  <p className="text-white w-[150px]">
-                    Check out our plans and boost your sales!
-                  </p>
-                </div>
-                <div className="flex-1 flex justify-center mt-6 ">
-                  <img
-                    src="/image.svg"
-                    alt="Promotional Image"
-                    className="max-w-full max-h-[200px]"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="relative overflow-hidden rounded-[22px] bg-[#EE9E03] px-4 py-3 sm:px-6 sm:py-4">
+      <button
+        type="button"
+        onClick={() => router.push("/pages/banners")}
+        className="absolute right-3 top-3 z-10 inline-flex items-center rounded-[22px] bg-[#F5C12B] px-3 py-1.5 text-sm font-semibold text-[#634802] sm:right-4 sm:top-4 sm:px-5"
+      >
+        <img src="/media-library-folder.1.svg" alt="" className="h-4 w-4" />
+        <span className="ml-2">Edit</span>
+      </button>
+      <div className="flex flex-col items-center gap-4 pr-16 sm:flex-row sm:pr-28">
+        <div className="w-full sm:w-1/3">
+          <p className="text-[20px] leading-snug text-white sm:text-[25px]">
+            Advertise your company on Braelo!
+          </p>
+          <p className="mt-2 max-w-[220px] text-sm text-white/90">
+            Check out our plans and boost your sales!
+          </p>
+        </div>
+        <div className="flex flex-1 justify-center">
+          <img
+            src="/image.svg"
+            alt=""
+            className="max-h-[92px] w-auto max-w-full sm:max-h-[120px]"
+          />
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Banner;

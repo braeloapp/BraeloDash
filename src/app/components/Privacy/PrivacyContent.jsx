@@ -3,8 +3,8 @@ import React from "react";
 const PrivacyContent = () => {
   return (
     <>
-      <div className=" mt-3 border">
-        <div className="px-10 pt-10">
+      <div className=" mt-3 rounded-2xl border border-[#EEF1F4] bg-white">
+        <div className="px-5 pt-8 sm:px-10 sm:pt-10">
           <p className="text-gray-500 font-extrabold text-lg">
             1. YOUR AGREEMENT
           </p>
@@ -19,7 +19,7 @@ const PrivacyContent = () => {
             time...
           </p>
         </div>
-        <div className="px-10 pt-10">
+        <div className="px-5 pt-8 sm:px-10 sm:pt-10">
           <p className="text-gray-500 font-extrabold text-lg">2. PRIVACY</p>
           <p className="mt-4 text-gray-500 text-base">
             Please review our Privacy Policy, which also governs your visit to

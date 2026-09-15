@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import { getData } from "@/app/API/method";
 import { categoryEntries, normalizeAdminStats } from "@/lib/adminStats";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -88,7 +89,7 @@ const ListingCategorystats = () => {
 
   return (
     <div className="w-full h-96">
-      {chartData ? <Bar data={chartData} options={options} /> : <p>Loading chart...</p>}
+      {chartData ? <Bar data={chartData} options={options} /> : <AppLoader label="Loading chart..." />}
     </div>
   );
 };

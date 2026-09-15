@@ -69,9 +69,13 @@ const CollectionChart = () => {
   };
 
   return (
-    <div>
-      <h4 className="text-xl font-semibold my-4 ">Total Listings, Businesses & Users</h4>
-      <Bar data={chartData} options={options} />
+    <div className="app-card">
+      <h4 className="mb-4 text-lg font-semibold text-[#495057] sm:text-xl">
+        Total Listings, Businesses & Users
+      </h4>
+      <div className="h-[220px] lg:h-[260px]">
+        <Bar data={chartData} options={{ ...options, maintainAspectRatio: false }} />
+      </div>
     </div>
   );
 };

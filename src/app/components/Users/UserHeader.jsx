@@ -127,18 +127,18 @@ const UserHeader = ({
 
   return (
     <div>
-      <div className="flex justify-between border-b py-4 px-5">
-        <div className="flex items-center gap-2">
+      <div className="page-header">
+        <div className="flex min-w-0 items-center gap-2">
           <BackButton/>
-          <h1 className="text-[#78828A] text-[24px] font-[500]">
+          <h1 className="page-title">
             User Overview
           </h1>
         </div>
-        <div className="flex gap-2">
+        <div className="page-actions">
           <div>
             <button 
               onClick={() => router.push("/pages/users/adduser")} 
-              className="px-6 py-2 bg-[#CD9403] text-center text-[16px] text-white text-semibold rounded-lg hover:bg-[#b78302] transition"
+              className="btn-primary"
             >
               Add user
             </button>
@@ -196,11 +196,11 @@ const UserHeader = ({
       </div>
 
       <div>
-        <div className="flex gap-2 p-5">
-          <div className="relative">
+        <div className="filter-row">
+          <div className="relative min-w-[140px]">
             <select
               onChange={(e) => onStatusChange(e.target.value)}
-              className="py-2 px-2 rounded-lg w-full text-sm text-gray-500 bg-transparent border border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-gray-300 peer"
+              className="field-control appearance-none"
             >
               <option value="">Select Status</option>
               <option value="active">Active</option>
@@ -208,11 +208,11 @@ const UserHeader = ({
             </select>
           </div>
 
-          <div className="relative flex-1">
+          <div className="filter-grow relative">
             <input
               type="text"
               placeholder="Search By Name or Email"
-              className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              className="field-control pr-10"
               onChange={(e) => onSearch(e.target.value)}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -225,18 +225,18 @@ const UserHeader = ({
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative min-w-[150px]">
             <input
               type="date"
-              className="block w-full pl-4 pr-10 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              className="field-control"
               onChange={(e) => onDateChange(e.target.value)}
             />
           </div>
 
-          <div className="relative">
+          <div className="relative min-w-[170px]">
             <select
               onChange={(e) => onVerificationChange(e.target.value)}
-              className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              className="field-control"
             >
               <option value="">Verification Status</option>
               <option value="verify-email">Email Verified</option>

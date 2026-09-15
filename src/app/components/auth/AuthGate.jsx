@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getApiBaseUrl } from "@/lib/apiConfig";
 import { clearAdminSession, getAdminToken, persistAdminSession } from "@/lib/adminAuth";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 export default function AuthGate({ children }) {
   const router = useRouter();
@@ -56,8 +57,8 @@ export default function AuthGate({ children }) {
 
   if (!ready) {
     return (
-      <div className="flex h-screen items-center justify-center text-[#78828A]">
-        Checking admin session...
+      <div className="flex h-screen items-center justify-center">
+        <AppLoader label="Checking admin session..." />
       </div>
     );
   }

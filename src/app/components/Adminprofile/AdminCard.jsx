@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { FaTimes } from "react-icons/fa";
 import { getData, postData, updateData } from "@/app/API/method";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 const defaultUserData = {
   name: "",
@@ -129,14 +130,7 @@ const AdminCard = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#CD9403] mx-auto"></div>
-          <p className="mt-4 text-[#78828A]">Loading profile data...</p>
-        </div>
-      </div>
-    );
+    return <AppLoader label="Loading profile data..." />;
   }
 
   if (error) {
@@ -157,8 +151,8 @@ const AdminCard = () => {
   }
 
   return (
-    <div className="flex justify-center min-h-screen py-12">
-      <div className="border rounded-lg shadow-lg p-6 bg-white w-full max-w-2xl">
+    <div className="flex justify-center py-4 sm:py-8">
+      <div className="w-full max-w-2xl rounded-2xl border border-[#EEF1F4] bg-white p-5 shadow-card sm:p-6">
         <h2 className="text-xl text-[#78828A] font-semibold mb-6">
           Personal Information
         </h2>

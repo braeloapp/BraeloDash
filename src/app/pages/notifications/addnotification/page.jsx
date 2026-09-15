@@ -80,13 +80,15 @@ const AddNewNotification = () => {
   };
 
   return (
-    <div className="p-5">
+    <div>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="flex items-center gap-2 mb-4">
+      <div className="page-header mb-4 px-0">
+        <div className="flex min-w-0 items-center gap-2">
         <BackButton />
-        <h1 className="text-[#78828A] text-2xl font-medium">
+        <h1 className="page-title">
           Create New Notification
         </h1>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mt-5">
