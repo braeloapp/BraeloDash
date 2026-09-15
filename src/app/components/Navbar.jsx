@@ -84,10 +84,6 @@ const NavBar = ({ onMenuClick }) => {
     return () => window.removeEventListener(NOTIFICATIONS_CHANGED, loadUnread);
   }, []);
 
-  const toggleSettingsDropdown = () => {
-    setSettingsDropdownOpen((prev) => !prev);
-  };
-
   useEffect(() => {
     if (searchQuery.trim()) {
       const filteredItems = sidebarItems.filter((item) =>
@@ -130,19 +126,19 @@ const NavBar = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 shrink-0 border-b border-[#EEF1F4] bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-30 shrink-0 border-b border-[var(--color-border)] bg-white/95 backdrop-blur">
       <div className="flex items-center gap-3 px-3 py-3 sm:px-5 sm:py-4">
         <button
           type="button"
           onClick={onMenuClick}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#EEF1F4] bg-[#F6F8FB] text-[#3a4248] md:hidden"
+          className="btn-icon md:hidden"
           aria-label="Open menu"
         >
           <FiMenu size={20} />
         </button>
 
-        <div className="relative min-w-0 flex-1" ref={searchContainerRef}>
-          <div className="flex items-center rounded-full border border-[#EEF1F4] bg-[#F6F8FB] px-3 py-2.5">
+        <div className="relative min-w-0 flex-1 md:max-w-md lg:max-w-xl" ref={searchContainerRef}>
+          <div className="flex items-center rounded-full border border-[var(--color-border)] bg-brand-canvas px-3 py-2.5 transition focus-within:border-[#f0e2b3] focus-within:shadow-focus">
             <Image
               src="/images/Seacrh.png"
               alt=""
@@ -156,30 +152,25 @@ const NavBar = ({ onMenuClick }) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}
               onFocus={() => searchQuery && setShowSuggestions(true)}
-              className="w-full min-w-0 bg-transparent text-sm text-[#232F30] placeholder:text-[#ACB6BE] focus:outline-none focus:ring-0 focus:shadow-none"
+              className="w-full min-w-0 bg-transparent text-sm text-brand-ink placeholder:text-brand-faint focus:outline-none focus:ring-0 focus:shadow-none"
               placeholder="Search menu..."
               aria-label="Search menu items"
             />
           </div>
 
           {showSuggestions && searchSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 z-50 mt-2 max-h-64 overflow-y-auto rounded-2xl border border-[#EEF1F4] bg-white shadow-panel">
+            <div className="menu-panel absolute left-0 right-0 z-50 mt-2 max-h-64 overflow-y-auto">
               {searchSuggestions.map((item) => (
                 <button
                   type="button"
                   key={item.to}
-                  className="flex w-full items-center border-b border-[#EEF1F4] px-4 py-3 text-left last:border-b-0 hover:bg-[#F6F8FB]"
+                  className="menu-item flex items-center gap-3"
                   onClick={() => handleSearchNavigation(item)}
                 >
-                  <div className="relative mr-3 h-6 w-6">
-                    <Image
-                      src={item.icon}
-                      alt=""
-                      fill
-                      className="object-contain"
-                    />
+                  <div className="relative h-6 w-6 shrink-0">
+                    <Image src={item.icon} alt="" fill className="object-contain" />
                   </div>
-                  <span className="text-sm text-[#3a4248]">{item.label}</span>
+                  <span>{item.label}</span>
                 </button>
               ))}
             </div>
@@ -190,8 +181,8 @@ const NavBar = ({ onMenuClick }) => {
           <div className="relative" ref={settingsDropdownRef}>
             <button
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full text-[#3a4248] hover:bg-[#F6F8FB]"
-              onClick={toggleSettingsDropdown}
+              className="btn-icon"
+              onClick={() => setSettingsDropdownOpen((prev) => !prev)}
               aria-label="Settings"
             >
               <FiSettings size={20} />
@@ -225,37 +216,25 @@ const NavBar = ({ onMenuClick }) => {
 
           <button
             type="button"
-            className="relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#feefcb] hover:bg-[#FFCC35]/40"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-cream transition hover:bg-brand-bright/40"
             onClick={() => router.push("/pages/notifications")}
             aria-label={unreadCount ? `${unreadCount} unread notifications` : "Notifications"}
           >
-            <Image
-              src="/images/notification.png"
-              alt=""
-              width={20}
-              height={20}
-            />
+            <Image src="/images/notification.png" alt="" width={20} height={20} />
             {unreadCount > 0 ? (
-              <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CD9403] px-1 text-[10px] font-semibold text-white">
+              <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-gold px-1 text-[10px] font-semibold text-white">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             ) : null}
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="relative h-11 w-11 overflow-hidden rounded-full bg-[#F6F8FB]">
-              <Image
-                src="/images/profile (1).png"
-                fill
-                alt=""
-                className="object-cover"
-              />
+            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-brand-canvas ring-1 ring-[var(--color-border)]">
+              <Image src="/images/profile (1).png" fill alt="" className="object-cover" />
             </div>
             <div className="hidden min-w-0 lg:block">
-              <p className="truncate text-sm font-medium text-[#78828A]">
-                {userName}
-              </p>
-              <p className="truncate text-[11px] text-[#ACB6BE]">{roleLabel}</p>
+              <p className="truncate text-sm font-semibold text-brand-ink">{userName}</p>
+              <p className="truncate text-[11px] font-medium text-brand-muted">{roleLabel}</p>
             </div>
           </div>
         </div>

@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import BusinessTabbar from "@/app/components/Listing/BusinessTabbar";
-import BackButton from "@/app/components/BackButton";
+import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
+import PageHeader from "@/app/components/ux/PageHeader";
 import PageState from "@/app/components/ux/PageState";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,7 +36,6 @@ const BusinessDetails = () => {
   const [businessData, setBusinessData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDownloadDropdownOpen, setIsDownloadDropdownOpen] = useState(false);
 
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -258,7 +259,6 @@ const BusinessDetails = () => {
     doc.text(`Description: ${businessData.Description || "N/A"}`, 10, yPosition, { maxWidth: 180 });
     
     doc.save(`${businessData.BusinessName}_details.pdf`);
-    setIsDownloadDropdownOpen(false);
     toast.success("PDF downloaded successfully!");
   };
 
@@ -282,7 +282,6 @@ const BusinessDetails = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Business Details");
     XLSX.writeFile(workbook, `${businessData.BusinessName}_details.csv`);
-    setIsDownloadDropdownOpen(false);
     toast.success("CSV downloaded successfully!");
   };
 
@@ -319,109 +318,77 @@ const BusinessDetails = () => {
 
   if (loading) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="Business Details" description="Loading profile…">
         <PageState status="loading" title="Loading business data..." />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   if (error) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="Business Details" description="Something went wrong.">
         <PageState
           status="error"
           title="Unable to load business"
           description={error.message}
           onRetry={() => router.refresh()}
         />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   if (!businessData) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="Business Details" description="No profile found.">
         <PageState status="empty" title="No business data available" />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   return (
     <>
-      <div className="border-b">
-        <div className="p-5">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-2">
-              <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
-              <h1 className="text-[#78828A] text-[24px] font-[500] flex items-center">
-                {businessData.BusinessName} Details
-              </h1>
-            </div>
-            <div className="relative">
-              <button
-                onClick={() => setIsDownloadDropdownOpen(!isDownloadDropdownOpen)}
-                className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-2 py-2"
-              >
-                <Image
-                  src="/images/export.png"
-                  alt="export"
-                  width={24}
-                  height={24}
-                  className="absolute left-3"
-                />
-                <span className="text-[#75818D] text-[14px]">
-                  Download Export
-                </span>
-              </button>
-              {isDownloadDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                  <div className="py-1">
-                    <button
-                      onClick={downloadAsPDF}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Export as PDF
-                    </button>
-                    <button
-                      onClick={downloadAsCSV}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Export as CSV
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      <div className="page-shell">
+        <PageHeader
+          showBack
+          title={`${businessData.BusinessName} Details`}
+          description="Review business profile, export records, and manage related listings."
+          actions={
+            <ActionMenu
+              label="Download"
+              items={[
+                { label: "Export as PDF", onClick: downloadAsPDF },
+                { label: "Export as CSV", onClick: downloadAsCSV },
+              ]}
+            />
+          }
+        />
 
-      <div className="p-5 border-b">
-        <div className="flex justify-between mt-5">
-          <div className="flex gap-2 items-center">
-            <div className="px-2 rounded-full">
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-5"
+          style={{ borderColor: "var(--color-border)" }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="rounded-full px-2">
               {businessData.business_logo?.[0] ? (
                 <img
                   src={businessData.business_logo[0]}
                   alt="logo"
                   width={20}
                   height={20}
-                  className="rounded-full w-8"
+                  className="h-8 w-8 rounded-full"
                   onError={(e) => (e.target.src = "/c1.png")}
                 />
               ) : (
                 <Image src="/c1.png" alt="logo" width={20} height={20} />
               )}
             </div>
-            <h1 className="text-[#75818D] text-[18px] font-[700]">
+            <h2 className="text-[18px] font-[700] text-[#75818D]">
               {businessData.BusinessName}
-            </h1>
+            </h2>
           </div>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => setChatModalOpen(true)}
               className="btn-primary"
             >
@@ -429,6 +396,7 @@ const BusinessDetails = () => {
               Chat
             </button>
             <button
+              type="button"
               onClick={() => setEditModalOpen(true)}
               className="btn-primary"
             >
@@ -437,50 +405,53 @@ const BusinessDetails = () => {
             </button>
           </div>
         </div>
-      </div>
 
-      <div className="p-5 border-b">
-        <div className="flex gap-3">
-          {businessData.business_images?.map((image, index) => (
-            <div
-              key={index}
-              className="border border-dashed border-[#CD940380] w-[154px] h-[134px] flex justify-center p-10 rounded-lg"
+        <div className="border-b p-4 sm:p-5" style={{ borderColor: "var(--color-border)" }}>
+          <div className="flex flex-wrap gap-3">
+            {businessData.business_images?.map((image, index) => (
+              <div
+                key={index}
+                className="flex h-[134px] w-[154px] justify-center rounded-lg border border-dashed border-[#CD940380] p-10"
+              >
+                <img
+                  src={image}
+                  alt={`business ${index}`}
+                  width={50}
+                  height={50}
+                  className="object-cover"
+                  onError={(e) => (e.target.src = "/b6.png")}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            <h1 className="text-[16px] font-[700] text-[#75818D]">
+              Bio: <span className="ml-1 font-[400] text-[#a0a8b1]">
+                {businessData.Bio || "No bio"}
+              </span>
+            </h1>
+            <h1 className="mt-3 text-[16px] font-[700] text-[#75818D]">
+              Description: <span className="ml-1 font-[400] text-[#a0a8b1]">
+                {businessData.Description || "No description"}
+              </span>
+            </h1>
+          </div>
+          <div className="mt-3">
+            <button
+              type="button"
+              className="btn-primary w-[200px]"
+              onClick={() => router.push("/pages/statistics")}
             >
-              <img
-                src={image}
-                alt={`business ${index}`}
-                width={50}
-                height={50}
-                className="object-cover"
-                onError={(e) => (e.target.src = "/b6.png")}
-              />
-            </div>
-          ))}
+              View Business Stats
+            </button>
+          </div>
         </div>
 
-        <div className="mt-5">
-          <h1 className="text-[16px] font-[700] text-[#75818D]">
-            Bio: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData.Bio || "No bio"}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Description: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData.Description || "No description"}
-            </span>
-          </h1>
-        </div>
-        <div className="mt-3">
-          <button
-            className="btn-primary w-[200px]"
-            onClick={() => router.push("/pages/statistics")}
-          >
-            View Business Stats
-          </button>
-        </div>
-      </div>
-
-      <div className="flex gap-[100px] mt-5 border-b p-5">
+        <div
+          className="mt-0 flex flex-wrap gap-8 border-b p-4 sm:gap-[100px] sm:p-5"
+          style={{ borderColor: "var(--color-border)" }}
+        >
         <div>
           <h1 className="text-[16px] font-[700] text-[#75818D]">
             Name: <span className="font-[400] text-[#a0a8b1] ml-1">
@@ -742,7 +713,7 @@ const BusinessDetails = () => {
                                 e.stopPropagation();
                                 handleRemoveImage(index);
                               }}
-                              className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
+                              className="absolute top-0 right-0 bg-brand-danger text-white rounded-full w-4 h-4 flex items-center justify-center text-xs"
                             >
                               ×
                             </button>
@@ -796,6 +767,7 @@ const BusinessDetails = () => {
       />
 
       <BusinessTabbar businessId={businessData?.id} />
+      </div>
     </>
   );
 };

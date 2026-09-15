@@ -6,9 +6,10 @@ import * as Yup from "yup";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BackButton from "@/app/components/BackButton";
 import { postData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 const AddUser = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -68,17 +69,18 @@ const AddUser = () => {
   });
 
   return (
-    <>
+    <div className="page-shell">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="mx-auto mt-2 w-full max-w-xl rounded-2xl border border-[#EEF1F4] bg-white p-4 shadow-card sm:mt-6 sm:p-6">
-        <div className="mb-5 flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h2 className="page-title">Add User</h2>
-        </div>
+      <PageHeader
+        showBack
+        title="Add User"
+        description="Create a new platform user or staff account."
+      />
 
-        <form onSubmit={formik.handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="fullName">
+      <div className="mx-auto w-full max-w-xl p-4 sm:p-6">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
+          <div>
+            <label className="field-label" htmlFor="fullName">
               Full Name
             </label>
             <input
@@ -88,20 +90,20 @@ const AddUser = () => {
               value={formik.values.fullName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full p-2 border rounded-md ${
+              className={`field-control ${
                 formik.touched.fullName && formik.errors.fullName
-                  ? "border-red-500"
-                  : "border-gray-300"
+                  ? "field-control--error"
+                  : ""
               }`}
               required
             />
             {formik.touched.fullName && formik.errors.fullName && (
-              <p className="text-red-500">{formik.errors.fullName}</p>
+              <p className="field-error">{formik.errors.fullName}</p>
             )}
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="email">
+          <div>
+            <label className="field-label" htmlFor="email">
               Email
             </label>
             <input
@@ -111,20 +113,20 @@ const AddUser = () => {
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full p-2 border rounded-md ${
+              className={`field-control ${
                 formik.touched.email && formik.errors.email
-                  ? "border-red-500"
-                  : "border-gray-300"
+                  ? "field-control--error"
+                  : ""
               }`}
               required
             />
             {formik.touched.email && formik.errors.email && (
-              <p className="text-red-500">{formik.errors.email}</p>
+              <p className="field-error">{formik.errors.email}</p>
             )}
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="phoneNumber">
+          <div>
+            <label className="field-label" htmlFor="phoneNumber">
               Phone Number
             </label>
             <input
@@ -134,20 +136,20 @@ const AddUser = () => {
               value={formik.values.phoneNumber}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className={`w-full p-2 border rounded-md ${
+              className={`field-control ${
                 formik.touched.phoneNumber && formik.errors.phoneNumber
-                  ? "border-red-500"
-                  : "border-gray-300"
+                  ? "field-control--error"
+                  : ""
               }`}
               required
             />
             {formik.touched.phoneNumber && formik.errors.phoneNumber && (
-              <p className="text-red-500">{formik.errors.phoneNumber}</p>
+              <p className="field-error">{formik.errors.phoneNumber}</p>
             )}
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="password">
+          <div>
+            <label className="field-label" htmlFor="password">
               Password
             </label>
             <div className="relative isolate flex items-center">
@@ -158,10 +160,10 @@ const AddUser = () => {
                 value={formik.values.password}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
-                className={`relative z-0 w-full p-2 pr-11 border rounded-md ${
+                className={`relative z-0 field-control pr-11 ${
                   formik.touched.password && formik.errors.password
-                    ? "border-red-500"
-                    : "border-gray-300"
+                    ? "field-control--error"
+                    : ""
                 }`}
                 required
                 autoComplete="new-password"
@@ -175,24 +177,24 @@ const AddUser = () => {
                   e.stopPropagation();
                   setShowPassword((v) => !v);
                 }}
-                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 p-1.5 text-gray-600 hover:text-[#232F30] rounded-md focus:outline-none focus:ring-2 focus:ring-[#CD9403] bg-white"
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md bg-white p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand)]"
                 aria-label={showPassword ? "Hide password" : "Show password"}
                 aria-pressed={showPassword}
               >
                 {showPassword ? (
-                  <FiEyeOff className="w-5 h-5 pointer-events-none" aria-hidden />
+                  <FiEyeOff className="h-5 w-5 pointer-events-none" aria-hidden />
                 ) : (
-                  <FiEye className="w-5 h-5 pointer-events-none" aria-hidden />
+                  <FiEye className="h-5 w-5 pointer-events-none" aria-hidden />
                 )}
               </button>
             </div>
             {formik.touched.password && formik.errors.password && (
-              <p className="text-red-500">{formik.errors.password}</p>
+              <p className="field-error">{formik.errors.password}</p>
             )}
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="role">
+          <div>
+            <label className="field-label" htmlFor="role">
               Role
             </label>
             <select
@@ -201,7 +203,7 @@ const AddUser = () => {
               value={formik.values.role}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              className="w-full p-2 border rounded-md"
+              className="field-control"
               required
             >
               {roleOptions.map((option) => (
@@ -211,24 +213,28 @@ const AddUser = () => {
               ))}
             </select>
             {!canCreateStaff && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="field-hint">
                 Only a Super Admin can create staff accounts.
               </p>
             )}
           </div>
 
-          <div className="text-center">
-            <button
-              type="submit"
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => formik.resetForm()}
               disabled={submitting}
-              className="btn-primary"
             >
-              {submitting ? "Submitting..." : "Submit"}
-            </button>
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" loading={submitting}>
+              Submit
+            </Button>
           </div>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

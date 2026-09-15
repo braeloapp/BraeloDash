@@ -1,22 +1,18 @@
-import React from 'react'
-import BackButton from '@/app/components/BackButton'
-import FeedbackCard from '@/app/components/Feedback/FeedbackCard'
+import React from "react";
+import FeedbackCard from "@/app/components/Feedback/FeedbackCard";
+import PageHeader from "@/app/components/ux/PageHeader";
 
 const feedback = () => {
   return (
-
     <div className="page-shell">
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h1 className="page-title">
-            Feedbacks
-          </h1>
-        </div>
-      </div>
+      <PageHeader
+        showBack
+        title="Feedbacks"
+        description="Browse user feedback submitted through the platform."
+      />
       <FeedbackCard />
     </div>
-  )
-}
+  );
+};
 
-export default feedback
+export default feedback;

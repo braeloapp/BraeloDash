@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { extractResultsList, getApiErrorMessage } from "@/lib/apiResponse";
 import { getData, postData } from "@/app/API/method";
 import Image from "next/image";
-import BackButton from "@/app/components/BackButton";
+import PageHeader from "@/app/components/ux/PageHeader";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -385,12 +385,11 @@ const ReportedUser = () => {
 
   return (
     <div className="page-shell">
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h1 className="page-title">Reported Users</h1>
-        </div>
-        <div className="page-actions">
+      <PageHeader
+        showBack
+        title="Reported Users"
+        description="Review reports and take moderation actions on flagged accounts."
+        actions={
           <div className="relative" ref={exportRef}>
             <button
               type="button"
@@ -404,37 +403,36 @@ const ReportedUser = () => {
                 height={24}
                 className="absolute left-3"
               />
-              <span className="text-[#75818D] text-[14px] font-[400]">
-                Export
-              </span>
+              <span>Export</span>
             </button>
             {showExportOptions && (
-              <div className="absolute right-0 mt-1 w-40 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                <div className="py-1">
-                  <button
-                    onClick={() => handleExport('CSV')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    CSV
-                  </button>
-                  <button
-                    onClick={() => handleExport('PDF')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    PDF
-                  </button>
-                  <button
-                    onClick={() => handleExport('HTML')}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    HTML
-                  </button>
-                </div>
+              <div className="menu-panel absolute right-0 z-10 mt-1 w-40">
+                <button
+                  type="button"
+                  onClick={() => handleExport("CSV")}
+                  className="menu-item"
+                >
+                  CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport("PDF")}
+                  className="menu-item"
+                >
+                  PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleExport("HTML")}
+                  className="menu-item"
+                >
+                  HTML
+                </button>
               </div>
             )}
           </div>
-        </div>
-      </div>
+        }
+      />
 
       <div className="filter-row">
           <div>
@@ -507,9 +505,11 @@ const ReportedUser = () => {
             totalRecords={totalRecords}
             onPage={onPage}
             rowsPerPageOptions={[5, 10, 20, 50]}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             tableStyle={{ width: "100%" }}
-            className="custom-paginator"
+            paginatorClassName="user-paginator"
+            className="p-datatable-striped"
             loading={loading}
             emptyMessage="No reports found"
           >
@@ -631,7 +631,7 @@ const ReportedUser = () => {
                 value={moderationNotes}
                 onChange={(e) => setModerationNotes(e.target.value)}
                 rows={4}
-                className="w-full border rounded-md p-2 mb-4"
+                className="field-control mb-4"
                 placeholder="Resolution notes"
               />
               <div className="flex justify-end gap-3">

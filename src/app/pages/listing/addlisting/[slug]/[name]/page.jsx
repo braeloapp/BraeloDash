@@ -3,7 +3,7 @@
 import { loadGoogleMaps } from "@/lib/googleMaps";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
-import BackButton from "@/app/components/BackButton";
+import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import { FormData as FormStructure } from "@/app/components/Listing/FormData";
 import { chipFieldName, chipFieldValue } from "@/lib/listingChips";
 import { postBusiData } from "@/app/API/method";
@@ -301,8 +301,20 @@ const Form = () => {
     </div>
   );
 
+  const pageTitle = [
+    category || (slug ? String(slug).charAt(0).toUpperCase() + String(slug).slice(1) : ""),
+    subcategory || (name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : ""),
+  ]
+    .filter(Boolean)
+    .join(" — ");
+
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <ListingPageChrome
+      showBack
+      title={pageTitle || "New Listing"}
+      description="Fill in the details below to create this listing."
+      bodyClassName="p-4 sm:p-5"
+    >
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -314,24 +326,18 @@ const Form = () => {
         draggable
         pauseOnHover
       />
-      <BackButton />
 
       <form
         onSubmit={handleSubmit}
         encType="multipart/form-data"
-        className="space-y-4"
+        className="mx-auto max-w-3xl space-y-4"
       >
-        <h1 className="text-2xl font-bold mb-6">
-          {slug && slug.charAt(0).toUpperCase() + slug.slice(1)} -
-          {subcategory && subcategory.charAt(0).toUpperCase() + subcategory.slice(1)}
-        </h1>
-
         {imagePreview && (
           <div className="mb-4 flex justify-center">
             <img
               src={imagePreview}
               alt="Preview"
-              className="max-h-60 rounded-md object-contain border"
+              className="max-h-60 rounded-xl border border-[var(--color-border)] object-contain"
             />
           </div>
         )}
@@ -348,7 +354,7 @@ const Form = () => {
           {isSubmitting ? "Submitting..." : "Submit Listing"}
         </button>
       </form>
-    </div>
+    </ListingPageChrome>
   );
 };
 

@@ -4,20 +4,22 @@ const DeleteListingModal = ({ isOpen, onClose, onConfirm }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-5 rounded-lg shadow-lg">
-        <p>Are you sure you want to delete this listing?</p>
-        <div className="flex justify-end mt-4 space-x-2">
-          <button
-            className="btn-ghost"
-            onClick={onClose}
-          >
+    <div className="app-modal-mask">
+      <div className="app-modal max-w-md">
+        <div className="app-modal-header">
+          <h2 className="text-lg font-semibold text-[#3a4248]">Delete listing</h2>
+        </div>
+        <div className="app-modal-body">
+          <p className="text-sm text-[#78828A]">
+            Are you sure you want to delete this listing? This action cannot be
+            undone.
+          </p>
+        </div>
+        <div className="app-modal-footer">
+          <button type="button" className="btn-ghost" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className="px-4 py-2 bg-red-500 text-white rounded-lg"
-            onClick={onConfirm}
-          >
+          <button type="button" className="btn-danger" onClick={onConfirm}>
             Delete
           </button>
         </div>

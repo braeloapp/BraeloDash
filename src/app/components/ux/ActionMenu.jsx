@@ -83,7 +83,7 @@ export default function ActionMenu({ items = [], disabled = false, label = "Acti
                   type="button"
                   role="menuitem"
                   disabled={item.disabled}
-                  className={`menu-item ${item.danger ? "text-[#C7233F] hover:bg-red-50 hover:text-[#C7233F]" : ""}`}
+                  className={`menu-item ${item.danger ? "text-[var(--brand-danger)] hover:bg-[#fdecef] hover:text-[var(--brand-danger)]" : ""}`}
                   onClick={() => {
                     setOpen(false);
                     item.onClick?.();

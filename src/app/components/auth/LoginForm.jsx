@@ -140,54 +140,63 @@ export default function LoginForm() {
               </p>
             </div>
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                autoComplete="username"
-                aria-label="Email"
-                className="w-full rounded-xl border border-[#EEF1F4] bg-[#F6F8FB] px-4 py-3 text-[#232F30] placeholder:text-[#ACB6BE] focus:outline-none"
-                required
-              />
-              <div className="relative w-full">
+              <div>
+                <label htmlFor="login-email" className="field-label">
+                  Email
+                </label>
                 <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  autoComplete="current-password"
-                  className="w-full rounded-xl border border-[#EEF1F4] bg-[#F6F8FB] px-4 py-3 pr-12 text-[#232F30] placeholder:text-[#ACB6BE] focus:outline-none"
+                  id="login-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  autoComplete="username"
+                  className="field-control bg-brand-canvas"
                   required
                 />
-                <button
-                  type="button"
-                  tabIndex={0}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    togglePasswordVisibility();
-                  }}
-                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md p-1.5 text-[#78828A] hover:text-[#232F30] focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  aria-pressed={showPassword}
-                >
-                  {showPassword ? (
-                    <FiEyeOff className="h-5 w-5 pointer-events-none" aria-hidden />
-                  ) : (
-                    <FiEye className="h-5 w-5 pointer-events-none" aria-hidden />
-                  )}
-                </button>
+              </div>
+              <div>
+                <label htmlFor="login-password" className="field-label">
+                  Password
+                </label>
+                <div className="relative w-full">
+                  <input
+                    id="login-password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    autoComplete="current-password"
+                    className="field-control bg-brand-canvas pr-12"
+                    required
+                  />
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                    }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      togglePasswordVisibility();
+                    }}
+                    className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md p-1.5 text-brand-muted hover:text-brand-ink focus:outline-none"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-pressed={showPassword}
+                  >
+                    {showPassword ? (
+                      <FiEyeOff className="h-5 w-5 pointer-events-none" aria-hidden />
+                    ) : (
+                      <FiEye className="h-5 w-5 pointer-events-none" aria-hidden />
+                    )}
+                  </button>
+                </div>
               </div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`btn-primary w-full ${
-                  isLoading ? "cursor-not-allowed opacity-50" : ""
-                }`}
+                className="btn-primary w-full"
               >
                 {isLoading ? "Logging in..." : "Login"}
               </button>

@@ -1,52 +1,56 @@
 "use client";
+
 import React, { useState } from "react";
 import TotalListing from "./TotalListing";
 import ActiveListing from "./ActiveLsiting";
 import InactiveListing from "./InactiveListing";
-import DeletedListing from "./DeletedLsiting";
 import SaveListing from "./SaveLsiting";
 
-const ListingTabbar = ({userId}) => {
+const TABS = [
+  { id: 1, label: "Total Listings" },
+  { id: 2, label: "Active Listings" },
+  { id: 3, label: "Inactive Listings" },
+  { id: 5, label: "Saved Listings" },
+];
+
+const ListingTabbar = ({ userId }) => {
   const [activeButton, setActiveButton] = useState(1);
 
-  const handleClick = (buttonIndex) => {
-    setActiveButton(buttonIndex);
-  };
-
   const buttonClasses = (index) =>
-    `whitespace-nowrap px-[10px] py-2 mx-1 sm:mx-2 font-semibold  transition ease-in-out duration-300 ${
+    `whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition duration-300 ${
       activeButton === index
-        ? "border-b-2 border-[#EE9E03] text-[#78828A]  font-[600]"
-        : "text-[#ACB6BE] text-[16px] font-[500] "
+        ? "border-[#CD9403] text-[#78828A]"
+        : "border-transparent text-[#ACB6BE] hover:text-[#78828A]"
     }`;
 
   return (
-    <>
-      <div className="flex gap-1 overflow-x-auto p-3 sm:justify-between sm:p-5">
-        <button className={buttonClasses(1)} onClick={() => handleClick(1)}>
-          Total Listings
-        </button>
-        <button className={buttonClasses(2)} onClick={() => handleClick(2)}>
-          Active Listings
-        </button>
-        <button className={buttonClasses(3)} onClick={() => handleClick(3)}>
-          Inactive Listings
-        </button>
-        {/* <button className={buttonClasses(4)} onClick={() => handleClick(4)}>
-          Deleted Listings
-        </button> */}
-        <button className={buttonClasses(5)} onClick={() => handleClick(5)}>
-          Saved Listings
-        </button>
+    <div className="mt-2">
+      <div
+        className="flex gap-1 overflow-x-auto border-b px-3 sm:justify-start sm:gap-2 sm:px-5"
+        style={{ borderColor: "var(--color-border)" }}
+        role="tablist"
+        aria-label="User listings"
+      >
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeButton === tab.id}
+            className={buttonClasses(tab.id)}
+            onClick={() => setActiveButton(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
-      <div className="mt-4">
+      <div className="mt-4 px-3 sm:px-5" role="tabpanel">
         {activeButton === 1 && <TotalListing user_id={userId} />}
         {activeButton === 2 && <ActiveListing user_id={userId} />}
         {activeButton === 3 && <InactiveListing user_id={userId} />}
-        {/* {activeButton === 4 && <DeletedListing user_id={userId} />} */}
         {activeButton === 5 && <SaveListing user_id={userId} />}
       </div>
-    </>
+    </div>
   );
 };
 

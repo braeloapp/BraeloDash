@@ -3,13 +3,14 @@ import { useState, useEffect, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { getBodyStyle, getHeaderStyle } from "@/app/components/Users/UserData";
-import BackButton from "@/app/components/BackButton";
 import { useRouter } from "next/navigation";
 import { getBanData, postData, updateListData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 const BANNER_LIST_ENDPOINT = "/auth/business/banner";
 const BANNER_DELETE_ENDPOINT = "/admin-panel/business/banner/delete";
@@ -290,23 +291,22 @@ export default function BannerManagement() {
     <div className="page-shell">
       <ToastContainer position="top-right" autoClose={3000} />
       <style jsx global>{paginatorStyles}</style>
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h1 className="page-title">All Banners</h1>
-        </div>
-        <button
-          onClick={handleNewListing}
-          className="btn-primary"
-        >
-          Add Banner
-        </button>
-      </div>
+      <PageHeader
+        showBack
+        title="All Banners"
+        description="Manage promotional banners shown across the platform."
+        actions={
+          <Button variant="primary" onClick={handleNewListing}>
+            Add Banner
+          </Button>
+        }
+      />
 
       {error && (
-        <div className="my-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+        <div className="relative mx-4 mt-4 rounded-xl border border-[var(--color-danger)]/25 bg-[#FEF2F2] px-4 py-3 text-[var(--color-danger)] sm:mx-5">
           <span>{error}</span>
           <button
+            type="button"
             onClick={() => setError(null)}
             className="absolute top-0 bottom-0 right-0 px-4 py-3"
           >
@@ -381,7 +381,7 @@ export default function BannerManagement() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Banner Image</label>
+                <label className="field-label">Banner Image</label>
                 <div className="mb-2 h-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
                   <img 
                     src={selectedBanner.business_banner?.[0] || "https://via.placeholder.com/300"} 
@@ -393,47 +393,47 @@ export default function BannerManagement() {
                   type="file"
                   onChange={handleImageChange}
                   accept="image/*"
-                  className="w-full text-sm border rounded p-2"
+                  className="field-control"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Business Name</label>
+                <label className="field-label">Business Name</label>
                 <input
                   type="text"
                   value={selectedBanner.business_name}
                   onChange={(e) => setSelectedBanner({...selectedBanner, business_name: e.target.value})}
-                  className="w-full p-2 border rounded"
+                  className="field-control"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Business Email</label>
+                <label className="field-label">Business Email</label>
                 <input
                   type="email"
                   value={selectedBanner.business_email}
                   onChange={(e) => setSelectedBanner({...selectedBanner, business_email: e.target.value})}
-                  className="w-full p-2 border rounded"
+                  className="field-control"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
+                <label className="field-label">Category</label>
                 <input
                   type="text"
                   value={selectedBanner.business_category}
                   onChange={(e) => setSelectedBanner({...selectedBanner, business_category: e.target.value})}
-                  className="w-full p-2 border rounded"
+                  className="field-control"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Subcategory</label>
+                <label className="field-label">Subcategory</label>
                 <input
                   type="text"
                   value={selectedBanner.business_subcategory}
                   onChange={(e) => setSelectedBanner({...selectedBanner, business_subcategory: e.target.value})}
-                  className="w-full p-2 border rounded"
+                  className="field-control"
                 />
               </div>
 

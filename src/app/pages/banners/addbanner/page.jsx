@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import BackButton from "@/app/components/BackButton";
 import { postBusiData } from "@/app/API/method";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getApiErrorMessage } from "@/lib/apiResponse";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 const AddBanner = () => {
   const [formData, setFormData] = useState({
@@ -72,16 +73,18 @@ const AddBanner = () => {
   };
 
   return (
-    <>
+    <div className="page-shell">
       <ToastContainer position="top-right" autoClose={3000} />
-      <BackButton />
-      <div className="max-w-md mx-auto p-4 border rounded shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Add Banner</h1>
+      <PageHeader
+        showBack
+        title="Add Banner"
+        description="Upload a banner and attach business details for promotion."
+      />
 
+      <div className="mx-auto w-full max-w-md p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Banner Image */}
           <div>
-            <label htmlFor="business_banner" className="block font-medium mb-1">
+            <label htmlFor="business_banner" className="field-label">
               Banner Image
             </label>
             <input
@@ -90,14 +93,13 @@ const AddBanner = () => {
               name="business_banner"
               accept="image/*"
               onChange={handleChange}
-              className="block w-full text-sm"
+              className="field-control"
               required
             />
           </div>
 
-          {/* Business Name */}
           <div>
-            <label htmlFor="business_name" className="block font-medium mb-1">
+            <label htmlFor="business_name" className="field-label">
               Business Name
             </label>
             <input
@@ -106,15 +108,14 @@ const AddBanner = () => {
               name="business_name"
               value={formData.business_name}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="field-control"
               placeholder="Enter business name"
               required
             />
           </div>
 
-          {/* Business Email */}
           <div>
-            <label htmlFor="business_email" className="block font-medium mb-1">
+            <label htmlFor="business_email" className="field-label">
               Business Email
             </label>
             <input
@@ -123,15 +124,14 @@ const AddBanner = () => {
               name="business_email"
               value={formData.business_email}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="field-control"
               placeholder="Enter business email"
               required
             />
           </div>
 
-          {/* Business Category */}
           <div>
-            <label htmlFor="business_category" className="block font-medium mb-1">
+            <label htmlFor="business_category" className="field-label">
               Business Category
             </label>
             <input
@@ -140,15 +140,14 @@ const AddBanner = () => {
               name="business_category"
               value={formData.business_category}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="field-control"
               placeholder="Enter business category"
               required
             />
           </div>
 
-          {/* Business Subcategory */}
           <div>
-            <label htmlFor="business_subcategory" className="block font-medium mb-1">
+            <label htmlFor="business_subcategory" className="field-label">
               Business Subcategory
             </label>
             <input
@@ -157,15 +156,14 @@ const AddBanner = () => {
               name="business_subcategory"
               value={formData.business_subcategory}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="field-control"
               placeholder="Enter business subcategory"
               required
             />
           </div>
 
-          {/* URL */}
           <div>
-            <label htmlFor="url" className="block font-medium mb-1">
+            <label htmlFor="url" className="field-label">
               URL
             </label>
             <input
@@ -174,23 +172,23 @@ const AddBanner = () => {
               name="url"
               value={formData.url}
               onChange={handleChange}
-              className="w-full p-2 border rounded"
+              className="field-control"
               placeholder="Enter URL"
               required
             />
           </div>
 
-          {/* Submit Button */}
-          <button
+          <Button
             type="submit"
-            className="btn-primary w-full"
-            disabled={isSubmitting}
+            variant="primary"
+            className="w-full"
+            loading={isSubmitting}
           >
-            {isSubmitting ? "Adding..." : "Add Banner"}
-          </button>
+            Add Banner
+          </Button>
         </form>
       </div>
-    </>
+    </div>
   );
 };
 

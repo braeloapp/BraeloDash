@@ -177,106 +177,107 @@ const BusinessHeader = ({
   return (
     <div>
       <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton/>
-          <h1 className="page-title">
-            Business Overview
-          </h1>
+        <div className="flex min-w-0 items-center gap-3">
+          <BackButton />
+          <div className="min-w-0">
+            <h1 className="page-title">Business Overview</h1>
+            <p className="page-desc">
+              Search, filter, and manage business accounts on the platform.
+            </p>
+          </div>
         </div>
         <div className="page-actions">
-          <div className="flex flex-wrap gap-2">
-            <button 
-              onClick={handleNewBusiness}
-              className="btn-primary"
-            >
-              Add Business
-            </button>
-            
-            <div className="relative">
-              <div
-                onClick={() => setIsExportOpen(!isExportOpen)}
-                className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-2 py-2 cursor-pointer focus:outline-none"
-              >
-                <Image
-                  src="/images/export.png"
-                  alt="export icon"
-                  className="absolute left-3"
-                  width={20}
-                  height={20}
-                />
-                <span className="text-[#75818D] text-[14px] font-[400]">
-                  Export
-                </span>
-                <svg
-                  className={`w-5 h-5 text-gray-400 ml-2 transition-transform duration-200 ${
-                    isExportOpen ? "transform rotate-180" : ""
-                  }`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 10l5 5 5-5"
-                  />
-                </svg>
-              </div>
+          <button
+            type="button"
+            onClick={handleNewBusiness}
+            className="btn-primary"
+          >
+            Add Business
+          </button>
 
-              {isExportOpen && (
-                <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                  {exportOptions.map((option, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleExportClick(option)}
-                      className="py-2 px-4 hover:bg-gray-100 cursor-pointer font-[500] text-[12px] text-[#75818D]"
-                    >
-                      {option.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="relative inline-block">
+            <button
+              type="button"
+              onClick={() => setIsExportOpen(!isExportOpen)}
+              className="btn-ghost relative pl-10"
+            >
+              <Image
+                src="/images/export.png"
+                alt=""
+                width={20}
+                height={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2"
+              />
+              <span>Export</span>
+              <svg
+                className={`ml-2 h-4 w-4 text-brand-faint transition-transform duration-200 ${
+                  isExportOpen ? "rotate-180" : ""
+                }`}
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 10l5 5 5-5"
+                />
+              </svg>
+            </button>
+
+            {isExportOpen && (
+              <div className="menu-panel absolute right-0 z-10 mt-1 w-full min-w-[120px]">
+                {exportOptions.map((option) => (
+                  <button
+                    type="button"
+                    key={option.value}
+                    onClick={() => handleExportClick(option)}
+                    className="menu-item"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
       <div className="filter-row">
-        <div className="min-w-0">
-          <select
-            value={status}
-            onChange={handleStatusChange}
-            className="field-control"
-          >
-            {statusOptions.map((option) => (
-              <option 
-                key={option.value} 
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        
+        <select
+          value={status}
+          onChange={handleStatusChange}
+          className="field-control"
+          aria-label="Filter by status"
+        >
+          {statusOptions.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </option>
+          ))}
+        </select>
+
         <div className="filter-grow">
           <input
             type="text"
             placeholder="Search By Name, Email or Phone"
             onChange={handleSearch}
             className="field-control"
+            aria-label="Search businesses"
           />
         </div>
-        
-        <div className="min-w-0">
-          <input
-            type="date"
-            onChange={(e) => onDateChange(e.target.value)}
-            className="field-control"
-          />
-        </div>
+
+        <input
+          type="date"
+          onChange={(e) => onDateChange(e.target.value)}
+          className="field-control"
+          aria-label="Filter by date"
+        />
       </div>
     </div>
   );

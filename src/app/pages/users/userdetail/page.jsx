@@ -6,9 +6,10 @@ import { getData } from "@/app/API/method";
 import ChatModal from "@/app/components/ChatModal";
 import EditUserdetailModal from "@/app/components/Users/EditUserdetailModal";
 import ListingTabbar from "@/app/components/Listing/ListingTabbar";
-import BackButton from "@/app/components/BackButton";
+import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
+import PageHeader from "@/app/components/ux/PageHeader";
 import PageState from "@/app/components/ux/PageState";
-import Image from "next/image";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
@@ -24,7 +25,6 @@ const Userdetail = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [OpenEditModal, setEditModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -49,16 +49,7 @@ const Userdetail = () => {
   }, [userId]);
 
   const OpeModal = () => {
-    setEditModalOpen(!isModalOpen);
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-  const handleActionSelect = (action) => {
-    console.log("Selected Action:", action);
-    setIsDropdownOpen(false);
+    setEditModalOpen((prev) => !prev);
   };
 
   const downloadAsPDF = () => {
@@ -101,7 +92,6 @@ const Userdetail = () => {
     doc.text(`Phone Verified: ${userData.is_phone_verified ? 'Yes' : 'No'}`, 10, yPosition);
     
     doc.save(`user_details_${userData.username || 'user'}.pdf`);
-    setIsDropdownOpen(false);
     toast.success("PDF downloaded successfully!");
   };
 
@@ -132,133 +122,77 @@ const Userdetail = () => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "User Details");
     XLSX.writeFile(workbook, `user_details_${userData.username || 'user'}.csv`);
-    setIsDropdownOpen(false);
     toast.success("CSV downloaded successfully!");
   };
 
   if (loading) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="User Details" description="Loading profile…">
         <PageState status="loading" title="Loading user data..." />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   if (error) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="User Details" description="Something went wrong.">
         <PageState
           status="error"
           title="Unable to load user"
           description={error.message}
           onRetry={() => router.refresh()}
         />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   if (!userData) {
     return (
-      <div className="p-5">
-        <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
+      <ListingPageChrome showBack title="User Details" description="No profile found.">
         <PageState status="empty" title="No user data available" />
-      </div>
+      </ListingPageChrome>
     );
   }
 
   return (
-    <div>
-      <div className="border-b">
-        <div className="p-5">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-2">
-              <BackButton buttonStyle="bg-gray-300" iconStyle="text-gray-700" />
-              <h1 className="text-[#78828A] text-[24px] font-[500]">
-                User Details
-              </h1>
-            </div>
-            <div className="relative">
-              <div
-                onClick={toggleDropdown}
-                className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-2 py-2 cursor-pointer focus:outline-none hover:bg-gray-50"
-              >
-                <Image
-                  src="/images/export.png"
-                  alt="export icon"
-                  width={24}
-                  height={24}
-                  className="absolute left-3"
-                />
-                <span className="text-[#75818D] text-[14px] font-plus font-[400]">
-                  Download
-                </span>
-                <svg
-                  className={`w-4 h-4 ml-2 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        downloadAsPDF();
-                        handleActionSelect('pdf');
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                    >
-                      Download as PDF
-                    </button>
-                    <button
-                      onClick={() => {
-                        downloadAsCSV();
-                        handleActionSelect('csv');
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                    >
-                      Download as CSV
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="page-shell">
+      <PageHeader
+        showBack
+        title="User Details"
+        description="Review profile info, export records, and manage this user’s listings."
+        actions={
+          <ActionMenu
+            label="Download"
+            items={[
+              { label: "Download as PDF", onClick: downloadAsPDF },
+              { label: "Download as CSV", onClick: downloadAsCSV },
+            ]}
+          />
+        }
+      />
 
-      <div className="p-5">
-        <div className="flex justify-between mt-5 border-b py-2 ">
+      <div className="p-4 sm:p-5">
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 border-b py-3"
+          style={{ borderColor: "var(--color-border)" }}
+        >
           <div>
-            <h1 className="text-[18px] font-[700] text-[#75818D]">
+            <h2 className="text-[18px] font-[700] text-[#75818D]">
               {userData.username || "User Name"}
-            </h1>
+            </h2>
           </div>
           <div className="flex gap-2">
-            <button className="btn-primary"
-            onClick={() => setModalOpen(true)}
+            <button
+              type="button"
+              className="btn-primary"
+              onClick={() => setModalOpen(true)}
             >
-            <img
-              src="/a7.png"
-              alt="button1"
-              className="cursor-pointer"
-            />
-            Chat
+              <img src="/a7.png" alt="" className="cursor-pointer" />
+              Chat
             </button>
-            <button className="btn-primary" 
-            onClick={OpeModal}>
-            <img
-              src="/a17.png"
-              alt="button2"
-              className="cursor-pointer"
-            />
-            Edit
+            <button type="button" className="btn-primary" onClick={OpeModal}>
+              <img src="/a17.png" alt="" className="cursor-pointer" />
+              Edit
             </button>
           </div>
           <ChatModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />

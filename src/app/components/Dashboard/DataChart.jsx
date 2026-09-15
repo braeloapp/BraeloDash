@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,29 +10,15 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getData } from "@/app/API/method";
-import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
+import { useDashboardStats } from "./DashboardStatsContext";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const CollectionChart = () => {
-  const [stats, setStats] = useState(emptyAdminStats());
-
-  useEffect(() => {
-    const fetchCollectionData = async () => {
-      try {
-        const response = await getData("/admin-panel/statistics");
-        setStats(normalizeAdminStats(response));
-      } catch (error) {
-        console.error("Error fetching collection data:", error);
-      }
-    };
-
-    fetchCollectionData();
-  }, []);
+  const { stats, loading } = useDashboardStats();
 
   const chartData = {
-    labels: ["Total Listings", "Businesses", "Users"],
+    labels: ["Listings", "Businesses", "Users"],
     datasets: [
       {
         label: "Count",
@@ -41,9 +27,10 @@ const CollectionChart = () => {
           stats.businesses.total || 0,
           stats.users.total || 0,
         ],
-        backgroundColor: ["#F3A000", "#FFE8BA", "#C98903"],
-        borderColor: ["#C98903", "#C98903", "#C98903"],
-        borderWidth: 1,
+        backgroundColor: ["#CD9403", "#D8B039", "#EE9E03"],
+        borderRadius: 10,
+        borderSkipped: false,
+        maxBarThickness: 48,
       },
     ],
   };
@@ -53,28 +40,54 @@ const CollectionChart = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
+        backgroundColor: "#232F30",
+        titleFont: { family: "inherit", size: 12 },
+        bodyFont: { family: "inherit", size: 12 },
+        padding: 10,
+        cornerRadius: 10,
         callbacks: {
-          label: function (context) {
+          label(context) {
             return `${context.label}: ${context.raw}`;
           },
         },
       },
     },
     scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: "#78828A", font: { size: 12, weight: "500" } },
+        border: { display: false },
+      },
       y: {
         beginAtZero: true,
-        title: { display: true, text: "Count" },
+        grace: "12%",
+        grid: { color: "#EEF1F4" },
+        ticks: { color: "#ACB6BE", precision: 0 },
+        border: { display: false },
+        title: {
+          display: true,
+          text: "Count",
+          color: "#ACB6BE",
+          font: { size: 11, weight: "500" },
+        },
       },
     },
   };
 
   return (
-    <div className="app-card">
-      <h4 className="mb-4 text-lg font-semibold text-[#495057] sm:text-xl">
-        Total Listings, Businesses & Users
-      </h4>
+    <div className="app-card h-full">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h4 className="section-title">Platform volume</h4>
+          <p className="page-desc">Listings, businesses, and users at a glance.</p>
+        </div>
+      </div>
       <div className="h-[220px] lg:h-[260px]">
-        <Bar data={chartData} options={{ ...options, maintainAspectRatio: false }} />
+        {loading ? (
+          <div className="skeleton h-full w-full" />
+        ) : (
+          <Bar data={chartData} options={{ ...options, maintainAspectRatio: false }} />
+        )}
       </div>
     </div>
   );

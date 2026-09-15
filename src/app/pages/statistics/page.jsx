@@ -3,17 +3,16 @@ import React from "react";
 import UserStatistics from "@/app/components/statistics/UserStatistics";
 import BusinessStatistics from "@/app/components/statistics/BusinessStatistics";
 import ListingCategorystats from "@/app/components/statistics/ListingCategorystats";
-import BackButton from "@/app/components/BackButton";
+import PageHeader from "@/app/components/ux/PageHeader";
 
 const Statistics = () => {
   return (
     <div className="page-shell">
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h3 className="page-title">Statistics</h3>
-        </div>
-      </div>
+      <PageHeader
+        showBack
+        title="Statistics"
+        description="Platform metrics across users, businesses, and listing categories."
+      />
       <div className="flex flex-col gap-5 p-4 sm:p-5">
         <UserStatistics />
         <BusinessStatistics />

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import BusinessHeader from '@/app/components/Business/BusinessHeader';
 import BusinessTable from '@/app/components/Business/BusinessTable';
 import { getData } from "@/app/API/method";
-import { debounce } from "lodash";
+import { debounce } from "@/lib/debounce";
 
 const BusinessPage = () => {
   const [businesses, setBusinesses] = useState([]);

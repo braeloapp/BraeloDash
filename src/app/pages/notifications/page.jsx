@@ -2,28 +2,28 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import NotificationsList from "@/app/components/Notifications/NotificationsList";
-import BackButton from "@/app/components/BackButton";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 const Notifications = () => {
   const router = useRouter();
 
   return (
     <div className="page-shell">
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-        <h1 className="page-title">Notifications</h1>
-        </div>
-        <button
-          className="btn-primary"
-          onClick={() => router.push("/pages/notifications/addnotification")}
-        >
-          Add New Notification
-        </button>
-      </div>
-      <div>
-        <NotificationsList />
-      </div>
+      <PageHeader
+        showBack
+        title="Notifications"
+        description="Review inbox activity and send announcements to the platform."
+        actions={
+          <Button
+            variant="primary"
+            onClick={() => router.push("/pages/notifications/addnotification")}
+          >
+            Add New Notification
+          </Button>
+        }
+      />
+      <NotificationsList />
     </div>
   );
 };

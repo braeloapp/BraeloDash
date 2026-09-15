@@ -1,11 +1,12 @@
 "use client";
-import BackButton from "@/app/components/BackButton";
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { postData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import { useRouter } from "next/navigation";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 const AddNewNotification = () => {
   const [messageData, setMessageData] = useState({
@@ -50,7 +51,6 @@ const AddNewNotification = () => {
       placeholder:
         "Just dropping by to let you know that there are 5 days left until your plan expires, eh? Do not waste time, get the plan that best fits your pocket now!",
     });
-
   };
 
   const handlePublish = async () => {
@@ -80,79 +80,56 @@ const AddNewNotification = () => {
   };
 
   return (
-    <div>
+    <div className="page-shell">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="page-header mb-4 px-0">
-        <div className="flex min-w-0 items-center gap-2">
-        <BackButton />
-        <h1 className="page-title">
-          Create New Notification
-        </h1>
-        </div>
-      </div>
+      <PageHeader
+        showBack
+        title="Create New Notification"
+        description="Compose and publish an announcement to platform users."
+      />
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mt-5">
-        <div className="col-span-1">
-          <label className="block text-gray-500 mb-2">Message Title</label>
-          <input
-            placeholder="Tic Tac, Tic Tac! Your plan needs you!"
-            className="w-full p-3 border border-gray-300 rounded-lg"
-            name="title"
-            value={messageData.title}
-            onChange={handleChange}
-            disabled={loading}
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2">
-        <div className="col-span-1">
-          <label className="block text-gray-500 mt-4">Description</label>
-          <textarea
-            placeholder={messagePreview.placeholder}
-            className="w-full h-40 p-3 border border-gray-300 rounded-lg"
-            name="description"
-            value={messageData.description}
-            onChange={handleChange}
-            disabled={loading}
-          />
-        </div>
-      </div>
-      {/* message preview */}
-
-      {/* <div className="grid grid-cols-2 relative">
-        <div className="mt-6">
-          <label className="block text-gray-500 mb-2">Message Preview</label>
-          <div className="p-4 border border-yellow-300 rounded-lg">
-            <div className="flex items-center border-b border-gray-300 pb-2 mb-4">
-              <p className="text-gray-500 font-bold">Notification</p>
-            </div>
-            <h3 className="font-bold">{messageData.title}</h3>
-            <p className="text-gray-500">
-              {messageData.description === ""
-                ? messagePreview.placeholder
-                : messagePreview.message}
-            </p>
+      <div className="space-y-5 p-4 sm:p-5">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <label className="field-label">Message Title</label>
+            <input
+              placeholder="Tic Tac, Tic Tac! Your plan needs you!"
+              className="field-control"
+              name="title"
+              value={messageData.title}
+              onChange={handleChange}
+              disabled={loading}
+            />
           </div>
         </div>
-      </div> */}
 
-      <div className="mt-6 flex justify-start gap-2 items-center">
-        <button
-          className="btn-ghost"
-          onClick={resetForm}
-          disabled={loading}
-        >
-          Cancel
-        </button>
-        <button
-          className="btn-primary"
-          type="button"
-          onClick={handlePublish}
-          disabled={loading}
-        >
-          {loading ? "Publishing..." : "Publish"}
-        </button>
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          <div>
+            <label className="field-label">Description</label>
+            <textarea
+              placeholder={messagePreview.placeholder}
+              className="field-control h-40"
+              name="description"
+              value={messageData.description}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-start gap-2">
+          <Button variant="ghost" onClick={resetForm} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            type="button"
+            onClick={handlePublish}
+            loading={loading}
+          >
+            Publish
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,74 +1,96 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { getData } from "@/app/API/method";
-import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
+import React from "react";
+import Link from "next/link";
+import { FiArrowRight } from "react-icons/fi";
+import { useDashboardStats } from "./DashboardStatsContext";
+import Badge from "@/app/components/ux/Badge";
 
 const ActiveUsers = () => {
-  const [stats, setStats] = useState(emptyAdminStats());
-
-  useEffect(() => {
-    const fetchActiveUsers = async () => {
-      try {
-        const response = await getData("/admin-panel/statistics");
-        setStats(normalizeAdminStats(response));
-      } catch (error) {
-        console.error("Error fetching active users:", error);
-      }
-    };
-
-    fetchActiveUsers();
-  }, []);
-
-  const recent = stats.recent_active_users.slice(0, 4);
+  const { stats, loading } = useDashboardStats();
+  const recent = stats.recent_active_users.slice(0, 6);
 
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="app-card col-span-12 md:col-span-4">
-        <h4 className="text-lg font-bold text-[#495057]">User Statistics</h4>
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-[#78828A]">Active Users</p>
-            <p className="mt-1 text-2xl font-semibold text-[#06B64C]">
-              {stats.users.active || 0}
+        <h4 className="section-title">User statistics</h4>
+        <p className="page-desc mb-4">Live counts from the users API.</p>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-3 text-center">
+            <p className="caption">Active</p>
+            <p className="mt-1 text-2xl font-semibold text-brand-success">
+              {loading ? "—" : stats.users.active || 0}
             </p>
           </div>
-          <div>
-            <p className="text-sm text-[#78828A]">New (7d)</p>
-            <p className="mt-1 text-2xl font-semibold text-[#CD9403]">
-              {stats.users.new_7d || 0}
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-3 text-center">
+            <p className="caption">New 7d</p>
+            <p className="mt-1 text-2xl font-semibold text-brand-gold">
+              {loading ? "—" : stats.users.new_7d || 0}
             </p>
           </div>
-          <div>
-            <p className="text-sm text-[#78828A]">Today</p>
-            <p className="mt-1 text-2xl font-semibold text-[#495057]">
-              {stats.users.new_today || 0}
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] p-3 text-center">
+            <p className="caption">Today</p>
+            <p className="mt-1 text-2xl font-semibold text-brand-ink">
+              {loading ? "—" : stats.users.new_today || 0}
             </p>
           </div>
         </div>
       </div>
 
       <div className="app-card col-span-12 md:col-span-8">
-        <p className="mb-3 text-[16px] font-semibold text-[#495057]">Recent Users</p>
-        {recent.length === 0 ? (
-          <p className="text-sm text-gray-500">No recent users</p>
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="section-title">Recent users</p>
+            <p className="page-desc">Newest accounts from live statistics.</p>
+          </div>
+          <Link
+            href="/pages/users"
+            className="inline-flex items-center gap-1 text-sm font-medium text-brand-gold transition hover:text-brand-hover"
+          >
+            View all <FiArrowRight size={14} />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="skeleton h-14 w-full" />
+            ))}
+          </div>
+        ) : recent.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-[var(--color-border)] px-4 py-8 text-center text-sm text-brand-muted">
+            No recent users yet.
+          </p>
         ) : (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {recent.map((person) => (
-              <div className="flex items-center justify-between" key={person.id}>
-                <div className="flex min-w-0 items-center">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#feefcb] font-semibold text-[#C98903]">
+            {recent.map((person) => {
+              const href =
+                person?.id != null
+                  ? `/pages/users/userdetail?id=${person.id}`
+                  : "/pages/users";
+              return (
+              <Link
+                key={person.id ?? person.email ?? person.name}
+                href={href}
+                className="flex items-center justify-between gap-3 rounded-xl border border-[var(--color-border)] bg-white px-3 py-2.5 transition hover:border-[#f0e2b3] hover:bg-[#FFFBF0]"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-cream text-sm font-semibold text-brand-gold ring-1 ring-[#f0e2b3]">
                     {(person.name || "U").charAt(0).toUpperCase()}
                   </div>
-                  <div className="ml-3 min-w-0">
-                    <p className="truncate text-sm text-gray-800">{person.name}</p>
-                    <p className="truncate text-xs text-gray-500">
-                      {person.city || "—"}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-brand-ink">
+                      {person.name || "User"}
+                    </p>
+                    <p className="truncate text-xs text-brand-faint">
+                      {person.city || person.email || "—"}
                     </p>
                   </div>
                 </div>
-              </div>
-            ))}
+                <Badge tone="brand">View</Badge>
+              </Link>
+              );
+            })}
           </div>
         )}
       </div>

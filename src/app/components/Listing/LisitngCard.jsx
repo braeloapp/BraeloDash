@@ -12,7 +12,10 @@ const ListingCard = ({
   onIconClick,
 }) => {
   return (
-    <div className="relative flex w-full min-h-[380px] flex-col overflow-hidden rounded-[24px] border border-[#EEF1F4] bg-white p-3 shadow-card">
+    <div
+      className="relative flex w-full min-h-[380px] flex-col overflow-hidden rounded-[24px] border bg-white p-3 shadow-card"
+      style={{ borderColor: "var(--brand-gold-soft, #d8b039)" }}
+    >
       <div className="relative h-48 w-full overflow-hidden rounded-xl sm:h-64">
         <img
           src={image}
@@ -33,7 +36,7 @@ const ListingCard = ({
             alt=""
             width={24}
             height={24}
-            className="w-8 cursor-pointer rounded-full bg-white/90 p-1 shadow-sm"
+            className="w-8 cursor-pointer rounded-full border border-[#F0E2B3] bg-white/90 p-1 shadow-sm"
             onClick={() => onIconClick(icon)}
           />
         ))}
@@ -48,10 +51,10 @@ const ListingCard = ({
         </div>
 
         {price && (
-          <p className="mt-2 text-[18px] font-bold text-[#78828A]">{price}</p>
+          <p className="mt-2 text-[18px] font-bold text-[#CD9403]">{price}</p>
         )}
         {salary && (
-          <p className="mt-2 text-[18px] font-bold text-[#78828A]">
+          <p className="mt-2 text-[18px] font-bold text-[#CD9403]">
             {salary}/mo
           </p>
         )}

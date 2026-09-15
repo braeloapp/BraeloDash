@@ -1,16 +1,15 @@
 import AllTickets from "@/app/components/Support/AllTickets";
 import React from "react";
-import BackButton from "@/app/components/BackButton";
+import PageHeader from "@/app/components/ux/PageHeader";
 
 const Support = () => {
   return (
     <div className="page-shell">
-      <div className="page-header">
-        <div className="flex min-w-0 items-center gap-2">
-          <BackButton />
-          <h1 className="page-title">Support Management</h1>
-        </div>
-      </div>
+      <PageHeader
+        showBack
+        title="Support Management"
+        description="Review and resolve customer support tickets."
+      />
       <AllTickets />
     </div>
   );

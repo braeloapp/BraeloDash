@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { FiArrowLeft } from "react-icons/fi"; // Import the left arrow icon
+import { FiArrowLeft } from "react-icons/fi";
 
 const BackButton = ({
   onBack,
@@ -15,16 +15,18 @@ const BackButton = ({
     if (onBack) {
       onBack();
     } else {
-      router.back(); // Use router.back() to navigate to the previous page
+      router.back();
     }
   };
 
   return (
     <button
-      className={`inline-flex shrink-0 items-center rounded-full bg-[#d8b039] p-2 transition hover:bg-[#CD9403] ${buttonStyle}`}
+      type="button"
+      aria-label="Go back"
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-white transition hover:bg-brand-gold focus-visible:outline-none focus-visible:shadow-focus ${buttonStyle}`}
       onClick={handleBackClick}
     >
-      <FiArrowLeft className={`text-white ${iconStyle}`} size={iconSize} />
+      <FiArrowLeft className={iconStyle} size={iconSize} />
     </button>
   );
 };

@@ -201,13 +201,19 @@ export default function UserTable({ data, loading, onRefresh }) {
   };
 
   const RoleDisplay = (rowData) => {
-    const roleValue = rowData.role;
-    if (typeof roleValue === 'boolean') {
-      return <div>{roleValue ? "Admin" : "Client"}</div>;
-    } else if (typeof roleValue === 'string') {
-      return <div>{roleValue.toLowerCase() === 'admin' ? "Admin" : "Client"}</div>;
-    }
-    return <div>Client</div>;
+    const isAdmin =
+      (rowData?.is_staff === true && rowData?.is_superuser === true) ||
+      rowData?.is_staff === true ||
+      rowData?.is_superuser === true ||
+      rowData?.role === true ||
+      String(rowData?.role || "").toLowerCase() === "admin" ||
+      String(rowData?.role || "").toLowerCase() === "super_admin";
+
+    return (
+      <span className={isAdmin ? "badge badge-brand" : "badge badge-neutral"}>
+        {isAdmin ? "Admin" : "Client"}
+      </span>
+    );
   };
 
 
@@ -226,6 +232,7 @@ export default function UserTable({ data, loading, onRefresh }) {
             first={first}
             rows={rows}
             onPage={onPage}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             tableStyle={{ width: "100%" }}
             loading={loading}

@@ -9,12 +9,13 @@ import { getApiErrorMessage } from "@/lib/apiResponse";
 import React, { useState, useRef, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import BackButton from "@/app/components/BackButton";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { postBusiData } from "@/app/API/method";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PageHeader from "@/app/components/ux/PageHeader";
+import Button from "@/app/components/ux/Button";
 
 // Categories (API values) and subcategories — keys must match backend expectations
 const categories = [
@@ -404,7 +405,7 @@ const AddNewBusiness = () => {
   }, [mapLoaded]);
 
   return (
-    <div className="p-5">
+    <div className="page-shell">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -416,41 +417,39 @@ const AddNewBusiness = () => {
         draggable
         pauseOnHover
       />
-      <div className="flex items-center gap-2">
-        <BackButton />
-        <h1 className="text-[#78828A] text-[24px] font-[500]">
-          Add New Business
-        </h1>
-      </div>
+      <PageHeader
+        showBack
+        title="Add New Business"
+        description="Create a business profile with media, contact details, and category."
+      />
 
-      <div className="p-5">
-        <form onSubmit={formik.handleSubmit}>
-          <label
-            htmlFor="business_name"
-            className="text-[#78828A] text-[16px] font-[600]"
-          >
-            Business Name
-          </label>
+      <div className="p-4 sm:p-5">
+        <form onSubmit={formik.handleSubmit} className="space-y-4">
           <div>
+            <label htmlFor="business_name" className="field-label">
+              Business Name
+            </label>
             <input
               id="business_name"
               name="business_name"
               placeholder="Enter business name"
-              className="border p-2 rounded-lg w-full"
+              className={`field-control ${
+                formik.touched.business_name && formik.errors.business_name
+                  ? "field-control--error"
+                  : ""
+              }`}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.business_name}
             />
             {formik.touched.business_name && formik.errors.business_name ? (
-              <div className="text-red-600">{formik.errors.business_name}</div>
+              <div className="field-error">{formik.errors.business_name}</div>
             ) : null}
           </div>
 
-          <div className="mt-4">
-            <h6 className="text-[#78828A] text-[16px] font-[600]">
-              Business Logo
-            </h6>
-            <div className="mt-4 flex w-full flex-col items-center overflow-hidden rounded-lg border-2 border-dotted border-gray-300 bg-neutral-50/60">
+          <div>
+            <h6 className="field-label">Business Logo</h6>
+            <div className="mt-2 flex w-full flex-col items-center overflow-hidden rounded-xl border border-dashed border-[#e8edf2] bg-[var(--color-surface-elevated)]">
               <div className="flex min-h-[200px] max-h-[300px] w-full items-center justify-center p-3">
                 {logoPreview ? (
                   <img
@@ -486,21 +485,19 @@ const AddNewBusiness = () => {
                 )}
               </div>
               <div className="flex flex-col justify-center px-3 pb-4 pt-1">
-                <p className="text-center text-[16px] text-[#AB9E7D]">
+                <p className="text-center text-sm text-[var(--color-text-muted)]">
                   Required dimensions
                 </p>
-                <p className="text-center text-[16px] text-[#AB9E7D]">
+                <p className="text-center text-sm text-[var(--color-text-muted)]">
                   1080x1920 pixels
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-4">
-            <h6 className="text-[#78828A] text-[16px] font-[600]">
-              Business Banner
-            </h6>
-            <div className="mt-4 flex w-full flex-col items-center overflow-hidden rounded-lg border-2 border-dotted border-gray-300 bg-neutral-50/60">
+          <div>
+            <h6 className="field-label">Business Banner</h6>
+            <div className="mt-2 flex w-full flex-col items-center overflow-hidden rounded-xl border border-dashed border-[#e8edf2] bg-[var(--color-surface-elevated)]">
               <div className="flex min-h-[200px] max-h-[300px] w-full items-center justify-center p-3">
                 {bannerPreview ? (
                   <img
@@ -536,21 +533,19 @@ const AddNewBusiness = () => {
                 )}
               </div>
               <div className="flex flex-col justify-center px-3 pb-4 pt-1">
-                <p className="text-center text-[16px] text-[#AB9E7D]">
+                <p className="text-center text-sm text-[var(--color-text-muted)]">
                   Required dimensions
                 </p>
-                <p className="text-center text-[16px] text-[#AB9E7D]">
+                <p className="text-center text-sm text-[var(--color-text-muted)]">
                   1080x1920 pixels
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-4">
-            <h6 className="text-[#78828A] text-[16px] font-[600]">
-              Business Images
-            </h6>
-            <div className="mt-4 flex w-full flex-col items-center overflow-hidden rounded-lg border-2 border-dotted border-gray-300 bg-neutral-50/60">
+          <div>
+            <h6 className="field-label">Business Images</h6>
+            <div className="mt-2 flex w-full flex-col items-center overflow-hidden rounded-xl border border-dashed border-[#e8edf2] bg-[var(--color-surface-elevated)]">
               <div className="flex min-h-[200px] w-full items-start justify-center p-3">
                 {imagePreviews.length > 0 ? (
                   <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
@@ -596,49 +591,41 @@ const AddNewBusiness = () => {
                 )}
               </div>
               <div className="flex flex-col justify-center px-3 pb-4 pt-1">
-                <p className="text-center text-[16px] text-[#AB9E7D]">
+                <p className="text-center text-sm text-[var(--color-text-muted)]">
                   Upload multiple images
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="mt-4">
-            <label
-              htmlFor="business_address"
-              className="text-[#78828A] text-[16px] font-[600]"
-            >
+          <div>
+            <label htmlFor="business_address" className="field-label">
               Business Address (Start typing to search)
             </label>
             <input
               id="business_address"
               name="business_address"
               placeholder="Enter business address"
-              className="border p-2 rounded-lg w-full mt-2"
+              className={`field-control ${
+                formik.touched.business_address && formik.errors.business_address
+                  ? "field-control--error"
+                  : ""
+              }`}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.business_address}
             />
             {formik.touched.business_address &&
             formik.errors.business_address ? (
-              <div className="text-red-600">
+              <div className="field-error">
                 {formik.errors.business_address}
               </div>
             ) : null}
-            {/* {coordinates.lat && coordinates.lng && (
-              <div className="text-sm text-gray-500 mt-1">
-                Coordinates: {coordinates.lat.toFixed(6)},{" "}
-                {coordinates.lng.toFixed(6)} 
-              </div>
-            )} */}
           </div>
 
-          <div className="flex gap-4 mt-5">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <div className="flex-1">
-              <label
-                htmlFor="business_number"
-                className="text-[#78828A] text-[16px] font-[600]"
-              >
+              <label htmlFor="business_number" className="field-label">
                 Business Number
               </label>
               <input
@@ -648,24 +635,25 @@ const AddNewBusiness = () => {
                 inputMode="tel"
                 autoComplete="tel"
                 placeholder="+1 234 567 8900"
-                className="border p-2 rounded-lg w-full mt-2"
+                className={`field-control ${
+                  formik.touched.business_number && formik.errors.business_number
+                    ? "field-control--error"
+                    : ""
+                }`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.business_number}
               />
               {formik.touched.business_number &&
               formik.errors.business_number ? (
-                <div className="text-red-600">
+                <div className="field-error">
                   {formik.errors.business_number}
                 </div>
               ) : null}
             </div>
 
             <div className="flex-1">
-              <label
-                htmlFor="business_email"
-                className="text-[#78828A] text-[16px] font-[600]"
-              >
+              <label htmlFor="business_email" className="field-label">
                 Business Email
               </label>
               <input
@@ -675,26 +663,27 @@ const AddNewBusiness = () => {
                 inputMode="email"
                 autoComplete="email"
                 placeholder="name@company.com"
-                className="border p-2 rounded-lg w-full mt-2"
+                className={`field-control ${
+                  formik.touched.business_email && formik.errors.business_email
+                    ? "field-control--error"
+                    : ""
+                }`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.business_email}
               />
               {formik.touched.business_email &&
               formik.errors.business_email ? (
-                <div className="text-red-600">
+                <div className="field-error">
                   {formik.errors.business_email}
                 </div>
               ) : null}
             </div>
           </div>
 
-          <div className="flex gap-4 mt-5">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <div className="flex-1">
-              <label
-                htmlFor="business_website"
-                className="text-[#78828A] text-[16px] font-[600]"
-              >
+              <label htmlFor="business_website" className="field-label">
                 Business Website
               </label>
               <input
@@ -704,30 +693,37 @@ const AddNewBusiness = () => {
                 inputMode="url"
                 autoComplete="url"
                 placeholder="https://example.com (optional)"
-                className="border p-2 rounded-lg w-full mt-2"
+                className={`field-control ${
+                  formik.touched.business_website &&
+                  formik.errors.business_website
+                    ? "field-control--error"
+                    : ""
+                }`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.business_website}
               />
               {formik.touched.business_website &&
               formik.errors.business_website ? (
-                <div className="text-red-600">
+                <div className="field-error">
                   {formik.errors.business_website}
                 </div>
               ) : null}
             </div>
 
             <div className="flex-1">
-              <label
-                htmlFor="business_category"
-                className="text-[#78828A] text-[16px] font-[600]"
-              >
+              <label htmlFor="business_category" className="field-label">
                 Business Category
               </label>
               <select
                 id="business_category"
                 name="business_category"
-                className="border p-2 rounded-lg w-full mt-2"
+                className={`field-control ${
+                  formik.touched.business_category &&
+                  formik.errors.business_category
+                    ? "field-control--error"
+                    : ""
+                }`}
                 onChange={(e) => {
                   formik.setFieldValue("business_category", e.target.value);
                   formik.setFieldValue("business_subcategory", "");
@@ -744,74 +740,77 @@ const AddNewBusiness = () => {
               </select>
               {formik.touched.business_category &&
               formik.errors.business_category ? (
-                <div className="text-red-600">
+                <div className="field-error">
                   {formik.errors.business_category}
                 </div>
               ) : null}
             </div>
           </div>
 
-          <div className="flex gap-4 mt-5">
-            <div className="flex-1">
-              <label
-                htmlFor="business_subcategory"
-                className="text-[#78828A] text-[16px] font-[600]"
-              >
-                Business Subcategory
-              </label>
-              <select
-                id="business_subcategory"
-                name="business_subcategory"
-                className="border p-2 rounded-lg w-full mt-2"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.business_subcategory}
-                disabled={!formik.values.business_category}
-              >
-                <option value="">Select a subcategory</option>
-                {formik.values.business_category &&
-                  categories
-                    .find((c) => c.value === formik.values.business_category)
-                    ?.subcategories.map((sub) => (
-                      <option key={sub} value={sub}>
-                        {sub}
-                      </option>
-                    ))}
-              </select>
-              {formik.touched.business_subcategory &&
-              formik.errors.business_subcategory ? (
-                <div className="text-red-600">
-                  {formik.errors.business_subcategory}
-                </div>
-              ) : null}
-            </div>
+          <div>
+            <label htmlFor="business_subcategory" className="field-label">
+              Business Subcategory
+            </label>
+            <select
+              id="business_subcategory"
+              name="business_subcategory"
+              className={`field-control ${
+                formik.touched.business_subcategory &&
+                formik.errors.business_subcategory
+                  ? "field-control--error"
+                  : ""
+              }`}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.business_subcategory}
+              disabled={!formik.values.business_category}
+            >
+              <option value="">Select a subcategory</option>
+              {formik.values.business_category &&
+                categories
+                  .find((c) => c.value === formik.values.business_category)
+                  ?.subcategories.map((sub) => (
+                    <option key={sub} value={sub}>
+                      {sub}
+                    </option>
+                  ))}
+            </select>
+            {formik.touched.business_subcategory &&
+            formik.errors.business_subcategory ? (
+              <div className="field-error">
+                {formik.errors.business_subcategory}
+              </div>
+            ) : null}
           </div>
 
-          <div className="mt-4">
-            <label
-              htmlFor="business_goals"
-              className="text-[#78828A] text-[16px] font-[600]"
-            >
+          <div>
+            <label htmlFor="business_goals" className="field-label">
               Business Goals
             </label>
             <textarea
               id="business_goals"
               name="business_goals"
               placeholder="Describe your business goals..."
-              className="border p-2 rounded-lg w-full h-[100px]"
+              className="field-control h-[100px]"
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.business_goals}
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn-primary mt-6"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
+          <div className="flex justify-end gap-2 pt-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/pages/business")}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="primary" loading={isSubmitting}>
+              Submit
+            </Button>
+          </div>
         </form>
       </div>
     </div>

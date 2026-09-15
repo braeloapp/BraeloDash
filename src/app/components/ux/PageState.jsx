@@ -2,6 +2,7 @@
 
 import React from "react";
 import AppLoader from "./AppLoader";
+import Button from "./Button";
 
 export default function PageState({
   status = "empty",
@@ -9,13 +10,15 @@ export default function PageState({
   description,
   onRetry,
   retryLabel = "Retry",
+  action,
 }) {
   if (status === "loading") {
     return <AppLoader label={title || "Loading..."} />;
   }
 
   const isError = status === "error";
-  const heading = title || (isError ? "Unable to load this page" : "Nothing to show");
+  const heading =
+    title || (isError ? "Unable to load this page" : "Nothing to show");
 
   return (
     <div
@@ -23,26 +26,23 @@ export default function PageState({
       role={isError ? "alert" : "status"}
       aria-live="polite"
     >
-      <div className="mb-4 rounded-2xl bg-[#F6F8FB] p-6 text-[#ACB6BE]">
-        <p className="text-sm uppercase tracking-wide">
+      <div className="mb-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-elevated)] px-6 py-5 text-[var(--color-text-muted)]">
+        <p className="text-xs font-semibold uppercase tracking-wide">
           {isError ? "Error" : "Empty"}
         </p>
       </div>
-      <p className="mt-4 text-lg font-semibold text-[#78828A]">{heading}</p>
+      <p className="section-title mt-2 !text-[var(--color-text-secondary)]">
+        {heading}
+      </p>
       {description ? (
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-[#ACB6BE]">
-          {description}
-        </p>
+        <p className="page-desc mx-auto mt-2 max-w-md">{description}</p>
       ) : null}
       {onRetry ? (
-        <button
-          type="button"
-          onClick={onRetry}
-          className="btn-primary mt-5"
-        >
+        <Button type="button" variant="primary" onClick={onRetry} className="mt-5">
           {retryLabel}
-        </button>
+        </Button>
       ) : null}
+      {action ? <div className="mt-5">{action}</div> : null}
     </div>
   );
 }

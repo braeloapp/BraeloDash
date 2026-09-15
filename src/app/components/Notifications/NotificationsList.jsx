@@ -263,13 +263,9 @@ const NotificationsList = () => {
                           {notification.title}
                         </h3>
                         {notification.unread ? (
-                          <span className="rounded-full bg-[#CD9403] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                            Unread
-                          </span>
+                          <span className="badge badge-brand">Unread</span>
                         ) : (
-                          <span className="rounded-full bg-[#F3F5F7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#ACB6BE]">
-                            Read
-                          </span>
+                          <span className="badge badge-neutral">Read</span>
                         )}
                       </div>
                       <p className="mt-0.5 line-clamp-2 text-sm text-[#78828A]">

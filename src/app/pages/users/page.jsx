@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import UserHeader from "@/app/components/Users/UserHeader";
 import UserDataTable from "@/app/components/Users/UserDataTable";
 import { getData } from "@/app/API/method";
-import { debounce } from "lodash";
+import { debounce } from "@/lib/debounce";
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
