@@ -126,7 +126,7 @@ const NavBar = ({ onMenuClick }) => {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 shrink-0 border-b border-[var(--color-border)] bg-white/95 backdrop-blur">
+    <header className="admin-topbar sticky top-0 z-30 shrink-0 border-b backdrop-blur">
       <div className="flex items-center gap-3 px-3 py-3 sm:px-5 sm:py-4">
         <button
           type="button"
@@ -138,7 +138,7 @@ const NavBar = ({ onMenuClick }) => {
         </button>
 
         <div className="relative min-w-0 flex-1 md:max-w-md lg:max-w-xl" ref={searchContainerRef}>
-          <div className="flex items-center rounded-full border border-[var(--color-border)] bg-brand-canvas px-3 py-2.5 transition focus-within:border-[#f0e2b3] focus-within:shadow-focus">
+          <div className="flex items-center rounded-full border border-[#f0e2b3] bg-gradient-to-r from-[#fff8e8] to-[#f6f8fb] px-3 py-2.5 transition focus-within:border-[#CD9403]/50 focus-within:shadow-focus">
             <Image
               src="/images/Seacrh.png"
               alt=""
@@ -216,7 +216,7 @@ const NavBar = ({ onMenuClick }) => {
 
           <button
             type="button"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl bg-brand-cream transition hover:bg-brand-bright/40"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#fff1c2] to-[#feefcb] ring-1 ring-[#f0e2b3] transition hover:from-[#FFCC35]/50 hover:to-[#feefcb]"
             onClick={() => router.push("/pages/notifications")}
             aria-label={unreadCount ? `${unreadCount} unread notifications` : "Notifications"}
           >
@@ -228,13 +228,13 @@ const NavBar = ({ onMenuClick }) => {
             ) : null}
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-brand-canvas ring-1 ring-[var(--color-border)]">
+          <div className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-[#fff8e8] to-transparent py-1 pl-1 pr-2 ring-1 ring-[#f0e2b3]/70">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-brand-canvas ring-2 ring-[#FFCC35]/50">
               <Image src="/images/profile (1).png" fill alt="" className="object-cover" />
             </div>
             <div className="hidden min-w-0 lg:block">
               <p className="truncate text-sm font-semibold text-brand-ink">{userName}</p>
-              <p className="truncate text-[11px] font-medium text-brand-muted">{roleLabel}</p>
+              <p className="truncate text-[11px] font-medium text-brand-gold">{roleLabel}</p>
             </div>
           </div>
         </div>

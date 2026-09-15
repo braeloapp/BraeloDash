@@ -79,8 +79,8 @@ body {
 }
 
 .admin-panel {
-  background-color: var(--color-background) !important;
-  color: var(--color-text-primary) !important;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
@@ -684,15 +684,307 @@ body {
   }
 }
 
+.admin-sidebar {
+  background:
+    radial-gradient(120% 70% at 0% 0%, rgba(205, 148, 3, 0.22), transparent 55%),
+    radial-gradient(90% 50% at 100% 100%, rgba(255, 204, 53, 0.08), transparent 50%),
+    linear-gradient(180deg, #262c32 0%, #2f363c 42%, #262b30 100%);
+  color: #fff;
+}
+
+.admin-sidebar a,
+.admin-sidebar button,
+.admin-sidebar .admin-sidebar-link,
+.admin-sidebar .admin-sidebar-link span {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.admin-sidebar .admin-sidebar-link:hover,
+.admin-sidebar .admin-sidebar-link:hover span {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .admin-sidebar-link--active,
+.admin-sidebar .admin-sidebar-link--active span {
+  color: #ffffff !important;
+}
+
+.admin-sidebar .admin-sidebar-section button span {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.admin-sidebar .admin-sidebar-section--active > button span {
+  color: rgba(255, 204, 53, 0.95) !important;
+}
+
+.admin-sidebar .admin-sidebar-footer p:first-child {
+  color: #ffcc35 !important;
+}
+
+.admin-sidebar .admin-sidebar-footer p:last-child {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.admin-shell {
+  background:
+    radial-gradient(900px 420px at 12% -10%, rgba(255, 204, 53, 0.28), transparent 55%),
+    radial-gradient(700px 380px at 100% 0%, rgba(205, 148, 3, 0.14), transparent 50%),
+    linear-gradient(180deg, #f7f1e3 0%, #f3f5f7 42%, #eef1f4 100%);
+}
+
+.admin-main {
+  background:
+    linear-gradient(180deg, rgba(255, 252, 245, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%);
+  box-shadow:
+    0 12px 40px rgba(58, 66, 72, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(205, 148, 3, 0.18) !important;
+}
+
+.admin-topbar {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 230, 0.95) 0%,
+    rgba(255, 255, 255, 0.92) 100%
+  );
+  border-bottom-color: rgba(205, 148, 3, 0.16) !important;
+}
+
+.admin-sidebar__aurora {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 30%, rgba(255, 204, 53, 0.12), transparent 35%),
+    radial-gradient(circle at 85% 70%, rgba(205, 148, 3, 0.1), transparent 40%);
+  animation: braelo-sidebar-aurora 12s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+.admin-sidebar__noise {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.admin-sidebar__seam {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 204, 53, 0.55),
+    rgba(255, 255, 255, 0.25),
+    rgba(205, 148, 3, 0.55),
+    transparent
+  );
+  box-shadow: 0 8px 24px rgba(205, 148, 3, 0.25);
+}
+
 .admin-sidebar::-webkit-scrollbar {
   width: 6px;
 }
 .admin-sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 204, 53, 0.22);
   border-radius: 99px;
 }
 .admin-sidebar::-webkit-scrollbar-track {
   background: transparent;
+}
+
+.admin-sidebar-section {
+  border-radius: 18px;
+  padding: 2px;
+}
+
+.admin-sidebar-section--active {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 204, 53, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 204, 53, 0.08);
+}
+
+.admin-sidebar-link--active {
+  background: linear-gradient(115deg, #ffcc35 0%, #e0ac1d 42%, #cd9403 100%);
+  background-size: 180% 180%;
+  animation: braelo-gold-flow 7s ease-in-out infinite;
+  box-shadow:
+    0 12px 28px rgba(205, 148, 3, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.admin-sidebar-link__pulse {
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.28) 48%,
+    transparent 65%
+  );
+  background-size: 220% 100%;
+  animation: braelo-gold-shine 3.8s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+
+.admin-sidebar-footer {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 204, 53, 0.12),
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(205, 148, 3, 0.08)
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 204, 53, 0.14),
+    0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.admin-sidebar-footer__glow {
+  position: absolute;
+  inset: -40% auto auto -20%;
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 204, 53, 0.28), transparent 70%);
+  filter: blur(8px);
+  animation: braelo-gold-glow 6s ease-in-out infinite alternate;
+}
+
+/* Animated golden brand header */
+.admin-sidebar-brand {
+  background: linear-gradient(
+    125deg,
+    #fff1c2 0%,
+    #ffcc35 16%,
+    #f0b429 36%,
+    #cd9403 55%,
+    #e0ac1d 74%,
+    #ffd860 100%
+  );
+  background-size: 300% 300%;
+  animation: braelo-gold-flow 8s ease-in-out infinite;
+  border-bottom: 1px solid rgba(120, 80, 0, 0.16);
+}
+
+.admin-sidebar-brand__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -45% -25%;
+  background:
+    radial-gradient(circle at 18% 35%, rgba(255, 255, 255, 0.65), transparent 40%),
+    radial-gradient(circle at 82% 25%, rgba(255, 236, 170, 0.75), transparent 42%),
+    radial-gradient(circle at 50% 120%, rgba(205, 148, 3, 0.55), transparent 48%);
+  animation: braelo-gold-glow 6.5s ease-in-out infinite alternate;
+}
+
+.admin-sidebar-brand__shine {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 32%,
+    rgba(255, 255, 255, 0.55) 48%,
+    transparent 64%
+  );
+  background-size: 220% 100%;
+  animation: braelo-gold-shine 3.6s ease-in-out infinite;
+  mix-blend-mode: soft-light;
+}
+
+.admin-sidebar-brand__orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(2px);
+  opacity: 0.55;
+}
+
+.admin-sidebar-brand__orb--a {
+  width: 70px;
+  height: 70px;
+  left: -12px;
+  bottom: -28px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7), transparent 70%);
+  animation: braelo-orb-float 5.5s ease-in-out infinite;
+}
+
+.admin-sidebar-brand__orb--b {
+  width: 54px;
+  height: 54px;
+  right: 8px;
+  top: -18px;
+  background: radial-gradient(circle, rgba(255, 236, 170, 0.9), transparent 70%);
+  animation: braelo-orb-float 7s ease-in-out infinite reverse;
+}
+
+@keyframes braelo-gold-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes braelo-gold-glow {
+  0% {
+    transform: translate3d(-4%, -2%, 0) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate3d(6%, 4%, 0) scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes braelo-gold-shine {
+  0% {
+    background-position: 140% 0;
+  }
+  100% {
+    background-position: -40% 0;
+  }
+}
+
+@keyframes braelo-orb-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -8px, 0);
+  }
+}
+
+@keyframes braelo-sidebar-aurora {
+  0% {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, -12px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar-brand,
+  .admin-sidebar-brand__glow,
+  .admin-sidebar-brand__shine,
+  .admin-sidebar-brand__orb,
+  .admin-sidebar__aurora,
+  .admin-sidebar-link--active,
+  .admin-sidebar-link__pulse,
+  .admin-sidebar-footer__glow {
+    animation: none;
+  }
 }
 
 /* Remap leftover Tailwind/Prime primary blues to brand gold */

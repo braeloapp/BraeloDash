@@ -1,22 +1,33 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { FiX } from "react-icons/fi";
+import { FiChevronDown, FiX } from "react-icons/fi";
 import { sidebarGroups, sidebarItems } from "./navItems";
+
+const COLLAPSE_KEY = "braelo_admin_sidebar_collapsed";
 
 function isItemActive(pathname, path) {
   if (!pathname || !path) return false;
   if (pathname === path) return true;
-  // Avoid /pages/users matching /pages/users/... incorrectly for siblings —
-  // still allow nested routes under the same section.
   return pathname.startsWith(`${path}/`) || pathname.startsWith(`${path}?`);
+}
+
+function loadCollapsed() {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(COLLAPSE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
 }
 
 const Sidebar = ({ open = false, onClose }) => {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState({});
 
   const grouped = useMemo(() => {
     return sidebarGroups
@@ -27,26 +38,62 @@ const Sidebar = ({ open = false, onClose }) => {
       .filter((section) => section.items.length > 0);
   }, []);
 
+  useEffect(() => {
+    setCollapsed(loadCollapsed());
+  }, []);
+
+  useEffect(() => {
+    const activeGroup = sidebarItems.find((item) =>
+      isItemActive(pathname, item.to)
+    )?.group;
+    if (!activeGroup) return;
+    setCollapsed((prev) => {
+      if (!prev[activeGroup]) return prev;
+      const next = { ...prev, [activeGroup]: false };
+      try {
+        window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }, [pathname]);
+
+  const toggleGroup = (group) => {
+    setCollapsed((prev) => {
+      const next = { ...prev, [group]: !prev[group] };
+      try {
+        window.localStorage.setItem(COLLAPSE_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
   return (
     <aside
-      className={`admin-sidebar fixed inset-y-0 left-0 z-50 flex h-dvh w-[272px] flex-col overflow-hidden border-r border-white/5 bg-[#2f363c] transition-transform duration-300 md:translate-x-0 ${
+      className={`admin-sidebar fixed inset-y-0 left-0 z-50 flex h-dvh w-[280px] flex-col overflow-hidden border-r border-white/[0.06] transition-transform duration-300 md:translate-x-0 ${
         open ? "translate-x-0" : "max-md:-translate-x-full"
       }`}
       aria-label="Admin navigation"
     >
+      <div className="admin-sidebar__aurora" aria-hidden />
+      <div className="admin-sidebar__noise" aria-hidden />
+
       {/* Brand header */}
-      <div className="relative shrink-0 overflow-hidden bg-gradient-to-br from-[#FFCC35] via-[#F0B429] to-[#CD9403] px-5 py-4">
-        <div
-          className="pointer-events-none absolute -right-6 -top-8 h-24 w-24 rounded-full bg-white/20 blur-2xl"
-          aria-hidden
-        />
-        <div className="relative flex items-center justify-center">
+      <div className="admin-sidebar-brand relative shrink-0 overflow-hidden px-5 py-5">
+        <div className="admin-sidebar-brand__glow" aria-hidden />
+        <div className="admin-sidebar-brand__shine" aria-hidden />
+        <div className="admin-sidebar-brand__orb admin-sidebar-brand__orb--a" aria-hidden />
+        <div className="admin-sidebar-brand__orb admin-sidebar-brand__orb--b" aria-hidden />
+        <div className="relative z-[1] flex items-center justify-center">
           <Image
-            src="/black logo.png"
-            alt="Braelo"
-            width={168}
-            height={42}
-            className="h-auto w-[142px] object-contain drop-shadow-sm"
+            src="/braelo-logo.png"
+            alt="braelo"
+            width={200}
+            height={56}
+            className="h-10 w-auto object-contain drop-shadow-[0_6px_16px_rgba(80,40,0,0.28)]"
             priority
           />
         </div>
@@ -54,7 +101,7 @@ const Sidebar = ({ open = false, onClose }) => {
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/5 text-[#2f363c] transition hover:bg-black/10 md:hidden"
+            className="absolute right-3 top-1/2 z-[2] inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-black/15 text-[#2a2208] transition hover:bg-black/25 md:hidden"
             aria-label="Close menu"
           >
             <FiX size={18} />
@@ -62,68 +109,152 @@ const Sidebar = ({ open = false, onClose }) => {
         ) : null}
       </div>
 
+      {/* Soft gold seam under brand */}
+      <div className="admin-sidebar__seam" aria-hidden />
+
       {/* Nav */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
-        <nav className="flex flex-col gap-5 pb-6">
-          {grouped.map((section) => (
-            <div key={section.group}>
-              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
-                {section.group}
-              </p>
-              <ul className="flex flex-col gap-1">
-                {section.items.map((item) => {
-                  const active = isItemActive(pathname, item.to);
-                  return (
-                    <li key={item.to}>
-                      <Link
-                        href={item.to}
-                        onClick={onClose}
-                        aria-current={active ? "page" : undefined}
-                        className={`group relative flex items-center gap-3 overflow-hidden rounded-xl px-2.5 py-2.5 text-sm transition-all duration-150 ${
-                          active
-                            ? "bg-gradient-to-r from-[#D8B039] to-[#CD9403] font-semibold text-white shadow-[0_10px_24px_rgba(205,148,3,0.28)]"
-                            : "font-medium text-white/75 hover:bg-white/[0.07] hover:text-white"
-                        }`}
-                      >
-                        {active ? (
-                          <span
-                            className="absolute inset-y-2 left-0 w-[3px] rounded-r-full bg-white/90"
-                            aria-hidden
-                          />
-                        ) : null}
-                        <span
-                          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition ${
-                            active
-                              ? "bg-white/20"
-                              : "bg-white/[0.06] group-hover:bg-white/10"
-                          }`}
-                        >
-                          <Image
-                            src={item.icon}
-                            alt=""
-                            width={18}
-                            height={18}
-                            className="h-[18px] w-[18px] object-contain brightness-0 invert opacity-95"
-                          />
-                        </span>
-                        <span className="truncate">{item.label}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+      <div className="relative z-[1] min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
+        <nav className="flex flex-col gap-3 pb-8">
+          {grouped.map((section) => {
+            const isCollapsed = Boolean(collapsed[section.group]);
+            const hasActive = section.items.some((item) =>
+              isItemActive(pathname, item.to)
+            );
+            const panelId = `sidebar-panel-${section.group}`;
+
+            return (
+              <div
+                key={section.group}
+                className={`admin-sidebar-section ${
+                  hasActive ? "admin-sidebar-section--active" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(section.group)}
+                  aria-expanded={!isCollapsed}
+                  aria-controls={panelId}
+                  className="group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition hover:bg-white/[0.05]"
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full transition ${
+                        hasActive
+                          ? "bg-[#FFCC35] shadow-[0_0_10px_rgba(255,204,53,0.8)]"
+                          : "bg-white/25 group-hover:bg-[#D8B039]/70"
+                      }`}
+                      aria-hidden
+                    />
+                    <span
+                      className={`text-[10px] font-semibold uppercase tracking-[0.2em] transition ${
+                        hasActive
+                          ? "text-[#FFCC35]/90"
+                          : "text-white/38 group-hover:text-white/58"
+                      }`}
+                    >
+                      {section.group}
+                    </span>
+                  </span>
+                  <FiChevronDown
+                    size={14}
+                    className={`shrink-0 transition-all duration-200 ${
+                      hasActive ? "text-[#FFCC35]/80" : "text-white/30 group-hover:text-white/50"
+                    } ${isCollapsed ? "-rotate-90" : "rotate-0"}`}
+                    aria-hidden
+                  />
+                </button>
+
+                <div
+                  id={panelId}
+                  className={`grid transition-[grid-template-rows] duration-300 ease-out ${
+                    isCollapsed ? "grid-rows-[0fr]" : "grid-rows-[1fr]"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <ul className="mt-1 flex flex-col gap-1.5 pb-1.5">
+                      {section.items.map((item) => {
+                        const active = isItemActive(pathname, item.to);
+                        return (
+                          <li key={item.to}>
+                            <Link
+                              href={item.to}
+                              onClick={onClose}
+                              aria-current={active ? "page" : undefined}
+                              className={`admin-sidebar-link group relative flex items-center gap-3 overflow-hidden rounded-2xl px-2.5 py-2.5 text-sm transition-all duration-200 ${
+                                active
+                                  ? "admin-sidebar-link--active font-semibold"
+                                  : "font-medium"
+                              }`}
+                            >
+                              {active ? (
+                                <span
+                                  className="admin-sidebar-link__pulse absolute inset-0"
+                                  aria-hidden
+                                />
+                              ) : (
+                                <span
+                                  className="absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+                                  style={{
+                                    background:
+                                      "linear-gradient(90deg, rgba(255,204,53,0.08), rgba(255,255,255,0.04) 55%, transparent)",
+                                  }}
+                                  aria-hidden
+                                />
+                              )}
+                              <span
+                                className={`relative z-[1] inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition ${
+                                  active
+                                    ? "bg-white/20 shadow-inner"
+                                    : "bg-white/[0.05] ring-1 ring-white/[0.06] group-hover:bg-[#CD9403]/20 group-hover:ring-[#FFCC35]/20"
+                                }`}
+                              >
+                                <Image
+                                  src={item.icon}
+                                  alt=""
+                                  width={18}
+                                  height={18}
+                                  className="h-[18px] w-[18px] object-contain brightness-0 invert opacity-95"
+                                />
+                              </span>
+                              <span className="admin-sidebar-link__label relative z-[1] truncate tracking-[-0.01em]">
+                                {item.label}
+                              </span>
+                              {active ? (
+                                <span
+                                  className="relative z-[1] ml-auto h-1.5 w-1.5 rounded-full bg-white/90 shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                                  aria-hidden
+                                />
+                              ) : null}
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </nav>
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-white/8 px-4 py-3">
-        <div className="rounded-xl bg-white/[0.04] px-3 py-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#D8B039]">
-            Braelo Admin
-          </p>
-          <p className="mt-0.5 text-[11px] text-white/40">Power console</p>
+      <div className="relative z-[1] shrink-0 px-3.5 pb-4 pt-1">
+        <div className="admin-sidebar-footer overflow-hidden rounded-2xl px-3.5 py-3">
+          <div className="admin-sidebar-footer__glow" aria-hidden />
+          <div className="relative z-[1] flex items-center gap-3">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFCC35] to-[#CD9403] text-sm font-bold text-[#2a2208] shadow-[0_6px_16px_rgba(205,148,3,0.35)]">
+              B
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFCC35]">
+                Braelo Admin
+              </p>
+              <p className="mt-0.5 truncate text-[11px] text-white/45">
+                Operations console
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </aside>
