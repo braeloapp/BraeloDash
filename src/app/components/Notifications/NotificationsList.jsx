@@ -1,19 +1,53 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getData, postData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 import AppLoader from "@/app/components/ux/AppLoader";
+import {
+  markNotificationLocallyRead,
+  markNotificationLocallyUnread,
+  isNotificationUnread,
+  NOTIFICATIONS_CHANGED,
+} from "@/lib/adminNotifications";
 
 const DELETE_NOTIFICATION_ENDPOINT = "/admin-panel/notification/delete";
+const READ_NOTIFICATION_ENDPOINT = "/admin-panel/notification/read";
+
+function formatNotificationTime(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "";
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.max(0, Math.floor(diff / 60000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleString([], {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function pageWindow(current, total) {
+  if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+  const start = Math.max(1, Math.min(current - 2, total - 4));
+  const end = Math.min(total, start + 4);
+  return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+}
 
 const NotificationsList = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [notificationToDelete, setNotificationToDelete] = useState(null);
   const [deleteInProgress, setDeleteInProgress] = useState(false);
@@ -21,18 +55,15 @@ const NotificationsList = () => {
     currentPage: 1,
     pageSize: 10,
     totalItems: 0,
-    totalPages: 1,
-    hasNext: false,
-    hasPrev: false,
   });
 
   const fetchNotifications = async (page = 1) => {
     try {
       setLoading(true);
       const data = await getData(`/admin-panel/notifications?page=${page}`);
-      console.log("API Response:", data);
 
       if (data?.data?.results) {
+        const pageSize = data.data.page_size || 10;
         const formattedNotifications = data.data.results.map((notif, index) => {
           const apiId = notif.id ?? notif._id ?? null;
           return {
@@ -41,30 +72,28 @@ const NotificationsList = () => {
             title: notif.title || "No Title",
             message: notif.body || "No Message",
             dateReceived: notif.created_at || new Date().toISOString(),
-            type: notif.type || "General Notification",
-            status: notif.is_read ? "Read" : "Unread",
+            type: notif.type || "General",
+            is_read: Boolean(notif.is_read),
+            unread: isNotificationUnread(notif),
             image: "/b5.png",
-            description: notif.body || "No Description",
           };
         });
-        
+
         setNotifications(formattedNotifications);
-        
-        // Update pagination state based on API response
         setPagination({
           currentPage: page,
-          pageSize: data.data.page_size || 10,
+          pageSize,
           totalItems: data.data.count || 0,
-          totalPages: Math.ceil((data.data.count || 0) / (data.data.page_size || 10)),
-          hasNext: data.data.next !== null,
-          hasPrev: data.data.previous !== null,
         });
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event(NOTIFICATIONS_CHANGED));
+        }
       } else {
         throw new Error("Invalid notifications data structure");
       }
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.message);
+      toast.error(getApiErrorMessage(err, "Failed to load notifications"));
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -84,6 +113,52 @@ const NotificationsList = () => {
     setNotificationToDelete(null);
   };
 
+  const syncReadOnServer = async (apiId, isRead) => {
+    if (apiId == null || apiId === "") return;
+    try {
+      await postData(READ_NOTIFICATION_ENDPOINT, {
+        notification_id: String(apiId),
+        is_read: isRead,
+      });
+    } catch {
+      // Local read state still updates even if this endpoint is unavailable.
+    }
+  };
+
+  const markAsRead = async (notification) => {
+    if (!notification?.unread) return;
+    setNotifications((prev) =>
+      prev.map((item) =>
+        item.rowKey === notification.rowKey ? { ...item, unread: false, is_read: true } : item
+      )
+    );
+    markNotificationLocallyRead(notification.apiId);
+    await syncReadOnServer(notification.apiId, true);
+  };
+
+  const markAsUnread = async (notification) => {
+    if (notification?.unread) return;
+    setNotifications((prev) =>
+      prev.map((item) =>
+        item.rowKey === notification.rowKey ? { ...item, unread: true, is_read: false } : item
+      )
+    );
+    markNotificationLocallyUnread(notification.apiId);
+    await syncReadOnServer(notification.apiId, false);
+  };
+
+  const markAllVisibleRead = async () => {
+    const unreadItems = notifications.filter((item) => item.unread);
+    if (unreadItems.length === 0) return;
+    setNotifications((prev) => prev.map((item) => ({ ...item, unread: false, is_read: true })));
+    await Promise.all(
+      unreadItems.map(async (item) => {
+        markNotificationLocallyRead(item.apiId);
+        await syncReadOnServer(item.apiId, true);
+      })
+    );
+  };
+
   const handleConfirmDelete = async () => {
     const apiId = notificationToDelete?.apiId;
     if (apiId == null || apiId === "") {
@@ -99,19 +174,17 @@ const NotificationsList = () => {
       hideDeleteDialog();
       await fetchNotifications(pagination.currentPage);
     } catch (err) {
-      console.error(err);
       toast.error(getApiErrorMessage(err, "Failed to delete notification"));
     } finally {
       setDeleteInProgress(false);
     }
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString();
-  };
+  const totalPages = Math.max(1, Math.ceil(pagination.totalItems / pagination.pageSize));
+  const pages = pageWindow(pagination.currentPage, totalPages);
 
   return (
-    <div className="p-4">
+    <div className="p-4 sm:p-5">
       <ToastContainer position="top-right" autoClose={3000} />
       <ConfirmDeleteDialog
         visible={deleteDialogVisible}
@@ -123,99 +196,171 @@ const NotificationsList = () => {
         confirmLoading={deleteInProgress}
       />
 
-      <h2 className="text-xl font-bold mb-4">Notifications</h2>
-      
       {loading ? (
         <AppLoader label="Loading notifications..." />
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : notifications.length > 0 ? (
+      ) : notifications.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[#EEF1F4] bg-[#FBFCFE] px-6 py-16 text-center">
+          <p className="text-base font-medium text-[#3a4248]">No notifications yet</p>
+          <p className="mt-1 text-sm text-[#78828A]">New activity from the app will show up here.</p>
+        </div>
+      ) : (
         <>
-          <div className="space-y-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm text-[#78828A]">
+              {notifications.filter((item) => item.unread).length > 0 ? (
+                <>
+                  <span className="font-semibold text-[#CD9403]">
+                    {notifications.filter((item) => item.unread).length} unread
+                  </span>
+                  <span> on this page</span>
+                </>
+              ) : (
+                "All caught up on this page"
+              )}
+            </p>
+            {notifications.some((item) => item.unread) ? (
+              <button type="button" className="btn-ghost text-xs" onClick={markAllVisibleRead}>
+                Mark all as read
+              </button>
+            ) : null}
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-[#EEF1F4] bg-white">
             {notifications.map((notification) => (
-              <div
+              <article
                 key={notification.rowKey}
-                className="bg-white p-4 rounded-lg shadow-md flex justify-between items-start gap-4 overflow-hidden"
+                className={`relative flex items-start gap-3 border-b border-[#EEF1F4] px-4 py-3.5 last:border-b-0 sm:gap-4 sm:px-5 ${
+                  notification.unread ? "cursor-pointer bg-[#FFFBF0]" : "bg-white"
+                }`}
+                onClick={() => markAsRead(notification)}
               >
-                <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <Image
+                {notification.unread ? (
+                  <span className="absolute bottom-3 left-0 top-3 w-[3px] rounded-r-full bg-[#CD9403]" />
+                ) : null}
+
+                <div className="relative shrink-0">
+                  <img
                     src={notification.image}
-                    alt="Notification"
-                    className="rounded shrink-0"
-                    width={48}
-                    height={48}
+                    alt=""
+                    className="h-11 w-11 rounded-full object-cover"
                   />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <h3 className="text-lg font-semibold break-words">
-                      {notification.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 break-words [overflow-wrap:anywhere]">
-                      {notification.message}
-                    </p>
-                    <p className="text-xs text-gray-500 break-words [overflow-wrap:anywhere]">
-                      {notification.description}
-                    </p>
+                  {notification.unread ? (
+                    <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#CD9403] ring-2 ring-white" />
+                  ) : null}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3
+                          className={`truncate text-[15px] ${
+                            notification.unread
+                              ? "font-semibold text-[#232F30]"
+                              : "font-medium text-[#78828A]"
+                          }`}
+                        >
+                          {notification.title}
+                        </h3>
+                        {notification.unread ? (
+                          <span className="rounded-full bg-[#CD9403] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                            Unread
+                          </span>
+                        ) : (
+                          <span className="rounded-full bg-[#F3F5F7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#ACB6BE]">
+                            Read
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 line-clamp-2 text-sm text-[#78828A]">
+                        {notification.message}
+                      </p>
+                    </div>
+                    <div
+                      className="flex shrink-0 items-center gap-1"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <time className="whitespace-nowrap text-xs text-[#ACB6BE]">
+                        {formatNotificationTime(notification.dateReceived)}
+                      </time>
+                      <ActionMenu
+                        disabled={deleteInProgress}
+                        items={[
+                          notification.unread
+                            ? {
+                                label: "Mark as read",
+                                onClick: () => markAsRead(notification),
+                              }
+                            : {
+                                label: "Mark as unread",
+                                onClick: () => markAsUnread(notification),
+                              },
+                          {
+                            label: "Delete",
+                            danger: true,
+                            onClick: () => openDeleteDialog(notification),
+                          },
+                        ]}
+                      />
+                    </div>
                   </div>
+                  <span className="mt-2 inline-flex rounded-full bg-[#FFF8E8] px-2 py-0.5 text-[11px] font-medium capitalize text-[#CD9403]">
+                    {notification.type}
+                  </span>
                 </div>
-                <div className="flex shrink-0 flex-col items-end">
-                  <p className="text-xs text-gray-500">
-                    {formatDate(notification.dateReceived)}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => openDeleteDialog(notification)}
-                    className="bg-[#CD9403] text-white px-3 py-1 rounded-lg transition mt-2 hover:opacity-90"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+              </article>
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-4">
-            <div className="text-sm text-gray-600">
-              Showing {(pagination.currentPage - 1) * pagination.pageSize + 1} to {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)} of {pagination.totalItems} entries
-            </div>
-
-            <div className="flex space-x-2 items-center">
-              {/* Prev Button */}
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-1.5">
+            <button
+              type="button"
+              className="paginator-btn"
+              disabled={pagination.currentPage <= 1}
+              onClick={() => fetchNotifications(1)}
+              aria-label="First page"
+            >
+              «
+            </button>
+            <button
+              type="button"
+              className="paginator-btn"
+              disabled={pagination.currentPage <= 1}
+              onClick={() => fetchNotifications(pagination.currentPage - 1)}
+              aria-label="Previous page"
+            >
+              ‹
+            </button>
+            {pages.map((page) => (
               <button
-                onClick={() => fetchNotifications(pagination.currentPage - 1)}
-                disabled={!pagination.hasPrev || loading}
-                className={`px-2 py-1 rounded-md ${pagination.hasPrev && !loading ? 'bg-gray-300 text-gray-800 hover:bg-gray-400' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                key={page}
+                type="button"
+                className={`paginator-btn ${page === pagination.currentPage ? "paginator-btn--active" : ""}`}
+                onClick={() => fetchNotifications(page)}
               >
-                &lt;
+                {page}
               </button>
-
-              {/* Page Numbers */}
-              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => fetchNotifications(page)}
-                  className={`w-8 h-8 rounded-full text-sm font-medium transition-colors
-                    ${page === pagination.currentPage
-                      ? 'bg-yellow-600 text-white'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-                >
-                  {page}
-                </button>
-              ))}
-
-              {/* Next Button */}
-              <button
-                onClick={() => fetchNotifications(pagination.currentPage + 1)}
-                disabled={!pagination.hasNext || loading}
-                className={`px-2 py-1 rounded-md ${pagination.hasNext && !loading ? 'bg-gray-300 text-gray-800 hover:bg-gray-400' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-              >
-                &gt;
-              </button>
-            </div>
+            ))}
+            <button
+              type="button"
+              className="paginator-btn"
+              disabled={pagination.currentPage >= totalPages}
+              onClick={() => fetchNotifications(pagination.currentPage + 1)}
+              aria-label="Next page"
+            >
+              ›
+            </button>
+            <button
+              type="button"
+              className="paginator-btn"
+              disabled={pagination.currentPage >= totalPages}
+              onClick={() => fetchNotifications(totalPages)}
+              aria-label="Last page"
+            >
+              »
+            </button>
           </div>
         </>
-      ) : (
-        <p className="text-gray-500">No notifications found.</p>
       )}
     </div>
   );

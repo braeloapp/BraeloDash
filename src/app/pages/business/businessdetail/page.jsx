@@ -307,7 +307,7 @@ const BusinessDetails = () => {
               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(businessEmail)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02]"
+              className="btn-primary"
             >
               Open Gmail
             </a>
@@ -423,14 +423,14 @@ const BusinessDetails = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setChatModalOpen(true)}
-              className="p-2 bg-[#CD9403] rounded text-white flex items-center gap-2"
+              className="btn-primary"
             >
               <img src="/a7.png" alt="" />
               Chat
             </button>
             <button
               onClick={() => setEditModalOpen(true)}
-              className="p-2 bg-[#CD9403] rounded text-white flex items-center"
+              className="btn-primary"
             >
               <img src="/a17.png" alt="" />
               Edit
@@ -472,7 +472,7 @@ const BusinessDetails = () => {
         </div>
         <div className="mt-3">
           <button
-            className="w-[200px] h-[40px] bg-[#CD9403] text-white rounded-lg text-[15px]"
+            className="btn-primary w-[200px]"
             onClick={() => router.push("/pages/statistics")}
           >
             View Business Stats
@@ -771,13 +771,13 @@ const BusinessDetails = () => {
                 <button
                   type="button"
                   onClick={() => setEditModalOpen(false)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  className="btn-ghost"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02] disabled:opacity-50"
+                  className="btn-primary"
                   disabled={loading}
                 >
                   {loading ? "Saving..." : "Save Changes"}

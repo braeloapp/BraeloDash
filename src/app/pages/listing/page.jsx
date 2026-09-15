@@ -22,7 +22,7 @@ const Listing = () => {
   };
 
   return (
-    <div>
+    <div className="page-shell">
       <div className="page-header">
         <div className="flex min-w-0 items-center gap-2">
           <BackButton />

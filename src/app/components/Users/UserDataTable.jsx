@@ -171,7 +171,7 @@ export default function UserTable({ data, loading, onRefresh }) {
           type="button"
           title="Reactivate user"
           onClick={() => reactivateUser(rowData)}
-          className="text-xs border border-black px-2 py-1 rounded hover:bg-gray-100"
+          className="btn-table"
         >
           Reactivate
         </button>
@@ -218,20 +218,16 @@ export default function UserTable({ data, loading, onRefresh }) {
       {loading ? (
         <AppLoader />
       ) : (
-        <div className="table-scroll-wrapper">
+        <div className="table-scroll-wrapper border-0">
           <DataTable
             value={data}
-            scrollable
             dataKey="id"
             paginator
             first={first}
             rows={rows}
             onPage={onPage}
-            scrollHeight="700px"
-            //rowsPerPageOptions={[5, 10, 20]}
-            //paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            tableStyle={{ minWidth: "56rem" }}
+            tableStyle={{ width: "100%" }}
             loading={loading}
             paginatorClassName="user-paginator"
             className="p-datatable-striped"

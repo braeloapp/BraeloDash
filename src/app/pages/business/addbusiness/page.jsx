@@ -807,7 +807,7 @@ const AddNewBusiness = () => {
 
           <button
             type="submit"
-            className="mt-6 px-6 py-2 bg-[#CD9403] text-white rounded-lg disabled:opacity-50"
+            className="btn-primary mt-6"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Submitting..." : "Submit"}

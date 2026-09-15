@@ -139,16 +139,14 @@ const AddNewNotification = () => {
 
       <div className="mt-6 flex justify-start gap-2 items-center">
         <button
-          className="py-2 px-8 bg-gray-200 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-300 transition"
+          className="btn-ghost"
           onClick={resetForm}
           disabled={loading}
         >
           Cancel
         </button>
         <button
-          className={`py-2 px-8 text-white border border-gray-800 rounded-lg transition ${
-            loading ? "bg-gray-500 cursor-not-allowed" : "bg-[#CD9403] hover:bg-[#DB9F04]"
-          }`}
+          className="btn-primary"
           type="button"
           onClick={handlePublish}
           disabled={loading}

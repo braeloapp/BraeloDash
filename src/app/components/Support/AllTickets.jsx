@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dropdown } from "primereact/dropdown";
 import { getHeaderStyle, getBodyStyle } from "../Users/UserData";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,6 +9,9 @@ import { getData, postData, deleteData, updateData } from "@/app/API/method";
 import { debounce } from "@/lib/debounce";
 import { extractResultsList } from "@/lib/apiResponse";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import AppLoader from "@/app/components/ux/AppLoader";
+import StatusSelect from "@/app/components/ux/StatusSelect";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 
 const API_URL = "/admin-panel/support";
 const SEARCH_API_URL = "/admin-panel/support/search";
@@ -36,15 +38,12 @@ const AllTickets = () => {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [error, setError] = useState(null);
   const [ticketToDelete, setTicketToDelete] = useState(null);
   const [deleteInProgress, setDeleteInProgress] = useState(false);
-  const dropdownRef = useRef(null);
 
-  // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (email, status, date) => {
       await fetchFilteredTickets(email, status, date);
@@ -54,19 +53,6 @@ const AllTickets = () => {
 
   useEffect(() => {
     fetchSupportRequests();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
   }, []);
 
   const showToast = (message, type = "success") => {
@@ -275,7 +261,6 @@ const AllTickets = () => {
 
   const handleStatusFilter = (status) => {
     setStatusFilter(status);
-    setIsDropdownOpen(false);
     debouncedSearch(searchEmail, status, creationDate);
   };
 
@@ -285,62 +270,46 @@ const AllTickets = () => {
     debouncedSearch(searchEmail, statusFilter, date);
   };
 
-  const statusDropdownTemplate = (rowData) => {
-    return (
-      <div className="p-2 text-black">
-        <Dropdown
-          value={rowData.status}
-          options={statusOptions}
-          onChange={(e) => handleStatusChange(e.value, rowData)}
-          placeholder="Select Status"
-          className="w-full text-black rounded-md bg-slate-200 p-2"
-          panelClassName="bg-gray-100 border border-gray-300 shadow-lg p-5 text-black"
-          disabled={statusUpdating}
-        />
-        {statusUpdating && (
-          <small className="block mt-1 text-blue-600">Updating...</small>
-        )}
-      </div>
-    );
-  };
+  const statusDropdownTemplate = (rowData) => (
+    <StatusSelect
+      value={rowData.status}
+      options={statusOptions}
+      disabled={statusUpdating}
+      onChange={(value) => handleStatusChange(value, rowData)}
+    />
+  );
 
   const actionTemplate = (rowData) => (
-    <div className="flex gap-2">
-      <button
-        className="flex items-center border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-        onClick={() => {
-          setEmailUser(rowData);
-          setReplyMessage("");
-          setIsEmailModalOpen(true);
-        }}
-        disabled={loading}
-      >
-        Response
-      </button>
-
-      <button
-        className="flex items-center border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-        onClick={() => openDeleteTicket(rowData.id)}
-        disabled={loading}
-      >
-        Delete
-      </button>
-      <button
-        className="flex items-center border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
-        onClick={() => openDetailsModalHandler(rowData)}
-        disabled={loading}
-      >
-        View Details
-      </button>
-    </div>
+    <ActionMenu
+      disabled={loading}
+      items={[
+        {
+          label: "Response",
+          onClick: () => {
+            setEmailUser(rowData);
+            setReplyMessage("");
+            setIsEmailModalOpen(true);
+          },
+        },
+        {
+          label: "View",
+          onClick: () => openDetailsModalHandler(rowData),
+        },
+        {
+          label: "Delete",
+          danger: true,
+          onClick: () => openDeleteTicket(rowData.id),
+        },
+      ]}
+    />
   );
 
   return (
-    <div className="p-5 table-scroll-wrapper">
+    <div className="p-4 sm:p-5">
       <ToastContainer />
 
       {error && (
-        <div className="bg-red-500 text-white p-3 rounded mb-4">
+        <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
           Error: {error}
           <button
             className="float-right font-bold"
@@ -351,24 +320,18 @@ const AllTickets = () => {
         </div>
       )}
 
-      {(loading || statusUpdating) && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl">
-            <p>Processing request...</p>
-          </div>
-        </div>
-      )}
+      {statusUpdating ? (
+        <AppLoader overlay label="Updating status..." />
+      ) : null}
 
-      {/* Search and Filters */}
-      <div className="flex gap-4 mb-4 flex-wrap">
-        {/* Email Search */}
-        <div className="relative flex-1 min-w-[250px]">
+      <div className="filter-row mb-4 rounded-2xl px-0 py-0">
+        <div className="filter-grow relative">
           <input
             type="text"
             value={searchEmail}
             onChange={handleEmailSearch}
             placeholder="Search by email"
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-control pr-10"
           />
           {searchEmail && (
             <button
@@ -383,96 +346,44 @@ const AllTickets = () => {
           )}
         </div>
 
-        {/* Status Filter Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <div
-            className="flex items-center bg-gray-100 text-gray-700 px-4 py-2 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 cursor-pointer hover:bg-gray-200 transition"
-            onClick={() => setIsDropdownOpen((prev) => !prev)}
+        <div>
+          <select
+            value={statusFilter}
+            onChange={(e) => handleStatusFilter(e.target.value)}
+            className="field-control"
           >
-            <input
-              type="text"
-              value={statusFilter === "All" ? "Filter by Status" : statusFilter}
-              readOnly
-              className="bg-transparent focus:outline-none cursor-pointer"
-              placeholder="Filter by Status"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className={`h-5 w-5 ml-2 text-gray-500 transition-transform ${
-                isDropdownOpen ? "transform rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-
-          {isDropdownOpen && (
-            <div className="absolute mt-1 w-full bg-white rounded-lg shadow-lg z-10 border border-gray-200">
-              <ul>
-                {["All", "Active", "On Hold", "Resolved", "In Progress"].map(
-                  (status) => (
-                    <li
-                      key={status}
-                      onClick={() => handleStatusFilter(status)}
-                      className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${
-                        statusFilter === status
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-700"
-                      }`}
-                    >
-                      {status}
-                    </li>
-                  )
-                )}
-              </ul>
-            </div>
-          )}
+            {["All", "Active", "On Hold", "Resolved", "In Progress"].map(
+              (status) => (
+                <option key={status} value={status}>
+                  {status === "All" ? "Filter by status" : status}
+                </option>
+              )
+            )}
+          </select>
         </div>
 
-        {/* Date Filter */}
-        <div className="relative min-w-[200px]">
+        <div className="relative">
           <input
             type="date"
             value={creationDate}
             onChange={handleDateChange}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="field-control"
           />
-          {creationDate && (
-            <button
-              onClick={() => {
-                setCreationDate("");
-                debouncedSearch(searchEmail, statusFilter, "");
-              }}
-              className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-          )}
         </div>
       </div>
 
+      {loading && filteredRequests.length === 0 ? (
+        <AppLoader label="Loading tickets..." />
+      ) : (
       <DataTable
         value={filteredRequests}
         paginator
         first={first}
         rows={rows}
         onPage={onPage}
-        scrollable
-        scrollHeight="700px"
-        //rowsPerPageOptions={[5, 10, 20]}
-        //paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        tableStyle={{ minWidth: "100rem" }}
+        tableStyle={{ width: "100%" }}
         className="custom-paginator"
-        loading={loading}
         emptyMessage="No tickets found"
       >
         <Column
@@ -525,6 +436,7 @@ const AllTickets = () => {
           bodyStyle={getBodyStyle()}
         />
       </DataTable>
+      )}
 
       {/* Details Modal */}
       {selectedTicket && (
@@ -597,7 +509,7 @@ const AllTickets = () => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsEmailModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="btn-ghost"
                 disabled={replySending}
               >
                 Cancel
@@ -624,7 +536,7 @@ const AllTickets = () => {
                     setReplySending(false);
                   }
                 }}
-                className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02] disabled:opacity-60"
+                className="btn-primary"
               >
                 {replySending ? "Sending..." : "Send reply"}
               </button>

@@ -6,6 +6,8 @@ import Image from "next/image";
 import { FiMenu, FiSettings } from "react-icons/fi";
 import { getApiBaseUrl } from "@/lib/apiConfig";
 import { adminRoleLabel, clearAdminSession, persistAdminSession } from "@/lib/adminAuth";
+import { getData } from "@/app/API/method";
+import { isNotificationUnread, NOTIFICATIONS_CHANGED } from "@/lib/adminNotifications";
 import { sidebarItems } from "./navItems";
 
 const NavBar = ({ onMenuClick }) => {
@@ -15,6 +17,7 @@ const NavBar = ({ onMenuClick }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [userName, setUserName] = useState("");
   const [roleLabel, setRoleLabel] = useState("Administrator");
+  const [unreadCount, setUnreadCount] = useState(0);
   const settingsDropdownRef = useRef(null);
   const searchContainerRef = useRef(null);
   const router = useRouter();
@@ -64,6 +67,22 @@ const NavBar = ({ onMenuClick }) => {
 
     fetchUserName();
   }, [router]);
+
+  useEffect(() => {
+    const loadUnread = async () => {
+      try {
+        const data = await getData("/admin-panel/notifications?page=1");
+        const results = data?.data?.results || [];
+        setUnreadCount(results.filter((item) => isNotificationUnread(item)).length);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+
+    loadUnread();
+    window.addEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+    return () => window.removeEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+  }, []);
 
   const toggleSettingsDropdown = () => {
     setSettingsDropdownOpen((prev) => !prev);
@@ -178,10 +197,10 @@ const NavBar = ({ onMenuClick }) => {
               <FiSettings size={20} />
             </button>
             {settingsDropdownOpen && (
-              <div className="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-[#EEF1F4] bg-white text-[#232F30] shadow-panel">
+              <div className="menu-panel absolute right-0 z-50 mt-2 w-48">
                 <button
                   type="button"
-                  className="block w-full border-b border-[#EEF1F4] px-4 py-3 text-left text-sm hover:bg-[#F6F8FB]"
+                  className="menu-item"
                   onClick={() => {
                     router.push("/pages/adminprofile");
                     setSettingsDropdownOpen(false);
@@ -191,7 +210,7 @@ const NavBar = ({ onMenuClick }) => {
                 </button>
                 <button
                   type="button"
-                  className="block w-full px-4 py-3 text-left text-sm hover:bg-[#F6F8FB]"
+                  className="menu-item"
                   onClick={() => {
                     clearAdminSession();
                     router.push("/");
@@ -206,9 +225,9 @@ const NavBar = ({ onMenuClick }) => {
 
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#feefcb] hover:bg-[#FFCC35]/40"
+            className="relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#feefcb] hover:bg-[#FFCC35]/40"
             onClick={() => router.push("/pages/notifications")}
-            aria-label="Notifications"
+            aria-label={unreadCount ? `${unreadCount} unread notifications` : "Notifications"}
           >
             <Image
               src="/images/notification.png"
@@ -216,6 +235,11 @@ const NavBar = ({ onMenuClick }) => {
               width={20}
               height={20}
             />
+            {unreadCount > 0 ? (
+              <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CD9403] px-1 text-[10px] font-semibold text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            ) : null}
           </button>
 
           <div className="flex items-center gap-3">

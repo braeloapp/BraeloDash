@@ -9,7 +9,7 @@ const DeleteListingModal = ({ isOpen, onClose, onConfirm }) => {
         <p>Are you sure you want to delete this listing?</p>
         <div className="flex justify-end mt-4 space-x-2">
           <button
-            className="px-4 py-2 bg-gray-300 rounded-lg"
+            className="btn-ghost"
             onClick={onClose}
           >
             Cancel

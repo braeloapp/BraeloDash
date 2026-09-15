@@ -221,7 +221,7 @@ const AddUser = () => {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-[#CD9403] text-white font-bold py-2 px-4 rounded hover:bg-[#b37f02] disabled:opacity-60"
+              className="btn-primary"
             >
               {submitting ? "Submitting..." : "Submit"}
             </button>

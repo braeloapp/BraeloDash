@@ -4,7 +4,7 @@ import BackButton from "@/app/components/BackButton";
 
 const Support = () => {
   return (
-    <>
+    <div className="page-shell">
       <div className="page-header">
         <div className="flex min-w-0 items-center gap-2">
           <BackButton />
@@ -12,7 +12,7 @@ const Support = () => {
         </div>
       </div>
       <AllTickets />
-    </>
+    </div>
   );
 };
 

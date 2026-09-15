@@ -185,7 +185,7 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`flex w-full items-center justify-center rounded-xl bg-[#CD9403] px-6 py-3 text-[16px] font-medium text-white transition hover:bg-[#b37f02] ${
+                className={`btn-primary w-full ${
                   isLoading ? "cursor-not-allowed opacity-50" : ""
                 }`}
               >

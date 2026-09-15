@@ -92,7 +92,7 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="page-shell">
       <UserHeader 
         onSearch={handleSearch}
         onStatusChange={handleStatusChange}

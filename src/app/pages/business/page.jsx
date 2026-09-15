@@ -144,7 +144,7 @@ const BusinessPage = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="page-shell">
       <BusinessHeader 
         onSearch={handleSearch}
         onStatusChange={handleStatusChange}

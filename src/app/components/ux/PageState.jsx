@@ -38,7 +38,7 @@ export default function PageState({
         <button
           type="button"
           onClick={onRetry}
-          className="mt-5 rounded-md bg-[#CD9403] px-4 py-2 text-sm font-medium text-white hover:bg-[#b37f02] focus:outline-none focus:ring-2 focus:ring-[#CD9403] focus:ring-offset-2 disabled:opacity-50"
+          className="btn-primary mt-5"
         >
           {retryLabel}
         </button>

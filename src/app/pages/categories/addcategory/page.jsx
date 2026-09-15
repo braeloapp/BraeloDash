@@ -110,14 +110,14 @@ const AddCategory = () => {
         <div className="flex gap-3">
           <button
             type="submit"
-            className="bg-[#CD9403] text-white px-6 py-2 rounded-lg"
+            className="btn-primary"
           >
             Save
           </button>
           <button
             type="button"
             onClick={handleCancel}
-            className="bg-gray-300 text-black px-4 py-2 rounded-lg"
+            className="btn-ghost"
           >
             Cancel
           </button>

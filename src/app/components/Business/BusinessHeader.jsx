@@ -243,7 +243,7 @@ const BusinessHeader = ({
         </div>
       </div>
       <div className="filter-row">
-        <div className="min-w-[160px]">
+        <div className="min-w-0">
           <select
             value={status}
             onChange={handleStatusChange}
@@ -270,7 +270,7 @@ const BusinessHeader = ({
           />
         </div>
         
-        <div className="min-w-[160px]">
+        <div className="min-w-0">
           <input
             type="date"
             onChange={(e) => onDateChange(e.target.value)}

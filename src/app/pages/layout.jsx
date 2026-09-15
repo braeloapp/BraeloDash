@@ -18,7 +18,7 @@ const Layout = ({ children }) => {
 
   return (
     <AuthGate>
-      <div className="admin-panel min-h-dvh bg-[#F6F8FB]">
+      <div className="admin-panel min-h-dvh" style={{ background: "radial-gradient(1200px 400px at 0% 0%, #fff3c4 0%, #F6F8FB 42%)" }}>
         <div className="relative flex h-dvh overflow-hidden">
           {navOpen ? (
             <button
@@ -32,7 +32,7 @@ const Layout = ({ children }) => {
           <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
           <div className="hidden w-[272px] shrink-0 md:block" aria-hidden />
 
-          <div className="flex min-w-0 flex-1 flex-col bg-white md:my-3 md:mr-3 md:rounded-panel md:border md:border-[#EEF1F4] md:shadow-panel">
+          <div className="flex min-w-0 flex-1 flex-col bg-white/95 md:my-3 md:mr-3 md:rounded-panel md:border md:border-[#EEF1F4] md:shadow-panel">
             <NavBar onMenuClick={() => setNavOpen(true)} />
             <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5">
               {children}

@@ -358,7 +358,7 @@ const ReportedUser = () => {
             setModerationNotes("");
           }
         }}
-        className="border rounded-md p-1 text-sm max-w-[11rem]"
+        className="status-select"
       >
         <option value="">Actions</option>
         <option value="view">View Details</option>
@@ -384,20 +384,18 @@ const ReportedUser = () => {
   };
 
   return (
-    <div className="w-full">
-      {/* Header Section */}
+    <div className="page-shell">
       <div className="page-header">
         <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="page-title">
-            Reported Users
-          </h1>
+          <h1 className="page-title">Reported Users</h1>
         </div>
         <div className="page-actions">
           <div className="relative" ref={exportRef}>
             <button
+              type="button"
               onClick={() => setShowExportOptions(!showExportOptions)}
-              className="field-control min-w-[140px] pl-10 pr-3"
+              className="btn-ghost relative pl-10"
             >
               <Image
                 src="/images/export.png"
@@ -439,21 +437,23 @@ const ReportedUser = () => {
       </div>
 
       <div className="filter-row">
-          <select
-            value={statusFilter}
-            onChange={handleStatusChange}
-            className="field-control min-w-[140px]"
-          >
-            <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="Resolved">Resolved</option>
-            <option value="Ignored">Ignored</option>
-          </select>
+          <div>
+            <select
+              value={statusFilter}
+              onChange={handleStatusChange}
+              className="field-control"
+            >
+              <option value="All">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Resolved">Resolved</option>
+              <option value="Ignored">Ignored</option>
+            </select>
+          </div>
 
           <div className="filter-grow relative">
             <input
               type="text"
-              placeholder="Search By Name"
+              placeholder="Search by name"
               className="field-control pr-10"
               value={searchQuery}
               onChange={handleSearch}
@@ -472,7 +472,7 @@ const ReportedUser = () => {
             )}
           </div>
 
-          <div className="relative min-w-[160px]">
+          <div className="relative">
             <input
               type="date"
               placeholder="Select date"
@@ -495,12 +495,9 @@ const ReportedUser = () => {
           </div>
       </div>
 
-      {/* Main Content */}
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         <ToastContainer position="top-right" autoClose={3000} />
-        
-        {/* Reports Table */}
-        <div className="card table-scroll-wrapper">
+        <div className="table-scroll-wrapper border-0">
           <DataTable
             value={reports}
             lazy
@@ -509,10 +506,9 @@ const ReportedUser = () => {
             rows={rows}
             totalRecords={totalRecords}
             onPage={onPage}
-            scrollHeight="400px"
             rowsPerPageOptions={[5, 10, 20, 50]}
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-            tableStyle={{ minWidth: "56rem" }}
+            tableStyle={{ width: "100%" }}
             className="custom-paginator"
             loading={loading}
             emptyMessage="No reports found"
@@ -641,7 +637,7 @@ const ReportedUser = () => {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setModerationTarget(null)}
-                  className="px-4 py-2 bg-gray-200 rounded"
+                  className="btn-ghost"
                 >
                   Cancel
                 </button>
@@ -654,7 +650,7 @@ const ReportedUser = () => {
                       moderationNotes
                     )
                   }
-                  className="px-4 py-2 bg-[#CD9403] text-white rounded disabled:opacity-60"
+                  className="btn-primary"
                 >
                   Confirm
                 </button>

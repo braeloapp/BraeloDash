@@ -215,13 +215,13 @@ const EditUserdetailModal = ({ isOpen, onClose, userData }) => {
           <div className="flex gap-2">
             <button
               type="submit"
-              className="bg-[#CD9403] text-white p-2 rounded"
+              className="btn-primary"
             >
               Save
             </button>
             <button
               type="button"
-              className="border border-[#CD9403] text-[#CD9403] p-2 rounded"
+              className="btn-ghost"
               onClick={onClose}
             >
               Cancel

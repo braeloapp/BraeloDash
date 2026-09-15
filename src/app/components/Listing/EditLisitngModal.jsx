@@ -140,13 +140,13 @@ const EditListingModal = ({ isOpen, onClose, card }) => {
 
         <div className="mt-4">
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            className="btn-primary"
             onClick={handleSave}
           >
             Save
           </button>
           <button
-            className="ml-2 px-4 py-2 bg-gray-500 text-white rounded-lg"
+            className="ml-2 btn-ghost"
             onClick={onClose}
           >
             Cancel

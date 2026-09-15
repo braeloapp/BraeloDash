@@ -147,7 +147,7 @@ const UserHeader = ({
             <div className="relative">
               <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center bg-white border border-gray-300 rounded-md shadow-sm pl-10 pr-2 py-2 cursor-pointer focus:outline-none hover:bg-gray-50 transition"
+                className="btn-ghost relative cursor-pointer pl-10"
               >
                 <Image
                   src="/images/export.png"
@@ -197,7 +197,7 @@ const UserHeader = ({
 
       <div>
         <div className="filter-row">
-          <div className="relative min-w-[140px]">
+          <div>
             <select
               onChange={(e) => onStatusChange(e.target.value)}
               className="field-control appearance-none"
@@ -225,7 +225,7 @@ const UserHeader = ({
             </div>
           </div>
 
-          <div className="relative min-w-[150px]">
+          <div>
             <input
               type="date"
               className="field-control"
@@ -233,7 +233,7 @@ const UserHeader = ({
             />
           </div>
 
-          <div className="relative min-w-[170px]">
+          <div>
             <select
               onChange={(e) => onVerificationChange(e.target.value)}
               className="field-control"

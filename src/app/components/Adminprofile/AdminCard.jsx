@@ -141,7 +141,7 @@ const AdminCard = () => {
           <p className="text-[#78828A] mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-2 bg-[#CD9403] text-white rounded-lg hover:bg-[#b78300] transition"
+            className="btn-primary"
           >
             Try Again
           </button>
@@ -257,7 +257,7 @@ const AdminCard = () => {
         {/* Edit Button */}
         <button
           onClick={openModal}
-          className="w-full py-2 text-white rounded-lg bg-[#CD9403] hover:bg-[#b78300] transition"
+          className="btn-primary w-full"
         >
           Edit Profile
         </button>
@@ -328,13 +328,13 @@ const AdminCard = () => {
                     <button
                       type="button"
                       onClick={closeModal}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      className="btn-ghost"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-[#CD9403] text-white rounded-lg hover:bg-[#b78300]"
+                      className="btn-primary"
                     >
                       Save
                     </button>

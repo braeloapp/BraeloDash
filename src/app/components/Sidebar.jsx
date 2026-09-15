@@ -13,7 +13,7 @@ const Sidebar = ({ open = false, onClose }) => {
     const isActive = pathname.startsWith(path);
     return `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors ${
       isActive
-        ? "bg-[#D8B039] text-white shadow-sm"
+        ? "bg-[#D8B039] text-white shadow-[0_8px_20px_rgba(216,176,57,0.35)]"
         : "text-white/90 hover:bg-white/10"
     }`;
   };

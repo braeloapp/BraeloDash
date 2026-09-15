@@ -183,7 +183,7 @@ const AddBanner = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#d8b039] text-white py-2 px-4 rounded disabled:opacity-50"
+            className="btn-primary w-full"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Adding..." : "Add Banner"}

@@ -33,7 +33,7 @@ const Modal = ({ isOpen, closeModal, imageSrc, text, label1, label2 }) => {
 
         {/* Button Section */}
         <div className="flex flex-col justify-center mt-5">
-          <button className="bg-[#78828A] text-white px-4 py-3 rounded-lg text-[18px] font-[600]">
+          <button className="btn-primary w-full py-3 text-[18px] font-[600]">
             {label1}
           </button>
           <button

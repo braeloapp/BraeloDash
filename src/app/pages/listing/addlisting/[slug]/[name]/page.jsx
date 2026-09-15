@@ -285,7 +285,7 @@ const Form = () => {
             onClick={() => handleChipSelection(chipGroup.label, option)}
             className={`px-3 py-1 rounded-full text-sm ${
               selectedChips[chipGroup.label] === option
-                ? "bg-blue-600 text-white"
+                ? "bg-[#CD9403] text-white"
                 : "bg-gray-200 hover:bg-gray-300"
             }`}
           >
@@ -343,9 +343,7 @@ const Form = () => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-2 px-4 text-white font-medium rounded transition-colors ${
-            isSubmitting ? "bg-[#D8B039]" : "bg-[#D8B039] hover:bg-[#dab852]"
-          }`}
+          className="btn-primary w-full"
         >
           {isSubmitting ? "Submitting..." : "Submit Listing"}
         </button>
@@ -559,7 +557,7 @@ export default Form;
 //             onClick={() => handleChipSelection(chipGroup.label, option)}
 //             className={`px-3 py-1 rounded-full text-sm ${
 //               selectedChips[chipGroup.label] === option
-//                 ? 'bg-blue-600 text-white'
+//                 ? 'bg-[#CD9403] text-white'
 //                 : 'bg-gray-200 hover:bg-gray-300'
 //             }`}
 //           >
@@ -601,7 +599,7 @@ export default Form;
 //           type="submit"
 //           disabled={isSubmitting}
 //           className={`w-full py-2 px-4 text-white font-medium rounded transition-colors ${
-//             isSubmitting ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+//             isSubmitting ? 'bg-[#D8B039]' : 'bg-[#CD9403] hover:bg-[#b37f02]'
 //           }`}
 //         >
 //           {isSubmitting ? 'Submitting...' : 'Submit Listing'}

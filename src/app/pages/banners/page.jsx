@@ -266,7 +266,7 @@ export default function BannerManagement() {
       <button
         type="button"
         onClick={() => editBanner(rowData)}
-        className="border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+        className="btn-table"
         disabled={loading}
       >
         Edit
@@ -274,7 +274,7 @@ export default function BannerManagement() {
       <button
         type="button"
         onClick={() => confirmDelete(rowData)}
-        className="border border-black px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+        className="btn-table"
         disabled={loading || deleteSubmitting}
       >
         Delete
@@ -287,7 +287,7 @@ export default function BannerManagement() {
   };
 
   return (
-    <div>
+    <div className="page-shell">
       <ToastContainer position="top-right" autoClose={3000} />
       <style jsx global>{paginatorStyles}</style>
       <div className="page-header">
@@ -440,13 +440,13 @@ export default function BannerManagement() {
               <div className="flex justify-end gap-3 pt-4 sticky bottom-0 bg-white pb-2">
                 <button
                   onClick={() => setEditModalVisible(false)}
-                  className="px-4 py-2 border rounded"
+                  className="btn-ghost"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={saveBanner}
-                  className="px-4 py-2 bg-[#CD9403] text-white rounded"
+                  className="btn-primary"
                   disabled={loading}
                 >
                   {loading ? "Saving..." : "Save"}

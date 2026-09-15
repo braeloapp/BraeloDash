@@ -121,7 +121,7 @@ const CategoriesTable = () => {
               onClick={() =>
                 router.push(`/pages/categories/${encodeURIComponent(rowData.key)}/subcategories`)
               }
-              className="flex items-center border border-black px-4 py-2 rounded-lg"
+              className="btn-table"
             >
               View
             </button>

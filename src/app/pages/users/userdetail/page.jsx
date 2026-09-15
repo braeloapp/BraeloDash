@@ -241,7 +241,7 @@ const Userdetail = () => {
             </h1>
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 bg-[#CD9403] text-white p-2 rounded-md cursor-pointer hover:bg-[#b37f02]"
+            <button className="btn-primary"
             onClick={() => setModalOpen(true)}
             >
             <img
@@ -251,7 +251,7 @@ const Userdetail = () => {
             />
             Chat
             </button>
-            <button className="flex items-center gap-2 bg-[#CD9403] text-white p-2 rounded-md cursor-pointer hover:bg-[#b37f02]" 
+            <button className="btn-primary" 
             onClick={OpeModal}>
             <img
               src="/a17.png"
@@ -372,7 +372,7 @@ const Userdetail = () => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="btn-ghost"
               >
                 Cancel
               </button>
@@ -383,7 +383,7 @@ const Userdetail = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <button className="px-4 py-2 bg-[#CD9403] text-white rounded hover:bg-[#b37f02]">
+                <button className="btn-primary">
                   Open in Gmail
                 </button>
               </a>
