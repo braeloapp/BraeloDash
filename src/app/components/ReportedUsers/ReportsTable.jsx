@@ -5,6 +5,7 @@
  */
 import React, { useState, useEffect, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { getBodyStyle, getHeaderStyle } from "../Users/UserData";
 import { getData, postData } from "@/app/API/method";
@@ -221,6 +222,7 @@ const ReportsTable = ({
           paginatorClassName="business-paginator app-paginator m-5"
           className="p-datatable-striped"
           loading={loading}
+            loadingIcon={<TableLoadingIcon />}
           emptyMessage="No reports found"
         >
           <Column

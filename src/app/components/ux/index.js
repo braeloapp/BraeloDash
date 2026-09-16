@@ -10,6 +10,7 @@ export { default as Card } from "./Card";
 export { default as Badge } from "./Badge";
 export { default as PageHeader } from "./PageHeader";
 export { default as DataTableShell } from "./DataTableShell";
+export { default as TableLoadingIcon } from "./TableLoadingIcon";
 export {
   Skeleton,
   TableSkeleton,

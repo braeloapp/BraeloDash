@@ -22,6 +22,7 @@ import {
 } from "@/lib/adminAuth";
 
 const defaultUserData = {
+  id: null,
   name: "",
   first_name: "",
   last_name: "",
@@ -54,11 +55,21 @@ function displayValue(value, fallback = "Not provided") {
   return text || fallback;
 }
 
+function formatApiError(err) {
+  const data = err?.response?.data;
+  if (!data) return err?.message || "Failed to update profile";
+  if (typeof data === "string") return data;
+  if (data.message) return String(data.message);
+  if (data.error) return String(data.error);
+  const first = Object.values(data).flat()?.[0];
+  return first ? String(first) : "Failed to update profile";
+}
+
 const AdminCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(defaultUserData);
+  const [editForm, setEditForm] = useState(defaultUserData);
   const [previewImage, setPreviewImage] = useState(ADMIN_DEFAULT_AVATAR);
-  const [editName, setEditName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -96,6 +107,7 @@ const AdminCard = () => {
         const avatar = resolveAdminAvatar(rawImage);
 
         const userData = {
+          id: me?.id || profile?.id || null,
           name: me?.name || profile?.name || "",
           first_name: profile?.first_name || "",
           last_name: profile?.last_name || "",
@@ -114,8 +126,8 @@ const AdminCard = () => {
         };
 
         setFormData(userData);
+        setEditForm(userData);
         setPreviewImage(avatar);
-        setEditName(userData.name || "");
       } catch (err) {
         setError(err.message || "Failed to fetch user data");
       } finally {
@@ -142,7 +154,7 @@ const AdminCard = () => {
   }, [formData.name, formData.last_name, formData.first_name]);
 
   const openModal = () => {
-    setEditName(formData.name || "");
+    setEditForm({ ...formData });
     setModalError(null);
     setIsModalOpen(true);
   };
@@ -153,32 +165,82 @@ const AdminCard = () => {
     setModalError(null);
   };
 
-  const handleSaveName = async () => {
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    if (!formData.id) {
+      setModalError("Missing admin user id. Please refresh and try again.");
+      return;
+    }
+
     try {
       setIsSaving(true);
       setModalError(null);
-      const response = await postData("/auth/update/profile", {
-        name: editName.trim(),
-      });
-      const nextName = response?.name || response?.data?.name || editName.trim();
-      setFormData((prev) => ({ ...prev, name: nextName }));
+
+      const payload = {
+        user_id: formData.id,
+        name: editForm.name.trim(),
+        first_name: editForm.first_name.trim(),
+        last_name: editForm.last_name.trim(),
+        email: editForm.email.trim(),
+        phone: editForm.phoneNumber.trim(),
+        dob: editForm.dob.trim(),
+        gender: editForm.gender.trim(),
+        address: editForm.address.trim(),
+        country: editForm.country.trim(),
+        state: editForm.state.trim(),
+        city: editForm.city.trim(),
+        zip_code: editForm.zip_code.trim(),
+      };
+
+      const response = await postData("/admin-panel/user/update", payload);
+      const ok =
+        response?.status === 200 ||
+        response?.success === true ||
+        /success/i.test(String(response?.message || ""));
+
+      if (!(ok || (response && !response.error))) {
+        throw new Error(
+          response?.message || response?.error || "Failed to update profile"
+        );
+      }
+
+      const next = {
+        ...formData,
+        name: payload.name,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        email: payload.email,
+        phoneNumber: payload.phone,
+        dob: payload.dob,
+        gender: payload.gender,
+        address: payload.address,
+        country: payload.country,
+        state: payload.state,
+        city: payload.city,
+        zip_code: payload.zip_code,
+      };
+
+      setFormData(next);
+      setEditForm(next);
       persistAdminSession({
         token: getAdminToken(),
-        name: nextName,
+        name: next.name || "Admin",
         role: formData.role,
       });
       setIsModalOpen(false);
     } catch (err) {
-      setModalError(
-        err.response?.data?.message || err.message || "Failed to update name"
-      );
+      setModalError(formatApiError(err));
     } finally {
       setIsSaving(false);
     }
   };
 
   if (isLoading) {
-    return <AppLoader label="Loading profile data..." />;
+    return <AppLoader />;
   }
 
   if (error) {
@@ -289,12 +351,6 @@ const AdminCard = () => {
             <MetaCard label="Zip code">
               {displayValue(formData.zip_code)}
             </MetaCard>
-            <div className="user-detail-meta md:col-span-2">
-              <p className="user-detail-meta__label">Bio</p>
-              <div className="user-detail-meta__value">
-                {displayValue(formData.bio, "No bio provided")}
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -303,17 +359,18 @@ const AdminCard = () => {
         open={isModalOpen}
         onClose={closeModal}
         title="Update profile"
-        description="Change the display name shown across the admin panel."
+        description="Edit your administrator account details."
         confirmLabel="Save changes"
         confirmLoading={isSaving}
-        onConfirm={handleSaveName}
-        size="sm"
+        onConfirm={handleSaveProfile}
+        size="lg"
       >
         {modalError ? (
           <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
             {modalError}
           </div>
         ) : null}
+
         <div className="mb-5 flex items-center gap-3">
           <ProfileAvatar
             src={previewImage}
@@ -322,25 +379,189 @@ const AdminCard = () => {
           />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">
-              {displayName}
+              {editForm.name || displayName}
             </p>
             <p className="truncate text-xs text-[var(--color-text-muted)]">
-              {formData.email}
+              {editForm.email || formData.email}
             </p>
           </div>
         </div>
-        <label className="field-label" htmlFor="admin-profile-name">
-          Full name
-        </label>
-        <input
-          id="admin-profile-name"
-          type="text"
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          className="field-control"
-          required
-          disabled={isSaving}
-        />
+
+        <div className="grid max-h-[55vh] grid-cols-1 gap-4 overflow-y-auto pr-1 sm:grid-cols-2">
+          <div>
+            <label className="field-label" htmlFor="admin-profile-name">
+              Full name
+            </label>
+            <input
+              id="admin-profile-name"
+              name="name"
+              type="text"
+              value={editForm.name}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-email">
+              Email
+            </label>
+            <input
+              id="admin-profile-email"
+              name="email"
+              type="email"
+              value={editForm.email}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-first">
+              First name
+            </label>
+            <input
+              id="admin-profile-first"
+              name="first_name"
+              type="text"
+              value={editForm.first_name}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-last">
+              Last name
+            </label>
+            <input
+              id="admin-profile-last"
+              name="last_name"
+              type="text"
+              value={editForm.last_name}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-phone">
+              Phone number
+            </label>
+            <input
+              id="admin-profile-phone"
+              name="phoneNumber"
+              type="tel"
+              value={editForm.phoneNumber}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-dob">
+              Date of birth
+            </label>
+            <input
+              id="admin-profile-dob"
+              name="dob"
+              type="text"
+              placeholder="YYYY-MM-DD"
+              value={editForm.dob}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-gender">
+              Gender
+            </label>
+            <select
+              id="admin-profile-gender"
+              name="gender"
+              value={editForm.gender}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            >
+              <option value="">Not specified</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-zip">
+              Zip code
+            </label>
+            <input
+              id="admin-profile-zip"
+              name="zip_code"
+              type="text"
+              value={editForm.zip_code}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="field-label" htmlFor="admin-profile-address">
+              Address
+            </label>
+            <input
+              id="admin-profile-address"
+              name="address"
+              type="text"
+              value={editForm.address}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-country">
+              Country
+            </label>
+            <input
+              id="admin-profile-country"
+              name="country"
+              type="text"
+              value={editForm.country}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div>
+            <label className="field-label" htmlFor="admin-profile-state">
+              State
+            </label>
+            <input
+              id="admin-profile-state"
+              name="state"
+              type="text"
+              value={editForm.state}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="field-label" htmlFor="admin-profile-city">
+              City
+            </label>
+            <input
+              id="admin-profile-city"
+              name="city"
+              type="text"
+              value={editForm.city}
+              onChange={handleEditChange}
+              className="field-control"
+              disabled={isSaving}
+            />
+          </div>
+        </div>
       </AppModal>
     </>
   );

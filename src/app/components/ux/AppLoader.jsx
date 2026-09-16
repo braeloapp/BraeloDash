@@ -2,29 +2,53 @@
 
 import React from "react";
 
-const SIZE = {
-  sm: "h-4 w-4 border-2",
-  md: "h-10 w-10 border-[3px]",
-  lg: "h-12 w-12 border-[3px]",
+const SIZE_CLASS = {
+  sm: "braelo-wave-loader--sm",
+  md: "braelo-wave-loader--md",
+  lg: "braelo-wave-loader--lg",
 };
 
+function WaveMark({ size = "md", tone = "brand" }) {
+  return (
+    <div
+      className={`braelo-wave-loader ${SIZE_CLASS[size] || SIZE_CLASS.md} ${
+        tone === "light" ? "braelo-wave-loader--light" : ""
+      }`}
+      aria-hidden
+    >
+      <span />
+      <span />
+      <span />
+      <span />
+      <span />
+    </div>
+  );
+}
+
+/**
+ * Universal Braelo loader — gold wave bars (matches mobile app loader).
+ * Visual label text is hidden by default; `label` stays for screen readers.
+ */
 export default function AppLoader({
-  label = "Loading...",
+  label = "Loading",
   size = "md",
   full = true,
   overlay = false,
+  showLabel = false,
+  tone = "brand",
 }) {
-  const spinner = (
-    <div
-      className={`${SIZE[overlay ? "lg" : size] || SIZE.md} animate-spin rounded-full border-[#D8B039] border-t-transparent`}
-      aria-hidden
-    />
-  );
+  const mark = <WaveMark size={overlay ? "lg" : size} tone={tone} />;
 
   const body = (
-    <div className="flex flex-col items-center justify-center gap-3" role="status" aria-live="polite">
-      {spinner}
-      {label ? (
+    <div
+      className="flex flex-col items-center justify-center gap-4"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      {mark}
+      <span className="sr-only">{label || "Loading"}</span>
+      {showLabel && label ? (
         <p className="text-sm font-medium text-[#78828A]">{label}</p>
       ) : null}
     </div>
@@ -42,9 +66,14 @@ export default function AppLoader({
 
   if (!full) {
     return (
-      <span className="inline-flex items-center justify-center gap-2" role="status" aria-live="polite">
-        {spinner}
-        {label ? <span className="sr-only">{label}</span> : null}
+      <span
+        className="inline-flex items-center justify-center gap-2"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        {mark}
+        <span className="sr-only">{label || "Loading"}</span>
       </span>
     );
   }

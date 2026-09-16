@@ -100,7 +100,7 @@ const SubcategoriesTable = () => {
         </Link>
       </div>
       {loading ? (
-        <AppLoader label="Loading subcategories..." />
+        <AppLoader />
       ) : !category ? (
         <p>Category not found.</p>
       ) : (

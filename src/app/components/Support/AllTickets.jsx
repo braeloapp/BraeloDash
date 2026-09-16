@@ -308,7 +308,7 @@ const AllTickets = () => {
       )}
 
       {statusUpdating ? (
-        <AppLoader overlay label="Updating status..." />
+        <AppLoader overlay />
       ) : null}
 
       <div className="filter-row mb-4 rounded-2xl px-0 py-0">
@@ -360,7 +360,7 @@ const AllTickets = () => {
       </div>
 
       {loading && filteredRequests.length === 0 ? (
-        <AppLoader label="Loading tickets..." />
+        <AppLoader />
       ) : (
       <DataTable
         value={filteredRequests}

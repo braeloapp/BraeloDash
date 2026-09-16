@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { getData } from "@/app/API/method";
 import { extractResultsList } from "@/lib/apiResponse";
@@ -170,6 +171,7 @@ const FeedbackCard = () => {
               setRows(event.rows);
             }}
             loading={loading}
+            loadingIcon={<TableLoadingIcon />}
             emptyMessage="No feedback yet. Feedback appears here when users submit reactions in the main app."
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"

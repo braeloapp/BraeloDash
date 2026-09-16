@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -524,6 +525,7 @@ const ReportedUser = () => {
             paginatorClassName="business-paginator app-paginator m-5"
             className="p-datatable-striped"
             loading={loading}
+            loadingIcon={<TableLoadingIcon />}
             emptyMessage="No reports found"
           >
             <Column 

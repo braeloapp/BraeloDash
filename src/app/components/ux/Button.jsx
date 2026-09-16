@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import AppLoader from "./AppLoader";
 
 const VARIANT_CLASS = {
   primary: "btn-primary",
@@ -31,11 +32,16 @@ export default function Button({
     >
       {loading ? (
         <>
-          <span
-            className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-r-transparent"
-            aria-hidden
+          <AppLoader
+            size="sm"
+            full={false}
+            label="Please wait"
+            showLabel={false}
+            tone={variant === "primary" || variant === "danger" ? "light" : "brand"}
           />
-          <span>{typeof children === "string" ? "Please wait…" : children}</span>
+          <span>
+            {typeof children === "string" ? "Please wait…" : children}
+          </span>
         </>
       ) : (
         children

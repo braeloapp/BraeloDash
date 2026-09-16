@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
@@ -114,6 +115,7 @@ const CategoriesTable = () => {
           setRows(event.rows);
         }}
         loading={loading}
+            loadingIcon={<TableLoadingIcon />}
         emptyMessage="No categories found"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         className="custom-paginator"

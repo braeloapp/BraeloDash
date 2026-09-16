@@ -13,7 +13,7 @@ export default function PageState({
   action,
 }) {
   if (status === "loading") {
-    return <AppLoader label={title || "Loading..."} />;
+    return <AppLoader />;
   }
 
   const isError = status === "error";

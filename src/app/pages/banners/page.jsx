@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { getBodyStyle, getHeaderStyle } from "@/app/components/Users/UserData";
 import { useRouter } from "next/navigation";
@@ -332,6 +333,7 @@ export default function BannerManagement() {
        // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         tableStyle={{ minWidth: "100%" }}
         loading={loading}
+            loadingIcon={<TableLoadingIcon />}
         emptyMessage="No banners found. Please add a new banner."
         paginatorClassName="banner-paginator m-5"
       >

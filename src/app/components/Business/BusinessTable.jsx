@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { DataTable } from "primereact/datatable";
+import TableLoadingIcon from "@/app/components/ux/TableLoadingIcon";
 import { Column } from "primereact/column";
 import { getHeaderStyle, getBodyStyle } from "../Users/UserData";
 import Image from "next/image";
@@ -145,6 +146,7 @@ const BusinessTable = ({
           totalRecords={isServerPaged ? totalRecords : undefined}
           onPage={isServerPaged ? onPageChange : undefined}
           loading={loading}
+            loadingIcon={<TableLoadingIcon />}
           selection={selectedBusinesses}
           onSelectionChange={onSelectionChange}
           tableStyle={{ width: "100%" }}
