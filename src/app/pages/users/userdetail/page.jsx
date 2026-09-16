@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { FiEdit2, FiMail, FiPhone, FiShield, FiClock } from "react-icons/fi";
 import { getData } from "@/app/API/method";
@@ -10,6 +10,7 @@ import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import PageHeader from "@/app/components/ux/PageHeader";
 import PageState from "@/app/components/ux/PageState";
 import ActionMenu from "@/app/components/ux/ActionMenu";
+import ProfileAvatar from "@/app/components/ux/ProfileAvatar";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
@@ -52,29 +53,30 @@ const Userdetail = () => {
   const [error, setError] = useState(null);
   const [OpenEditModal, setEditModalOpen] = useState(false);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      if (!userId) {
-        setError({ message: "User id is required" });
-        setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        const response = await getData(`/admin-panel/users/${userId}`);
-        setUserData(response?.data || null);
-        setError(null);
-      } catch (err) {
-        setError({
-          message: err.response?.data?.message || "Failed to load user",
-        });
-        setUserData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadUser();
+  const loadUser = useCallback(async () => {
+    if (!userId) {
+      setError({ message: "User id is required" });
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await getData(`/admin-panel/users/${userId}`);
+      setUserData(response?.data || null);
+      setError(null);
+    } catch (err) {
+      setError({
+        message: err.response?.data?.message || "Failed to load user",
+      });
+      setUserData(null);
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
+
+  useEffect(() => {
+    loadUser();
+  }, [loadUser]);
 
   const OpeModal = () => {
     setEditModalOpen((prev) => !prev);
@@ -82,7 +84,8 @@ const Userdetail = () => {
 
   const roleLabel = useMemo(() => {
     if (!userData) return "Client";
-    if (userData.is_superuser || userData.is_staff) return "Admin";
+    if (userData.is_superuser) return "Super Admin";
+    if (userData.is_staff) return "Admin";
     if (String(userData.role || "").toLowerCase() === "admin") return "Admin";
     return "Client";
   }, [userData]);
@@ -194,7 +197,8 @@ const Userdetail = () => {
   }
 
   const displayName = userData.name || userData.username || "User";
-  const avatarUrl = userData.profile_picture || "";
+  const avatarUrl =
+    userData.profile_picture || userData.image || userData.avatar || "";
 
   return (
     <div className="page-shell user-detail-page">
@@ -217,16 +221,11 @@ const Userdetail = () => {
         <div className="user-detail-hero">
           <div className="user-detail-hero__glow" aria-hidden />
           <div className="user-detail-hero__row">
-            <div className="user-detail-avatar" aria-hidden>
-              {avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarUrl} alt="" className="user-detail-avatar__img" />
-              ) : (
-                <span className="user-detail-avatar__initials">
-                  {initialsFrom(userData)}
-                </span>
-              )}
-            </div>
+            <ProfileAvatar
+              src={avatarUrl}
+              className="user-detail-avatar admin-profile-avatar"
+              initials={initialsFrom(userData)}
+            />
 
             <div className="user-detail-hero__copy min-w-0 flex-1">
               <div className="user-detail-kicker">
@@ -248,7 +247,7 @@ const Userdetail = () => {
                 </span>
                 <span
                   className={`badge ${
-                    roleLabel === "Admin" ? "badge-brand" : "badge-neutral"
+                    roleLabel === "Client" ? "badge-neutral" : "badge-brand"
                   }`}
                 >
                   {roleLabel}
@@ -313,20 +312,20 @@ const Userdetail = () => {
 
       <EditUserdetailModal
         isOpen={OpenEditModal}
-        OpeModal={OpeModal}
         onClose={() => setEditModalOpen(false)}
+        onSaved={loadUser}
         userData={userData}
       />
 
-      <section className="user-detail-listings">
+      <div className="user-detail-listings">
         <div className="user-detail-listings__head">
           <h3 className="user-detail-listings__title">Listings</h3>
           <p className="user-detail-listings__desc">
             Browse and manage every listing owned by this account.
           </p>
         </div>
-        <ListingTabbar userId={userData.id} />
-      </section>
+        <ListingTabbar userId={userId} />
+      </div>
     </div>
   );
 };

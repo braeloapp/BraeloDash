@@ -1,3 +1,25 @@
+import { resolveProfileAvatar } from "@/lib/avatar";
+
+/** Admin account photo used in the sidebar + Admin Profile. */
+export const ADMIN_DEFAULT_AVATAR = "/images/profile (1).png";
+
+/**
+ * Admin profile prefers the branded admin photo when no real upload exists.
+ * User detail pages should use `resolveProfileAvatar` (silhouette fallback).
+ */
+export function resolveAdminAvatar(url) {
+  if (!url || typeof url !== "string" || !url.trim()) {
+    return ADMIN_DEFAULT_AVATAR;
+  }
+  const resolved = resolveProfileAvatar(url);
+  // Dead Azure defaults resolve to the user silhouette; for admin UI keep the
+  // dedicated admin photo instead.
+  if (resolved === "/images/profile-avatar.svg") {
+    return ADMIN_DEFAULT_AVATAR;
+  }
+  return resolved;
+}
+
 const SESSION_COOKIE = "braelo_admin_session";
 
 export function setAdminSessionCookie() {

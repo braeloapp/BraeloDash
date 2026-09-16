@@ -20,6 +20,8 @@ import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 import { Update_data } from "./Data";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
+
 
 
 const CoordinatesToAddress = ({ coordinates }) => {
@@ -241,10 +243,20 @@ const TotalListing = ({ user_id }) => {
     };
 
     const category = originalData.category || "";
-    const formFields = Update_data[category] || [];
-    setCurrentFormFields(formFields);
+    const formFields = (
+      getEditFieldsForListing(
+        category,
+        originalData.subcategory,
+        initialFormData,
+        { excludeLocation: true }
+      ) || []
+    );
+    const resolvedFields = formFields.length
+      ? formFields
+      : (Update_data[category] || []).filter((f) => f.name !== "location");
+    setCurrentFormFields(resolvedFields);
 
-    formFields.forEach(field => {
+    resolvedFields.forEach(field => {
       if (!(field.name in initialFormData)) {
         initialFormData[field.name] = field.type === 'checkbox' ? false : '';
       }
@@ -724,7 +736,7 @@ const TotalListing = ({ user_id }) => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {currentFormFields.map((field) => (
+                  {currentFormFields.filter((field) => field.name !== "location").map((field) => (
                     <div key={field.name} className="mb-4">
                       <label className="field-label">
                         {field.label}

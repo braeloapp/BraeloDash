@@ -17,6 +17,7 @@ import {
   adminRoleLabel,
   clearAdminSession,
   persistAdminSession,
+  ADMIN_DEFAULT_AVATAR,
 } from "@/lib/adminAuth";
 import { getData } from "@/app/API/method";
 import {
@@ -224,8 +225,8 @@ const Sidebar = ({ open = false, onClose }) => {
       <div className="admin-sidebar__seam" aria-hidden />
 
       {/* Nav */}
-      <div className="relative z-[1] min-h-0 flex-1 overflow-y-auto px-3.5 py-4">
-        <nav className="flex flex-col gap-3 pb-8">
+      <div className="relative z-[1] min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
+        <nav className="flex flex-col gap-1 pb-3">
           {grouped.map((section) => {
             const isCollapsed = Boolean(collapsed[section.group]);
             const hasActive = section.items.some((item) =>
@@ -245,7 +246,7 @@ const Sidebar = ({ open = false, onClose }) => {
                   onClick={() => toggleGroup(section.group)}
                   aria-expanded={!isCollapsed}
                   aria-controls={panelId}
-                  className="group flex w-full items-center justify-between rounded-xl px-3 py-2 text-left transition hover:bg-white/[0.05]"
+                  className="group flex w-full items-center justify-between rounded-lg px-2.5 py-1 text-left transition hover:bg-white/[0.05]"
                 >
                   <span className="flex items-center gap-2">
                     <span
@@ -257,7 +258,7 @@ const Sidebar = ({ open = false, onClose }) => {
                       aria-hidden
                     />
                     <span
-                      className={`text-[10px] font-semibold uppercase tracking-[0.2em] transition ${
+                      className={`text-[10px] font-semibold uppercase tracking-[0.18em] transition ${
                         hasActive
                           ? "text-[#FFCC35]/90"
                           : "text-white/38 group-hover:text-white/58"
@@ -267,7 +268,7 @@ const Sidebar = ({ open = false, onClose }) => {
                     </span>
                   </span>
                   <FiChevronDown
-                    size={14}
+                    size={13}
                     className={`shrink-0 transition-all duration-200 ${
                       hasActive
                         ? "text-[#FFCC35]/80"
@@ -284,7 +285,7 @@ const Sidebar = ({ open = false, onClose }) => {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <ul className="mt-1 flex flex-col gap-1.5 pb-1.5">
+                    <ul className="mt-0.5 flex flex-col gap-0.5 pb-0.5">
                       {section.items.map((item) => {
                         const active = isItemActive(pathname, item.to);
                         return (
@@ -293,7 +294,7 @@ const Sidebar = ({ open = false, onClose }) => {
                               href={item.to}
                               onClick={onClose}
                               aria-current={active ? "page" : undefined}
-                              className={`admin-sidebar-link group relative flex items-center gap-3 overflow-hidden rounded-2xl px-2.5 py-2.5 text-sm transition-all duration-200 ${
+                              className={`admin-sidebar-link group relative flex items-center gap-2.5 overflow-hidden rounded-xl px-2 py-1.5 text-[13px] leading-tight transition-all duration-200 ${
                                 active
                                   ? "admin-sidebar-link--active font-semibold"
                                   : "font-medium"
@@ -315,7 +316,7 @@ const Sidebar = ({ open = false, onClose }) => {
                                 />
                               )}
                               <span
-                                className={`relative z-[1] inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition ${
+                                className={`relative z-[1] inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition ${
                                   active
                                     ? "bg-white/20 shadow-inner"
                                     : "bg-white/[0.05] ring-1 ring-white/[0.06] group-hover:bg-[#CD9403]/20 group-hover:ring-[#FFCC35]/20"
@@ -324,9 +325,9 @@ const Sidebar = ({ open = false, onClose }) => {
                                 <Image
                                   src={item.icon}
                                   alt=""
-                                  width={18}
-                                  height={18}
-                                  className="h-[18px] w-[18px] object-contain brightness-0 invert opacity-95"
+                                  width={16}
+                                  height={16}
+                                  className="h-4 w-4 object-contain brightness-0 invert opacity-95"
                                 />
                               </span>
                               <span className="admin-sidebar-link__label relative z-[1] truncate tracking-[-0.01em]">
@@ -420,7 +421,7 @@ const Sidebar = ({ open = false, onClose }) => {
           <div className="relative z-[1] flex items-center gap-3">
             <span className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#FFCC35]/55">
               <Image
-                src="/images/profile (1).png"
+                src={ADMIN_DEFAULT_AVATAR}
                 alt=""
                 fill
                 className="object-cover"

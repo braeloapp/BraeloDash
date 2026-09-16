@@ -17,6 +17,7 @@ import ListingDetailModal from "./ListingDetailModal";
 import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
 const Services = () => {
   // State management
@@ -324,38 +325,39 @@ const Services = () => {
         return;
       }
 
-      const form = new FormData();
 
-      // Append all form data
-      form.append("category", formData.category || "Services");
-      form.append("subcategory", formData.subcategory || "Cleaning");
-      form.append("title", formData.title || "");
-      form.append("description", formData.description || "");
-      form.append("location", formData.location || "");
-      form.append("make", formData.make || "");
-      form.append("model", formData.model || "");
-      form.append("year", formData.year || "");
-      form.append("color", formData.color || "");
-      form.append("price", String(formData.price || 0));
-      form.append("negotiable", formData.negotiable || "NO");
-      form.append("condition", formData.condition || "USED");
+      const fields = getEditFieldsForListing(
+        formData.category || "Services",
+        formData.subcategory,
+        formData
+      );
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
+      }
+
+      const form = new FormData();
+      fields.forEach((field) => {
+        const raw = formData[field.name];
+        if (raw === undefined || raw === null) return;
+        const value = Array.isArray(raw) ? raw.join(",") : String(raw);
+        if (value === "" && !field.required) return;
+        form.append(field.name, value);
+      });
+
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
           '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
-      // Handle keywords
-      if (formData.keywords) {
-        form.append(
-          "keywords",
-          Array.isArray(formData.keywords)
-            ? formData.keywords.join(",")
-            : formData.keywords
-        );
-      }
-
-      // Handle images
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -436,42 +438,12 @@ const Services = () => {
   };
 
   // Form fields configuration
-  const formFields = [
-    { name: "title", label: "Title", type: "text", required: true },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      required: true,
-    },
-    { name: "make", label: "Make", type: "text", required: true },
-    { name: "model", label: "Model", type: "text", required: true },
-    { name: "year", label: "Year", type: "number", required: true },
-    { name: "color", label: "Color", type: "text", required: true },
-    { name: "price", label: "Price", type: "number", required: true },
-    {
-      name: "negotiable",
-      label: "Negotiable",
-      type: "select",
-      options: ["YES", "NO"],
-      required: true,
-    },
-    {
-      name: "condition",
-      label: "Condition",
-      type: "select",
-      options: ["NEW", "USED", "REFURBISHED"],
-      required: true,
-    },
-    {
-      name: "keywords",
-      label: "Keywords (comma separated)",
-      type: "text",
-      required: false,
-    },
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
-  ];
+  const formFields = getEditFieldsForListing(
+    formData.category || "Services",
+    formData.subcategory,
+    formData,
+    { excludeLocation: true }
+  );
 
   if (loading) {
     return <AppLoader />;
@@ -620,7 +592,7 @@ const Services = () => {
                       {field.type === "select" ? (
                         <select
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -635,7 +607,7 @@ const Services = () => {
                       ) : field.type === "textarea" ? (
                         <textarea
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -653,7 +625,7 @@ const Services = () => {
                         <input
                           type={field.type}
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"

@@ -17,6 +17,7 @@ import ListingDetailModal from "./ListingDetailModal";
 import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
 const Jobs = () => {
   // State management
@@ -321,40 +322,39 @@ const Jobs = () => {
         return;
       }
 
-      const form = new FormData();
 
-      // Append all form data
-      form.append("category", formData.category || "Jobs");
-      form.append("subcategory", formData.subcategory || "Home Office");
-      form.append("title", formData.title || "");
-      form.append("job_title", formData.job_title || "");
-      form.append("description", formData.description || "");
-      form.append("location", formData.location || "");
-      form.append("job_type", formData.job_type || "FULL_TIME");
-      form.append("company", formData.company || "");
-      form.append("experience_level", formData.experience_level || "");
-      form.append("salary_range", formData.salary_range || "");
-      form.append("negotiable", formData.negotiable || "NO");
-      form.append("required_skills", formData.required_skills || "");
-      form.append("employment_type", formData.employment_type || "");
-      form.append("working_hours", formData.working_hours || "");
+      const fields = getEditFieldsForListing(
+        formData.category || "Jobs",
+        formData.subcategory,
+        formData
+      );
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
+      }
+
+      const form = new FormData();
+      fields.forEach((field) => {
+        const raw = formData[field.name];
+        if (raw === undefined || raw === null) return;
+        const value = Array.isArray(raw) ? raw.join(",") : String(raw);
+        if (value === "" && !field.required) return;
+        form.append(field.name, value);
+      });
+
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
           '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
-      // Handle keywords
-      if (formData.keywords) {
-        form.append(
-          "keywords",
-          Array.isArray(formData.keywords)
-            ? formData.keywords.join(",")
-            : formData.keywords
-        );
-      }
-
-      // Handle images
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -435,39 +435,12 @@ const Jobs = () => {
   };
 
   // Form fields configuration
-  const formFields = [
-    { name: "title", label: "Title", type: "text", required: true },
-    { name: "description", label: "Job Description", type: "textarea", required: true },
-    { name: "company", label: "Company", type: "text", required: true },
-    { name: "experience_level", label: "Experience Level", type: "text", required: true },
-    { name: "job_title", label: "Job Title", type: "text", required: true },
-    { name: "required_skills", label: "Required Skills", type: "text", required: true },
-    { name: "employment_type", label: "Employment Type", type: "text", required: true },
-    { name: "salary_range", label: "Salary Range", type: "text", required: true },
-    { name: "working_hours", label: "Working Hours", type: "number", required: true },
-    {
-      name: "negotiable",
-      label: "Negotiable",
-      type: "select",
-      options: ["YES", "NO"],
-      required: true,
-    },
-    {
-      name: "job_type",
-      label: "Job Type",
-      type: "select",
-      options: ["FULL_TIME", "PART_TIME", "CONTRACT", "TEMPORARY", "INTERNSHIP", "VOLUNTEER"],
-      required: true,
-    },
-    {
-      name: "keywords",
-      label: "Keywords (comma separated)",
-      type: "text",
-      required: false,
-    },
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
-  ];
+  const formFields = getEditFieldsForListing(
+    formData.category || "Jobs",
+    formData.subcategory,
+    formData,
+    { excludeLocation: true }
+  );
 
   if (loading) {
     return <AppLoader />;
@@ -594,7 +567,7 @@ const Jobs = () => {
                       {field.type === "select" ? (
                         <select
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -609,7 +582,7 @@ const Jobs = () => {
                       ) : field.type === "textarea" ? (
                         <textarea
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -619,7 +592,7 @@ const Jobs = () => {
                         <input
                           type={field.type}
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"

@@ -4,7 +4,7 @@ import PageHeader from "@/app/components/ux/PageHeader";
 
 const AdminProfile = () => {
   return (
-    <div className="page-shell">
+    <div className="page-shell user-detail-page">
       <PageHeader
         showBack
         title="Admin Profile"

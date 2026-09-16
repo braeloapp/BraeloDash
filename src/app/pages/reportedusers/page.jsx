@@ -518,11 +518,10 @@ const ReportedUser = () => {
             rows={rows}
             totalRecords={totalRecords}
             onPage={onPage}
-            rowsPerPageOptions={[5, 10, 20, 50]}
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             tableStyle={{ width: "100%" }}
-            paginatorClassName="user-paginator"
+            paginatorClassName="business-paginator app-paginator m-5"
             className="p-datatable-striped"
             loading={loading}
             emptyMessage="No reports found"

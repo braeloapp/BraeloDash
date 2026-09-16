@@ -1,1764 +1,5431 @@
 export const FormData = {
   Vehicles: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Make", type: "text", name: "make" },
-      { label: "Price", type: "number", name: "price" },
-      { label: "Model", type: "text", name: "model" },
-      { label: "Year", type: "number", name: "year" },
-      { label: "Color", type: "text", name: "color" },
-      { label: "Fuel Type", type: "text", name: "fuel_type" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "keywords", type: "text", name: "keywords" },
+      { label: "Choose Image", type: "file", name: "image", required: true },
+      { label: "Ad Title", type: "text", name: "title", required: true },
+      { label: "Location", type: "text", name: "location", required: true },
+      { label: "Make", type: "text", name: "make", required: true },
+      { label: "Model", type: "text", name: "model", required: true },
+      { label: "Year", type: "number", name: "year", required: true },
+      { label: "Color", type: "text", name: "color", required: true },
+      { label: "Mileage", type: "number", name: "mileage", required: true },
+      { label: "Fuel Type", type: "text", name: "fuel_type", required: true },
+      { label: "Price", type: "number", name: "price", required: true },
+      { label: "Description", type: "textarea", name: "description", required: true },
+      { label: "keywords", type: "text", name: "keywords", required: true },
     ],
     Cars: {
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Number of Doors", options: ["1/3", "4/5"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Number of Doors", name: "number_of_doors", options: ["1/3", "4/5"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Motorcycle: {
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Truck: {
-      fields: [{ label: "Load Capacity", type: "text", name: "Load_capacity" }],
+      fields: [{ label: "Load Capacity", type: "number", name: "Load_capacity", required: true }],
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Bike: {
-      fields: [{ label: "Type", type: "text", name: "bike_type" }],
+      fields: [{ label: "Type", type: "text", name: "bike_type", required: true }],
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Boat: {
-      fields: [{ label: "Length", type: "text", name: "boat_length" }],
+      fields: [{ label: "Length", type: "number", name: "boat_length", required: true }],
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Van: {
-      fields: [{ label: "Passenger Capacity", type: "text", name: "passenger_capacity" }],
+      fields: [{ label: "Passenger Capacity", type: "number", name: "passenger_capacity", required: true }],
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Scooter: {
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     partsandaccessories: {
-      fields: [{ label: "Part Name", type: "text", name: "part_name" }],
+      fields: [{ label: "Part Name", type: "text", name: "part_name", required: true }],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Rentals: {
       fields: [
-        { label: "Vehicle Type", type: "text", name: "vehicle_type" },
-        { label: "Rental Duration", type: "text", name: "rental_duration" },
+        { label: "Vehicle Type", type: "text", name: "vehicle_type", required: true },
+        { label: "Rental Duration", type: "text", name: "rental_duration", required: true },
       ],
       chips: [
-        { label: "Transmission", options: ["Manual", "Automatic"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Purpose", options: ["Sale", "Rental"] },
-        { label: "For Sale", options: ["YES", "NO"] },
-        { label: "Rentals", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
+        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "For Sale", name: "for_sale", options: ["YES", "NO"], required: true },
+        { label: "Rentals", name: "rentals", options: ["YES", "NO"], required: true },
+        { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
   },
   realestate: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Property Type", type: "text", name: "property_type" },
-      { label: "No of Bedrooms", type: "number", name: "bedrooms" },
-      { label: "No of bathrooms", type: "number", name: "bathrooms" },
-      { label: "Year Built", type: "number", name: "yearbuilt" },
-      { label: "Size", type: "text", name: "size" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Property Type",
+        type: "text",
+        name: "property_type",
+        required: true
+      },
+      {
+        label: "No of Bedrooms",
+        type: "number",
+        name: "bedrooms",
+        required: true
+      },
+      {
+        label: "No of bathrooms",
+        type: "number",
+        name: "bathrooms",
+        required: true
+      },
+      {
+        label: "Size",
+        type: "text",
+        name: "size",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     House: {
       fields: [
-        { label: "Parking Availability and Cost", type: "text", name: "cost" },
+        {
+          label: "Parking Availability and Cost",
+          type: "text",
+          name: "parking_and_cost",
+          required: true
+        },
         {
           label: "Maintenance and Repair Policy",
           type: "text",
-          name: "maintainace",
+          name: "maintenance_policy",
+          required: true
         },
-        { label: "Other (Specify)", type: "text", name: "other" },
-        { label: "Price", type: "text", name: "price" }
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Basement", options: ["YES", "NO"] },
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "Lease Terms", options: ["DURATION", "RENWAL"] },
-        { label: "Credit Score Requirement", options: ["YES", "NO"] },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "Basement",
+          name: "basement",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "Lease Terms",
+          name: "lease_terms",
+          options: [
+            "DURATION",
+            "RENEWAL"
+          ],
+          required: true
+        },
+        {
+          label: "Credit Score Requirement",
+          name: "credit_score",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
         {
           label: "Utilities Included",
-          options: ["WATER", "GAS", "ELECTRICITY"],
+          name: "utilities_included",
+          options: [
+            "WATER",
+            "GAS",
+            "ELECTRICITY"
+          ],
+          required: true
         },
-        { label: "Access to Amenities", options: ["POOL", "GYM", "LAUNDARY"] },
+        {
+          label: "Access to Amenities",
+          name: "access_to_amenities",
+          options: [
+            "POOL",
+            "GYM",
+            "LAUNDRY"
+          ],
+          required: true
+        },
         {
           label: "Additional Fees",
-          options: ["APPLICATION FEE", "SECURITY DEPOSIT", "MOVE-INFEE"],
+          name: "additional_fees",
+          options: [
+            "APPLICATION FEE",
+            "SECURITY DEPOSIT",
+            "MOVE-IN FEE"
+          ],
+          required: true
         },
         {
           label: "Pet Policy",
+          name: "pet_policy",
           options: [
             "ALLOWED",
-            "Not ALLOWED",
+            "NOT ALLOWED",
             "ADDITIONAL PET FEE",
-            "RESTRICTIONS",
+            "RESTRICTIONS"
           ],
+          required: true
         },
         {
           label: "Renter's Insurance Requirement",
-          options: ["REQUIRED", "NOT REQUIRED"],
+          name: "renters_insurance_requirement",
+          options: [
+            "REQUIRED",
+            "NOT REQUIRED"
+          ],
+          required: true
         },
         {
           label: "Security Measures",
-          options: ["GATED COMMUNITY", "SECURITY CAMERAS"],
+          name: "security_measures",
+          options: [
+            "GATED COMMUNITY",
+            "SECURITY CAMERAS"
+          ],
+          required: true
         },
-        { label: "Lease Managed By", options: ["OWNER", "AGENCY"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Lease Managed By",
+          name: "lease_managed_by",
+          options: [
+            "OWNER",
+            "AGENCY"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     Apartment: {
       fields: [
-        { label: "Parking Availability and Cost", type: "text", name: "cost" },
+        {
+          label: "Parking Availability and Cost",
+          type: "text",
+          name: "parking_and_cost",
+          required: true
+        },
         {
           label: "Maintenance and Repair Policy",
           type: "text",
-          name: "maintainace",
+          name: "maintenance_policy",
+          required: true
         },
-        { label: "Other (Specify)", type: "text", name: "other" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Basement", options: ["YES", "NO"] },
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "Lease Terms", options: ["DURATION", "RENWAL"] },
-        { label: "Credit Score Requirement", options: ["YES", "NO"] },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "Basement",
+          name: "basement",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "Lease Terms",
+          name: "lease_terms",
+          options: [
+            "DURATION",
+            "RENEWAL"
+          ],
+          required: true
+        },
+        {
+          label: "Credit Score Requirement",
+          name: "credit_score",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
         {
           label: "Utilities Included",
-          options: ["WATER", "GAS", "ELECTRICITY"],
+          name: "utilities_included",
+          options: [
+            "WATER",
+            "GAS",
+            "ELECTRICITY"
+          ],
+          required: true
         },
-        { label: "Access to Amenities", options: ["POOL", "GYM", "LAUNDARY"] },
+        {
+          label: "Access to Amenities",
+          name: "access_to_amenities",
+          options: [
+            "POOL",
+            "GYM",
+            "LAUNDRY"
+          ],
+          required: true
+        },
         {
           label: "Additional Fees",
-          options: ["APPLICATION FEE", "SECURITY DEPOSIT", "MOVE-INFEE"],
+          name: "additional_fees",
+          options: [
+            "APPLICATION FEE",
+            "SECURITY DEPOSIT",
+            "MOVE-IN FEE"
+          ],
+          required: true
         },
         {
           label: "Pet Policy",
+          name: "pet_policy",
           options: [
             "ALLOWED",
-            "Not ALLOWED",
+            "NOT ALLOWED",
             "ADDITIONAL PET FEE",
-            "RESTRICTIONS",
+            "RESTRICTIONS"
           ],
+          required: true
         },
         {
           label: "Renter's Insurance Requirement",
-          options: ["REQUIRED", "NOT REQUIRED"],
+          name: "renters_insurance_requirement",
+          options: [
+            "REQUIRED",
+            "NOT REQUIRED"
+          ],
+          required: true
         },
         {
           label: "Security Measures",
-          options: ["GATED COMMUNITY", "SECURITY CAMERAS"],
+          name: "security_measures",
+          options: [
+            "GATED COMMUNITY",
+            "SECURITY CAMERAS"
+          ],
+          required: true
         },
-        { label: "Lease Managed By", options: ["OWNER", "AGENCY"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Lease Managed By",
+          name: "lease_managed_by",
+          options: [
+            "OWNER",
+            "AGENCY"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     Land: {
       fields: [
-        { label: "Land Type", type: "text", name: "landtype" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Land Type",
+          type: "text",
+          name: "land_type",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     mobilehome: {
       fields: [
-        { label: "Parking Availability and Cost", type: "text", name: "cost" },
+        {
+          label: "Parking Availability and Cost",
+          type: "text",
+          name: "parking_and_cost",
+          required: true
+        },
         {
           label: "Maintenance and Repair Policy",
           type: "text",
-          name: "maintainace",
+          name: "maintenance_policy",
+          required: true
         },
-        { label: "Other (Specify)", type: "text", name: "other" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Basement", options: ["YES", "NO"] },
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "Lease Terms", options: ["DURATION", "RENWAL"] },
-        { label: "Credit Score Requirement", options: ["YES", "NO"] },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "Basement",
+          name: "basement",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "Lease Terms",
+          name: "lease_terms",
+          options: [
+            "DURATION",
+            "RENEWAL"
+          ],
+          required: true
+        },
+        {
+          label: "Credit Score Requirement",
+          name: "credit_score",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
         {
           label: "Utilities Included",
-          options: ["WATER", "GAS", "ELECTRICITY"],
+          name: "utilities_included",
+          options: [
+            "WATER",
+            "GAS",
+            "ELECTRICITY"
+          ],
+          required: true
         },
-        { label: "Access to Amenities", options: ["POOL", "GYM", "LAUNDARY"] },
+        {
+          label: "Access to Amenities",
+          name: "access_to_amenities",
+          options: [
+            "POOL",
+            "GYM",
+            "LAUNDRY"
+          ],
+          required: true
+        },
         {
           label: "Additional Fees",
-          options: ["APPLICATION FEE", "SECURITY DEPOSIT", "MOVE-INFEE"],
+          name: "additional_fees",
+          options: [
+            "APPLICATION FEE",
+            "SECURITY DEPOSIT",
+            "MOVE-IN FEE"
+          ],
+          required: true
         },
         {
           label: "Pet Policy",
+          name: "pet_policy",
           options: [
             "ALLOWED",
-            "Not ALLOWED",
+            "NOT ALLOWED",
             "ADDITIONAL PET FEE",
-            "RESTRICTIONS",
+            "RESTRICTIONS"
           ],
+          required: true
         },
         {
           label: "Renter's Insurance Requirement",
-          options: ["REQUIRED", "NOT REQUIRED"],
+          name: "renters_insurance_requirement",
+          options: [
+            "REQUIRED",
+            "NOT REQUIRED"
+          ],
+          required: true
         },
         {
           label: "Security Measures",
-          options: ["GATED COMMUNITY", "SECURITY CAMERAS"],
+          name: "security_measures",
+          options: [
+            "GATED COMMUNITY",
+            "SECURITY CAMERAS"
+          ],
+          required: true
         },
-        { label: "Lease Managed By", options: ["OWNER", "AGENCY"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Lease Managed By",
+          name: "lease_managed_by",
+          options: [
+            "OWNER",
+            "AGENCY"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     commercial: {
       fields: [
-        { label: "No of Floors", type: "text", name: "nooffloors" },
-        { label: "HOA Fees", type: "text", name: "cost" },
+        {
+          label: "No of Floors",
+          type: "number",
+          name: "number_of_floors",
+          required: true
+        },
+        {
+          label: "HOA Fees",
+          type: "number",
+          name: "hoa_fees",
+          required: false
+        },
         {
           label: "Maintenance and Repair Policy",
           type: "text",
-          name: "maintainace",
+          name: "maintenance_policy",
+          required: true
         },
-        { label: "Other (Specify)", type: "text", name: "other" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "Basement", options: ["YES", "NO"] },
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "Lease Terms", options: ["DURATION", "RENWAL"] },
-        { label: "Credit Score Requirement", options: ["YES", "NO"] },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "Basement",
+          name: "basement",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "Lease Terms",
+          name: "lease_terms",
+          options: [
+            "DURATION",
+            "RENEWAL"
+          ],
+          required: true
+        },
+        {
+          label: "Credit Score Requirement",
+          name: "credit_score",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
         {
           label: "Utilities Included",
-          options: ["WATER", "GAS", "ELECTRICITY"],
+          name: "utilities_included",
+          options: [
+            "WATER",
+            "GAS",
+            "ELECTRICITY"
+          ],
+          required: true
         },
         {
           label: "Additional Fees",
-          options: ["APPLICATION FEE", "SECURITY DEPOSIT", "MOVE-INFEE"],
+          name: "additional_fees",
+          options: [
+            "APPLICATION FEE",
+            "SECURITY DEPOSIT",
+            "MOVE-IN FEE"
+          ],
+          required: true
+        },
+        {
+          label: "Pet Policy",
+          name: "pet_policy",
+          options: [
+            "ALLOWED",
+            "NOT ALLOWED",
+            "ADDITIONAL PET FEE",
+            "RESTRICTIONS"
+          ],
+          required: true
         },
         {
           label: "Renter's Insurance Requirement",
-          options: ["REQUIRED", "NOT REQUIRED"],
+          name: "renters_insurance_requirement",
+          options: [
+            "REQUIRED",
+            "NOT REQUIRED"
+          ],
+          required: true
         },
         {
           label: "Security Measures",
-          options: ["GATED COMMUNITY", "SECURITY CAMERAS"],
+          name: "security_measures",
+          options: [
+            "GATED COMMUNITY",
+            "SECURITY CAMERAS"
+          ],
+          required: true
         },
-        { label: "Lease Managed By", options: ["OWNER", "AGENCY"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Lease Managed By",
+          name: "lease_managed_by",
+          options: [
+            "OWNER",
+            "AGENCY"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     bedroom: {
       fields: [
         {
           label: "Rent Price and What's Included",
           type: "text",
-          name: "nooffloors",
+          name: "rent_price",
+          required: true
         },
-        { label: "Lease Terms", type: "text", name: "cost" },
+        {
+          label: "Lease Terms",
+          type: "text",
+          name: "lease_terms",
+          required: true
+        },
         {
           label: "Parking Availability and Cost",
           type: "text",
-          name: "maintainace",
+          name: "parking_and_cost",
+          required: true
         },
         {
-          label: "Security Deposit and Any Additional Fees)",
+          label: "Security Deposit",
+          type: "number",
+          name: "security_deposit",
+          required: true
+        },
+        {
+          label: "House Rules",
+          type: "text",
+          name: "house_rules",
+          required: true
+        },
+        {
+          label: "Location Details",
+          type: "text",
+          name: "location_details",
+          required: true
+        },
+        {
+          label: "Availability Date",
+          type: "date",
+          name: "availability_dates",
+          required: true
+        },
+        {
+          label: "Number of Current Occupants",
+          type: "number",
+          name: "number_of_occupants",
+          required: true
+        },
+        {
+          label: "Other (Specify)",
           type: "text",
           name: "other",
+          required: false
         },
-        { label: "House Rules", type: "text", name: "price" },
-        { label: "Location Details", type: "text", name: "price" },
-        { label: "Availability Date", type: "date", name: "price" },
         {
-          label: "Number of Current Occupants and Type",
-          type: "text",
+          label: "Price",
+          type: "number",
           name: "price",
-        },
-        { label: "Other (Specify)", type: "text", name: "other" },
-        { label: "Price", type: "text", name: "price" },
+          required: true
+        }
       ],
       chips: [
-        { label: "Bathroom Type", options: ["PRIVATE", "SHARED"] },
-        { label: "Kitchen Access and Type", options: ["YES", "NO"] },
+        {
+          label: "Bathroom Type",
+          name: "bathroom_type",
+          options: [
+            "PRIVATE",
+            "SHARED"
+          ],
+          required: true
+        },
+        {
+          label: "Kitchen Access and Type",
+          name: "kitchen_access_type",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
         {
           label: "Laundry Facilities",
-          options: ["IN-UNIT", "ON-SITE", "OFF-SITE"],
+          name: "laundry_facilities",
+          options: [
+            "IN-UNIT",
+            "ON-SITE",
+            "OFF-SITE"
+          ],
+          required: true
         },
-        { label: "Pet Policy", options: ["ALLOWED", "Not ALLOWED"] },
-        { label: "Additional Fees", options: ["YES", "NO"] },
-        { label: "Smoking Policy", options: ["ALLOWED", "Not ALLOWED"] },
-        { label: "Security Features", options: ["LOCKS", "CAMERAS"] },
+        {
+          label: "Pet Policy",
+          name: "pet_policy",
+          options: [
+            "ALLOWED",
+            "NOT ALLOWED"
+          ],
+          required: true
+        },
+        {
+          label: "Additional Fees",
+          name: "bedroom_additional_Fees",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "Smoking Policy",
+          name: "smoking_policy",
+          options: [
+            "ALLOWED",
+            "NOT ALLOWED"
+          ],
+          required: true
+        },
+        {
+          label: "Security Features",
+          name: "security_features",
+          options: [
+            "LOCKS",
+            "CAMERAS"
+          ],
+          required: true
+        },
         {
           label: "Preferred Occupants",
+          name: "preferred_occupants",
           options: [
             "MEN ONLY",
             "WOMEN ONLY",
             "COUPLES WELCOME",
-            "SINGLE OCCUPENCY",
+            "SINGLE OCCUPANCY"
           ],
+          required: true
         },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     suite: {
-      fields: [{ label: "Price", type: "text", name: "price" }],
-      chips: [
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
+      chips: [
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     studio: {
-      fields: [{ label: "Price", type: "text", name: "price" }],
-      chips: [
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
+      chips: [
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     vacationhome: {
       fields: [
-        { label: "Rental Price", type: "text", name: "price" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Rental Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     basement: {
-      fields: [{ label: "Price", type: "text", name: "price" }],
-      chips: [
-        { label: "Furnished", options: ["UNFURNISHED", "FURNISHED"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
+      chips: [
+        {
+          label: "Furnished",
+          name: "furnished",
+          options: [
+            "UNFURNISHED",
+            "FURNISHED"
+          ],
+          required: true
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
+  },
+  services: {
+    commonFields: [
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Availability",
+        type: "text",
+        name: "availability",
+        required: true
+      },
+      {
+        label: "Service Fee",
+        type: "number",
+        name: "service_fee",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
+    ],
+    Cleaning: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cleaning Type",
+          type: "text",
+          name: "cleaning_type",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Insurance",
+          name: "insurance",
+          options: [
+            "REQUIRED",
+            "NOT REQUIRED"
+          ],
+          required: false
+        },
+        {
+          label: "Types of Cleaning Offered",
+          name: "cleaning_services",
+          options: [
+            "DEEP CLEANING",
+            "STANDARD CLEANING",
+            "MOVE-IN/MOVE-OUT",
+            "POST CONSTRUCTION",
+            "ORGANIZATION",
+            "UPHOLSTERY CLEANING",
+            "PRESSURE WASHING",
+            "HOUSE KEEPING"
+          ],
+          required: false
+        },
+        {
+          label: "Eco-Friendly Products",
+          name: "eco_friendly_product",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Equipment Provided",
+          name: "provided_equipment",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
     },
+    Handyman: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Specific Services Offered",
+          name: "handyman_services",
+          options: [
+            "PLUMBING",
+            "ELECTRICAL",
+            "CARPENTRY",
+            "GENERAL REPAIRS",
+            "OTHER SPECIFIC SERVICES (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Same-Day Service",
+          name: "same_day_service",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Drivers: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Licence Type",
+          type: "text",
+          name: "licence_type",
+          required: false
+        },
+        {
+          label: "Insurance and Bonding Status",
+          type: "text",
+          name: "insurance_bonding_status",
+          required: false
+        },
+        {
+          label: "Additional Services",
+          type: "text",
+          name: "additional_service",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Driving Services",
+          name: "driving_services",
+          options: [
+            "PERSONAL DRIVERS",
+            "DELIVERIES",
+            "AIRPORT TRANSFERS",
+            "LONG TRIP AVAILABILITY",
+            "RECURRING RIDES"
+          ],
+          required: false
+        },
+        {
+          label: "Vehicle Type",
+          name: "vehicle_type",
+          options: [
+            "SEDAN",
+            "SUV",
+            "LUXURY CAR",
+            "VAN",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Landscaping: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Landscaping Services",
+          name: "landscaping_services",
+          options: [
+            "MOWING",
+            "PLANTING",
+            "DESIGN",
+            "IRRIGATION",
+            "LIGHTING",
+            "SNOW REMOVAL",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Regular Maintenance",
+          name: "regular_maintenance",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Seasonal Service",
+          name: "seasonal_service",
+          options: [
+            "SEASONAL SERVICES",
+            "ONE-TIME SERVICES",
+            "SPRING CLEANUP",
+            "FALL CLEANUP"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Consultancy: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Consultancy Services",
+          name: "consultancy_services",
+          options: [
+            "BUSINESS",
+            "MARKETING",
+            "FINANCE",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Initial Consultation",
+          name: "initial_consultation",
+          options: [
+            "IN-PERSON",
+            "ONLINE",
+            "REMOTELY",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Services Available",
+          name: "offered_services",
+          options: [
+            "IN-PERSON",
+            "ONLINE",
+            "REMOTELY",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    HomeAutomation: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Supported Products",
+          type: "text",
+          name: "supported_products",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Automation Services",
+          name: "automation_services",
+          options: [
+            "SECURITY",
+            "LIGHTING",
+            "ENTERTAINMENT",
+            "CLIMATE CONTROL",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    ClassesCourses: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Subjects or Skills",
+          type: "text",
+          name: "subject_skills",
+          required: false
+        },
+        {
+          label: "Class Duration",
+          type: "number",
+          name: "class_duration",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Classes Format",
+          name: "classes_format",
+          options: [
+            "ONLINE",
+            "IN-PERSON",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    PersonalTraining: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Training Services",
+          name: "training_services",
+          options: [
+            "FITNESS",
+            "WEIGHT LOSS",
+            "STRENGTH TRAINING",
+            "DANCE",
+            "CIRCUIT TRAINING",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Session Format",
+          name: "session_format",
+          options: [
+            "IN-PERSON",
+            "ONLINE",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Personalized Fitness Plan",
+          name: "personalised_fitness_plan",
+          options: [
+            "INCLUDED",
+            "NOT INCLUDED"
+          ],
+          required: false
+        },
+        {
+          label: "Group Sessions",
+          name: "group_session",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    PersonalTrainer: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Training Services",
+          name: "training_services",
+          options: [
+            "FITNESS",
+            "WEIGHT LOSS",
+            "STRENGTH TRAINING",
+            "DANCE",
+            "CIRCUIT TRAINING",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Session Format",
+          name: "session_format",
+          options: [
+            "IN-PERSON",
+            "ONLINE",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Personalized Fitness Plan",
+          name: "personalised_fitness_plan",
+          options: [
+            "INCLUDED",
+            "NOT INCLUDED"
+          ],
+          required: false
+        },
+        {
+          label: "Group Sessions",
+          name: "group_session",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Construction: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Construction Services",
+          name: "construction_services",
+          options: [
+            "RESIDENTIAL",
+            "COMMERCIAL",
+            "RENOVATION",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Technology: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Expertise Level",
+          name: "expertise_level",
+          options: [
+            "BEGINNER",
+            "INTERMEDIATE",
+            "ADVANCED"
+          ],
+          required: false
+        },
+        {
+          label: "Technology Services",
+          name: "technology_services",
+          options: [
+            "IT SUPPORT",
+            "SOFTWARE DEVELOPMENT",
+            "HARDWARE REPAIR",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Service Delivery Method",
+          name: "service_delivery_method",
+          options: [
+            "ON-SITE",
+            "REMOTE",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Ongoing Support",
+          name: "ongoing_support_maintenance",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    ImmigrationVisa: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Experience and Qualifications",
+          type: "text",
+          name: "experience_qualifications",
+          required: false
+        },
+        {
+          label: "Portfolio",
+          type: "text",
+          name: "portfolio",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Visa Services",
+          name: "visa_services",
+          options: [
+            "VISA APPLICATIONS",
+            "GREEN CARD APPLICATIONS",
+            "NATURALIZATION SERVICES",
+            "STUDENT VISA SERVICES",
+            "INVESTOR VISA SERVICES",
+            "WORK PERMIT APPLICATIONS",
+            "FAMILY SPONSORSHIP",
+            "ASYLUM",
+            "CITIZENSHIP"
+          ],
+          required: false
+        },
+        {
+          label: "Free Appointment",
+          name: "free_appointment",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    EventServices: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Event Type",
+          type: "text",
+          name: "event_type",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Events Services",
+          name: "events_services",
+          options: [
+            "CATERING",
+            "DECORATION",
+            "ENTERTAINMENT",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Customizable Package",
+          name: "customizable_package",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    MoversPackers: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Movers Services",
+          name: "movers_services",
+          options: [
+            "LOCAL",
+            "LONG-DISTANCE",
+            "INTERNATIONAL",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Packing Material",
+          name: "packing_material",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Insurance for Goods",
+          name: "insurance_for_goods",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    FarmFreshFood: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Farm Services",
+          name: "farm_services",
+          options: [
+            "VEGETABLES",
+            "FRUITS",
+            "DAIRY",
+            "MEAT",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Delivery Availability",
+          name: "delivery_availability",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Organic Sourced",
+          name: "organic_sourced",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Regular Delivery Option",
+          name: "regular_delivery_option",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    VideoPhotography: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Photography Services",
+          name: "photography_services",
+          options: [
+            "WEDDING",
+            "EVENT",
+            "PORTRAIT",
+            "PRODUCT",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Different Packages",
+          name: "different_packages",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Recurring Services",
+          name: "recurring_services",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    InteriorDesign: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Interior Services",
+          name: "interior_services",
+          options: [
+            "RESIDENTIAL",
+            "COMMERCIAL",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Material / Furniture Selection",
+          name: "material_furniture_Selection",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Rendering Visualizations",
+          name: "rendering_visualizations",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    HomemadeFood: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Homemade Service",
+          name: "homemade_service",
+          options: [
+            "BAKED GOODS",
+            "MEALS",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Service Availability",
+          name: "service_availability",
+          options: [
+            "PICKUP",
+            "DELIVERY",
+            "BOTH"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    InsuranceServices: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Insurance Service",
+          name: "insurance_service",
+          options: [
+            "AUTO",
+            "HOME",
+            "LIFE",
+            "HEALTH",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    HomeCareHealth: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Homecare Service",
+          name: "homecare_service",
+          options: [
+            "NURSING",
+            "ELDERLY CARE",
+            "CHILD CARE",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Catering: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cuisine Type",
+          type: "text",
+          name: "cuisine_type",
+          required: false
+        },
+        {
+          label: "Cuisine Speciality",
+          type: "text",
+          name: "cuisine_speciality",
+          required: false
+        },
+        {
+          label: "Menu",
+          type: "text",
+          name: "menu",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Menu Customization",
+          name: "menu_customization",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Chef: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cuisine Type",
+          type: "text",
+          name: "cuisine_type",
+          required: false
+        },
+        {
+          label: "Cuisine Speciality",
+          type: "text",
+          name: "cuisine_speciality",
+          required: false
+        },
+        {
+          label: "Menu",
+          type: "text",
+          name: "menu",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Menu Customization",
+          name: "menu_customization",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Cake: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cake Type",
+          type: "text",
+          name: "cake_type",
+          required: false
+        },
+        {
+          label: "Menu",
+          type: "text",
+          name: "menu",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Menu Customization",
+          name: "menu_customization",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    FingerFood: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cuisine Type",
+          type: "text",
+          name: "cuisine_type",
+          required: false
+        },
+        {
+          label: "Menu",
+          type: "text",
+          name: "menu",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Menu Customization",
+          name: "menu_customization",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Buffet: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Cuisine Type",
+          type: "text",
+          name: "cuisine_type",
+          required: false
+        },
+        {
+          label: "Menu",
+          type: "text",
+          name: "menu",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Menu Customization",
+          name: "menu_customization",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    Influencer: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Platform",
+          type: "text",
+          name: "platform",
+          required: false
+        },
+        {
+          label: "Audience Size",
+          type: "number",
+          name: "audience_size",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    ACServices: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Brands Specialization",
+          type: "text",
+          name: "brands_specialization",
+          required: false
+        },
+        {
+          label: "Other (Specify)",
+          type: "text",
+          name: "other",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "AC Services",
+          name: "ac_Services",
+          options: [
+            "INSTALLATION",
+            "REPAIR",
+            "MAINTENANCE",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    },
+    TransportServices: {
+      fields: [
+        {
+          label: "Service Type",
+          type: "text",
+          name: "service_type",
+          required: false
+        },
+        {
+          label: "Pricing Structure",
+          type: "number",
+          name: "pricing_structure",
+          required: false
+        },
+        {
+          label: "Service Area or Travel Radius",
+          type: "text",
+          name: "service_area",
+          required: false
+        },
+        {
+          label: "Distance",
+          type: "text",
+          name: "distance",
+          required: false
+        }
+      ],
+      chips: [
+        {
+          label: "Transport Type",
+          name: "transport_type",
+          options: [
+            "VAN",
+            "TRUCK",
+            "CAR",
+            "OTHER (SPECIFY)"
+          ],
+          required: false
+        },
+        {
+          label: "Certification",
+          name: "certifications",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Payment Options",
+          name: "payment_options",
+          options: [
+            "CASH",
+            "CREDIT CARD",
+            "ZELLE",
+            "VENMO",
+            "PAYPAL",
+            "PIX"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        }
+      ]
+    }
   },
   electronics: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Brand", type: "text", name: "brand" },
-      { label: "Model year", type: "number", name: "model" },
-      { label: "Warranty", type: "number", name: "warranty" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Brand",
+        type: "text",
+        name: "brand",
+        required: true
+      },
+      {
+        label: "Model",
+        type: "text",
+        name: "model",
+        required: true
+      },
+      {
+        label: "Warranty",
+        type: "text",
+        name: "warranty",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     smartphones: {
       fields: [
-        { label: "Operating System", type: "text", name: "os" },
-        { label: "Carrier Lock", type: "text", name: "lock" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Operating System",
+          type: "text",
+          name: "operating_system",
+          required: true
+        },
+        {
+          label: "Carrier Lock",
+          type: "text",
+          name: "carrier_lock",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     computers: {
       fields: [
-        { label: "Processor", type: "text", name: "processor" },
-        { label: "RAM", type: "text", name: "ram" },
-        { label: "Storage Type", type: "text", name: "stype" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Processor",
+          type: "text",
+          name: "processor",
+          required: true
+        },
+        {
+          label: "RAM",
+          type: "text",
+          name: "ram",
+          required: true
+        },
+        {
+          label: "Storage Type",
+          type: "text",
+          name: "storage_type",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     appliances: {
       fields: [
-        { label: "Energy Rating", type: "text", name: "processor" },
-        { label: "Dimensions", type: "text", name: "ram" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Energy Rating",
+          type: "text",
+          name: "energy_rating",
+          required: true
+        },
+        {
+          label: "Dimensions",
+          type: "text",
+          name: "dimension",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     games: {
       fields: [
-        { label: "Platforms", type: "text", name: "processor" },
-        { label: "Jenry", type: "text", name: "ram" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Platforms",
+          type: "text",
+          name: "platforms",
+          required: true
+        },
+        {
+          label: "Genre",
+          type: "text",
+          name: "jenry",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     servicesandparts: {
       fields: [
-        { label: "Part Type", type: "text", name: "processor" },
-        { label: "Compatible Model", type: "text", name: "ram" },
-        { label: "Price", type: "text", name: "price" },
+        {
+          label: "Part Type",
+          type: "text",
+          name: "part_type",
+          required: true
+        },
+        {
+          label: "Compatible Model",
+          type: "text",
+          name: "compatible_model",
+          required: true
+        },
+        {
+          label: "Price",
+          type: "number",
+          name: "price",
+          required: true
+        }
       ],
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
-    },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   events: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Event Date & Time", type: "date", name: "event_date" },
-      { label: "Expected Audience", type: "text", name: "expected_audience" },
-      { label: "Special Feature", type: "text", name: "special_feature" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "Ticket Price", type: "text", name: "ticket_price" },
-      { label: "keywords", type: "text", name: "keywords" },
-      { label: "Event type", type: "text", name: "event_type" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Event Date & Time",
+        type: "date",
+        name: "event_date",
+        required: true
+      },
+      {
+        label: "Expected Audience",
+        type: "number",
+        name: "expected_audience",
+        required: true
+      },
+      {
+        label: "Special Feature",
+        type: "text",
+        name: "special_feature",
+        required: true
+      },
+      {
+        label: "Event type",
+        type: "text",
+        name: "event_type",
+        required: true
+      },
+      {
+        label: "Ticket Price",
+        type: "number",
+        name: "ticket_price",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     networkingevents: {
       fields: [
-        { label: "Industry Focus", type: "text", name: "processor" },
-        { label: "Speaker List", type: "text", name: "ram" },
+        {
+          label: "Industry Focus",
+          type: "text",
+          name: "industry_focus",
+          required: true
+        },
+        {
+          label: "Speaker List",
+          type: "text",
+          name: "speaker_list",
+          required: true
+        }
       ],
-      chips: [{ label: "negotiable", options: ["YES", "NO"] }],
+      chips: [
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     concert: {
       fields: [
-        { label: "Performer", type: "text", name: "processor" },
-        { label: "Genre", type: "text", name: "ram" },
+        {
+          label: "Genre",
+          type: "text",
+          name: "genre",
+          required: true
+        }
       ],
-      chips: [{ label: "negotiable", options: ["YES", "NO"] }],
+      chips: [
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     festival: {
       fields: [
-        { label: "No of Days", type: "text", name: "processor" },
-        { label: "Theme", type: "text", name: "ram" },
-        { label: "Major Attraction", type: "text", name: "ram" },
+        {
+          label: "No of Days",
+          type: "number",
+          name: "no_of_days",
+          required: true
+        },
+        {
+          label: "Theme",
+          type: "text",
+          name: "theme",
+          required: true
+        },
+        {
+          label: "Major Attraction",
+          type: "text",
+          name: "major_attraction",
+          required: true
+        }
       ],
-      chips: [{ label: "negotiable", options: ["YES", "NO"] }],
-    },
+      chips: [
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   jobs: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Job Title", type: "date", name: "job_tittle" },
-      { label: "Required Skills", type: "text", name: "required_skills" },
-      { label: "Experience Level", type: "text", name: "experience_level" },
-      { label: "Employment Type", type: "textarea", name: "employment_type" },
-      { label: "Salary Range", type: "text", name: "salary_range" },
-      { label: "keywords", type: "text", name: "keywords" },
-      { label: "Working Hours", type: "text", name: "working_hours" },
-      { label: "Benefits offered", type: "text", name: "benefits_offered" },
-      { label: "Description", type: "text", name: "description" }
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Job Title",
+        type: "text",
+        name: "job_tittle",
+        required: true
+      },
+      {
+        label: "Required Skills",
+        type: "text",
+        name: "required_skills",
+        required: true
+      },
+      {
+        label: "Experience Level",
+        type: "text",
+        name: "experience_level",
+        required: true
+      },
+      {
+        label: "Employment Type",
+        type: "text",
+        name: "employment_type",
+        required: true
+      },
+      {
+        label: "Salary Range",
+        type: "text",
+        name: "salary_range",
+        required: true
+      },
+      {
+        label: "Working Hours",
+        type: "text",
+        name: "working_hours",
+        required: false
+      },
+      {
+        label: "Benefits offered",
+        type: "text",
+        name: "benefits_offered",
+        required: false
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     fulltime: {
-      fields: [
-        {label :"working",type:"text",name:"working"},
-      ],
-
+      fields: [],
       chips: [
-        { label: "Work Permit", options: ["Yes", "No"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Work Permit",
+          name: "work_permit",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     parttime: {
       fields: [
-        { label: "Working Hours", type: "text", name: "processor" },
-        { label: "Flexibility", type: "text", name: "ram" },
+        {
+          label: "Working Hours",
+          type: "text",
+          name: "working_hours",
+          required: false
+        },
+        {
+          label: "Flexibility",
+          type: "number",
+          name: "flexibility",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "Work Permit", options: ["Yes", "No"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Work Permit",
+          name: "work_permit",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     freelancer: {
       fields: [
-        { label: "Project Type", type: "text", name: "processor" },
-        { label: "Contact Duration", type: "text", name: "ram" },
+        {
+          label: "Project Type",
+          type: "text",
+          name: "project_type",
+          required: false
+        },
+        {
+          label: "Contract Duration",
+          type: "number",
+          name: "contract_duration",
+          required: false
+        }
       ],
-
-      chips: [{ label: "negotiable", options: ["YES", "NO"] }],
+      chips: [
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     helper: {
       fields: [
-        { label: "Duties", type: "text", name: "processor" },
-        { label: "Accommodation Provided", type: "text", name: "ram" },
+        {
+          label: "Duties",
+          type: "text",
+          name: "duties",
+          required: false
+        },
+        {
+          label: "Accommodation Provided",
+          type: "text",
+          name: "accommodation_provided",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "Own Tools Needed", options: ["Yes", "No"] },
-        { label: "Car Needed", options: ["Yes", "No"] },
-        { label: "Permit Work", options: ["Yes", "No"] },
-        { label: "Pay", options: ["HOUR", "DAY", "TASKS", "No"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "Own Tools Needed",
+          name: "own_tools",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Car Needed",
+          name: "car_needed",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Work Permit",
+          name: "work_permit",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "Pay",
+          name: "helper_pay",
+          options: [
+            "HOUR",
+            "DAY",
+            "TASKS"
+          ],
+          required: false
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     homeoffice: {
       fields: [
         {
           label: "Remote Work Tools Provided",
           type: "text",
-          name: "processor",
+          name: "remote_work_tools",
+          required: false
         },
-        { label: "Work Hours", type: "text", name: "ram" },
+        {
+          label: "Work Hours",
+          type: "text",
+          name: "working_hours",
+          required: false
+        }
       ],
-
-      chips: [{ label: "negotiable", options: ["YES", "NO"] }],
-    },
+      chips: [
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   furniture: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Material Type", type: "date", name: "material_type" },
-      { label: "Color", type: "text", name: "color" },
-      { label: "Dimension", type: "text", name: "dimensions" },
-      { label: "Price", type: "text", name: "price" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Material Type",
+        type: "text",
+        name: "material_type",
+        required: true
+      },
+      {
+        label: "Color",
+        type: "text",
+        name: "color",
+        required: true
+      },
+      {
+        label: "Dimension",
+        type: "text",
+        name: "dimensions",
+        required: true
+      },
+      {
+        label: "Price",
+        type: "number",
+        name: "price",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     couch: {
       fields: [
-        { label: "Seating Capacity", type: "text", name: "processor" },
-        { label: "Upholstery Material", type: "text", name: "ram" },
-        { label: "Benefits offered", type: "text", name: "benefit" },
+        {
+          label: "Seating Capacity",
+          type: "text",
+          name: "seating_capacity",
+          required: false
+        },
+        {
+          label: "Upholstery Material",
+          type: "text",
+          name: "upholstery_material",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     tables: {
       fields: [
-        { label: "Table Type", type: "text", name: "processor" },
-        { label: "Shape", type: "text", name: "ram" },
+        {
+          label: "Table Type",
+          type: "text",
+          name: "table_type",
+          required: false
+        },
+        {
+          label: "Shape",
+          type: "text",
+          name: "shapes",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     chairs: {
       fields: [
-        { label: "Chair Type", type: "text", name: "processor" },
-        { label: "Weight Capacity", type: "text", name: "ram" },
+        {
+          label: "Chair Type",
+          type: "text",
+          name: "chair_type",
+          required: false
+        },
+        {
+          label: "Weight Capacity",
+          type: "number",
+          name: "weight_capacity",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     beds: {
-      fields: [{ label: "Bed Size", type: "text", name: "processor" }],
-
-      chips: [
-        { label: "Mattress Included", options: ["Yes", "No"] },
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Bed Size",
+          type: "text",
+          name: "bed_size",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "Mattress Included",
+          name: "mattress_included",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     customfurniture: {
       fields: [
-        { label: "Customization", type: "text", name: "processor" },
-        { label: "Lead Time", type: "text", name: "ram" },
+        {
+          label: "Customization",
+          type: "text",
+          name: "customization",
+          required: false
+        },
+        {
+          label: "Lead Time",
+          type: "text",
+          name: "lead_time",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
-    },
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   fashion: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Brand", type: "text", name: "brand" },
-      { label: "Size", type: "text", name: "size" },
-      { label: "Color", type: "text", name: "color" },
-      { label: "Material Type", type: "text", name: "material_type" },
-      { label: "Price", type: "number", name: "price" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Brand",
+        type: "text",
+        name: "brand",
+        required: true
+      },
+      {
+        label: "Size",
+        type: "text",
+        name: "size",
+        required: false
+      },
+      {
+        label: "Color",
+        type: "text",
+        name: "color",
+        required: false
+      },
+      {
+        label: "Material Type",
+        type: "text",
+        name: "material_type",
+        required: false
+      },
+      {
+        label: "Price",
+        type: "number",
+        name: "price",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     clothes: {
-      fields: [{ label: "Gender", type: "text", name: "gender" }],
-
-      chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Gender",
+          type: "text",
+          name: "gender",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     shoes: {
-      fields: [{ label: "Shoe Type", type: "text", name: "shoetype" }],
-
-      chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Shoe Type",
+          type: "text",
+          name: "shoe_type",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     accessories: {
-      fields: [{ label: "Type", type: "text", name: "type" }],
-
-      chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Type",
+          type: "text",
+          name: "accessories_type",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     beautyproducts: {
       fields: [
-        { label: "Skin Type", type: "text", name: "skintype" },
-        { label: "Expiry Date", type: "date", name: "expire" },
+        {
+          label: "Skin Type",
+          type: "text",
+          name: "skin_type",
+          required: false
+        },
+        {
+          label: "Expiry Date",
+          type: "date",
+          name: "expiry_date",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "Mattress Included", options: ["NEW", "USED"] },
-        { label: "condition", options: ["YES", "NO"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     jewelry: {
-      fields: [{ label: "Gem Stone", type: "text", name: "gemstone" }],
-
-      chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Metal Type",
+          type: "text",
+          name: "metal_type",
+          required: false
+        },
+        {
+          label: "Gem Stone",
+          type: "text",
+          name: "gem_stone",
+          required: false
+        }
       ],
-    },
+      chips: [
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   kids: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Age Range", type: "text", name: "age_range" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "Price", type: "text", name: "price" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Age Range",
+        type: "text",
+        name: "age_range",
+        required: true
+      },
+      {
+        label: "Price",
+        type: "number",
+        name: "price",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     health: {
       fields: [
-        { label: "Product Type", type: "text", name: "product_type" },
-        { label: "Expiry Date", type: "date", name: "expire_date" },
+        {
+          label: "Product Type",
+          type: "text",
+          name: "product_type",
+          required: false
+        },
+        {
+          label: "Expiry Date",
+          type: "date",
+          name: "expiry_date",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     toys: {
       fields: [
-        { label: "Toy Type", type: "text", name: "toy_type" },
-        { label: "Safety Standard", type: "text", name: "safety_standard" },
+        {
+          label: "Toy Type",
+          type: "text",
+          name: "toy_type",
+          required: false
+        },
+        {
+          label: "Safety Standard",
+          type: "text",
+          name: "safety_standard",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     transport: {
       fields: [
-        { label: "Vehicle Type", type: "text", name: "vehicle_type" },
-        { label: "Weight Capacity", type: "text", name: "processor" },
+        {
+          label: "Vehicle Type",
+          type: "text",
+          name: "vehicle_type",
+          required: false
+        },
+        {
+          label: "Weight Capacity",
+          type: "number",
+          name: "weight_capacity",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     accessories: {
-      fields: [{ label: "Type", type: "text", name: "type" }],
-
-      chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Type",
+          type: "text",
+          name: "accessories_type",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     classes: {
       fields: [
-        { label: "Subject", type: "text", name: "subject" },
-        { label: "Duration", type: "text", name: "duration" },
-        { label: "Level", type: "text", name: "level" },
+        {
+          label: "Subject",
+          type: "text",
+          name: "subject",
+          required: false
+        },
+        {
+          label: "Duration",
+          type: "text",
+          name: "duration",
+          required: false
+        },
+        {
+          label: "Level",
+          type: "text",
+          name: "experience_level",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     babysitter: {
-      fields: [{ label: "Experience Level", type: "text", name: "experience" }],
-
-      chips: [
-        { label: "Certification", options: ["Yes", "No"] },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Experience Level",
+          type: "text",
+          name: "babysitter_experience",
+          required: false
+        }
       ],
+      chips: [
+        {
+          label: "Certification",
+          name: "certification",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: false
+        },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     daycare: {
       fields: [
-        { label: "No of Children", type: "text", name: "no_of_child" },
-        { label: "Age Group", type: "text", name: "age_group" },
+        {
+          label: "No of Children",
+          type: "number",
+          name: "no_of_children",
+          required: false
+        },
+        {
+          label: "Age Group",
+          type: "text",
+          name: "age_group",
+          required: false
+        }
       ],
-
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     schooloffices: {
       chips: [
         {
           label: "Grades",
+          name: "grades",
           options: [
             "KINDERGARTEN",
             "ELEMENTARY SCHOOL",
             "MIDDLE SCHOOL",
             "HIGH SCHOOL",
             "COLLEGE",
-            "UNIVERSITY",
+            "UNIVERSITY"
           ],
+          required: false
         },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     afterschoolprogram: {
       fields: [
-        { label: "Activities Offered", type: "text", name: "activity" },
-        { label: "Duration", type: "text", name: "duration" },
+        {
+          label: "Activities Offered",
+          type: "text",
+          name: "activities_offered",
+          required: false
+        },
+        {
+          label: "Duration",
+          type: "text",
+          name: "duration",
+          required: false
+        }
       ],
       chips: [
         {
           label: "Grades",
+          name: "grades",
           options: [
             "KINDERGARTEN",
             "ELEMENTARY SCHOOL",
             "MIDDLE SCHOOL",
             "HIGH SCHOOL",
             "COLLEGE",
-            "UNIVERSITY",
+            "UNIVERSITY"
           ],
+          required: false
         },
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     activities: {
       fields: [
-        { label: "Type of Activity", type: "text", name: "activity_type" },
-        { label: "Equipment Required", type: "text", name: "equipment_required" },
+        {
+          label: "Type of Activity",
+          type: "text",
+          name: "activity_type",
+          required: false
+        },
+        {
+          label: "Equipment Required",
+          type: "text",
+          name: "equipment_required",
+          required: false
+        }
       ],
       chips: [
-        { label: "donation", options: ["YES", "NO"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
-    },
+        {
+          label: "donation",
+          name: "donation",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
   sportsandhobby: {
     commonFields: [
-      { label: "Choose Image", type: "file", name: "image" },
-      { label: "Ad Title", type: "text", name: "title" },
-      { label: "Location", type: "text", name: "location" },
-      { label: "Item Type", type: "text", name: "item_type" },
-      { label: "Description", type: "textarea", name: "description" },
-      { label: "Price", type: "text", name: "price" },
-      { label: "keywords", type: "text", name: "keywords" },
+      {
+        label: "Choose Image",
+        type: "file",
+        name: "image",
+        required: true
+      },
+      {
+        label: "Ad Title",
+        type: "text",
+        name: "title",
+        required: true
+      },
+      {
+        label: "Location",
+        type: "text",
+        name: "location",
+        required: true
+      },
+      {
+        label: "Item Type",
+        type: "text",
+        name: "item_type",
+        required: true
+      },
+      {
+        label: "Price",
+        type: "number",
+        name: "price",
+        required: true
+      },
+      {
+        label: "Description",
+        type: "textarea",
+        name: "description",
+        required: true
+      },
+      {
+        label: "keywords",
+        type: "text",
+        name: "keywords",
+        required: true
+      }
     ],
     sportsequipment: {
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     musicalinstruments: {
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     collecteditems: {
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     games: {
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     camping: {
       chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
-      ],
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
     },
     outdooractivities: {
-      fields: [{ label: "Activity Type", type: "text", name: "activity_type" }],
-      chips: [
-        { label: "condition", options: ["NEW", "USED"] },
-        { label: "negotiable", options: ["YES", "NO"] },
+      fields: [
+        {
+          label: "Activity Type",
+          type: "text",
+          name: "activity_type",
+          required: false
+        }
       ],
-    },
+      chips: [
+        {
+          label: "condition",
+          name: "condition",
+          options: [
+            "NEW",
+            "USED"
+          ],
+          required: true
+        },
+        {
+          label: "negotiable",
+          name: "negotiable",
+          options: [
+            "YES",
+            "NO"
+          ],
+          required: true
+        }
+      ]
+    }
   },
-  // services: {
-  //   commonFields: [
-  //     { label: "Choose Image", type: "file", name: "image" },
-  //     { label: "Ad Title", type: "text", name: "title" },
-  //     { label: "Location", type: "text", name: "location" },
-  //     { label: "Availability", type: "text", name: "make" },
-  //     ,
-  //     {
-  //       label: "Description of Services Offered",
-  //       type: "textarea",
-  //       name: "description",
-  //     },
-  //     { label: "Service Fee", type: "text", name: "description" },
-  //   ],
-  //   cleaning: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Cleaning Type", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Insurance", options: ["REQUIRED", "NOT REQUIRED"] },
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Cleaning Offered",
-  //         options: [
-  //           "DEEP CLEANING",
-  //           "4STANDARD CLEANING",
-  //           "MOVE-IN/MOVE-OUT",
-  //           "POST CONSTRUCTION",
-  //           "ORGANIZATION",
-  //           "UPHOLSTERY CLEANING",
-  //           "PRESSURE WASHING",
-  //           "PRESSURE WASHING",
-  //         ],
-  //       },
-  //       {
-  //         label: "Eco-Friendly or Chemical-Free Product",
-  //         options: ["YES", "NO"],
-  //       },
-  //       { label: "Equipment Provided", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   handyman: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Specific Services Offered",
-  //         options: [
-  //           "PLUMBING",
-  //           "ELECTRICAL",
-  //           "CARPENTARY",
-  //           "GENERAL REPAIRS",
-  //           "OTHER SPECIFIC SERVICES (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Emergency or Same-Day Service Availability",
-  //         options: ["Yes", "No"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   drivers: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Insurance and Bonding Status",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Additional Services Provided",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Driving Services Offered",
-  //         options: [
-  //           "PERSONAL DRIVERS",
-  //           "DELIVERIES",
-  //           "AIRPORT TRANSFERS",
-  //           "LONG TRIP AVAILABILITY",
-  //           "RECURRING RIDES",
-  //         ],
-  //       },
-  //       {
-  //         label: "Types of Vehicles Available",
-  //         options: ["SEDAN", "SUV", "LUXURY CAR", "VAN", "OTHER (SPECIFY)"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   landscaping: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Landscaping Services Provided",
-  //         options: [
-  //           "MOWING DRIVERS",
-  //           "PLANTING",
-  //           "DESIGN",
-  //           "IRRIGATION",
-  //           "LIGHTING",
-  //           "SNOW REMOVAL",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Regular Maintenance Service Availability",
-  //         options: ["Yes", "No"],
-  //       },
-  //       {
-  //         label: "Seasonal or One-Time Services",
-  //         options: ["SESONAL SERVICES", "ONE-TIME SERVICES"],
-  //       },
-
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   consultancy: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Process for Initial Consultation",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Landscaping Services Provided",
-  //         options: ["BUSINESS", "MARKETING", "FINANCE", "OTHER (SPECIFY)"],
-  //       },
-  //       {
-  //         label: "Services Available",
-  //         options: ["IN-PERSON", "REMOTELY", "REMOTELY"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   homeautomation: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Brands or Products Supported",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Home Automation Services Offered",
-  //         options: [
-  //           "SECURITY",
-  //           "LIGHTING",
-  //           "ENTERTAINMENT",
-  //           "CLIMATE CONTROL",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   classesandcourses: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Subjects or Skills", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Duration and Format of the Classes",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Duration and Format of the Classes",
-  //         options: ["ONLINE", "IN-PERSON", "BOTH"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   personaltraining: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Training Offered",
-  //         options: [
-  //           "FITNESS",
-  //           "WEIGHT LOSS",
-  //           "STRENGTH TRAINING",
-  //           "DANCE",
-  //           "CIRCUIT TRAINING",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Session Format",
-  //         options: ["IN-PERSON", "ONLINE", "BOTH", "DANCE"],
-  //       },
-  //       {
-  //         label: "Personalized Fitness Plan",
-  //         options: ["INCLUDED", "NOT INCLUDED"],
-  //       },
-  //       { label: "Group Sessions Availability", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   construction: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Construction Services Offered",
-  //         options: [
-  //           "RESIDENTIAL",
-  //           "COMMERCIAL",
-  //           "RENOVATION",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   technology: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Expertise Level",
-  //         options: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
-  //       },
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Technology Services Offered",
-  //         options: [
-  //           "IT SUPPORT",
-  //           "SOFTWARE DEVELOPMENT",
-  //           "HARDWARE REPAIR",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Service Delivery Method",
-  //         options: ["ON-SITE", "REMOTELY", "BOTH"],
-  //       },
-  //       { label: "Ongoing Support and Maintenance", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   immigrationandvisa: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Travel and Visa Services Offered",
-  //         options: [
-  //           "VISA APPLICATIONS",
-  //           "GREEN CARD APPLICATIONS",
-  //           "NATURALIZATION SERVICES",
-  //           "STUDENT VISA SERVICES",
-  //           "INVESTOR VISA SERVICES",
-  //           "WORK PERMIT APPLICATIONS",
-  //           "FAMILY SPONSERSHIP",
-  //           "ASYLUM",
-  //           "CITIZENSHIP",
-  //         ],
-  //       },
-  //       {
-  //         label: "Service Delivery Method",
-  //         options: ["ON-SITE", "REMOTELY", "BOTH"],
-  //       },
-  //       { label: "Ongoing Support and Maintenance", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   eventservices: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Portfolio or Gallery of Past Events",
-  //         type: "file",
-  //         name: "loadcapcity",
-  //       },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Events",
-  //         options: [
-  //           "WEDDINGS",
-  //           "CORPORATE EVENTS",
-  //           "PARTIES",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Specific Services Offered",
-  //         options: ["PLANNING", "CATTERING", "DECORATION"],
-  //       },
-  //       { label: "Customizable Packages", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   moversandpackers: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Moving Services Offered",
-  //         options: [
-  //           "LOCAL",
-  //           "LOCAL-DISTANCE",
-  //           "RESIDENTIAL",
-  //           "COMMERCIAL",
-  //           "STORAGE",
-  //           "INTERNATIONALLY",
-  //         ],
-  //       },
-  //       {
-  //         label: "Specific Services Offered",
-  //         options: ["PLANNING", "CATTERING", "DECORATION"],
-  //       },
-  //       { label: "Packing Materials Provided", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   farmandfreshfood: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Delivery Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Products Available",
-  //         options: [
-  //           "VEGETABLES",
-  //           "FRUITS",
-  //           "DAIRY",
-  //           "FAIR",
-  //           "LUNCH",
-  //           "CLONIAL COFFEE",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Specific Services Offered",
-  //         options: ["PLANNING", "CATTERING", "DECORATION"],
-  //       },
-  //       { label: "Delivery Availability", options: ["Yes", "No"] },
-  //       {
-  //         label: "Products Organic or Sustainably Sourced",
-  //         options: ["Yes", "No"],
-  //       },
-  //       {
-  //         label: "Subscription or Regular Delivery Option",
-  //         options: ["Yes", "No"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   videoandphotography: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Photography or Videography Services Offered",
-  //         options: [
-  //           "WEDDINGS",
-  //           "CORPORATE",
-  //           "PORTRAIT",
-  //           "COMMERCIAL",
-  //           "DRONE",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Specific Services Offered",
-  //         options: ["PLANNING", "CATTERING", "DECORATION"],
-  //       },
-  //       { label: "Different Packages Available", options: ["Yes", "No"] },
-  //       {
-  //         label: "Recurring Service Packages Available",
-  //         options: ["Yes", "No"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   interiordesign: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Initial Consultation Fee",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Interior Design Services Offered",
-  //         options: ["RESIDENTIAL", "COMMERCIAL", "VIRTUAL", "OTHER (SPECIFY)"],
-  //       },
-  //       {
-  //         label: "Material and Furniture Selections Included",
-  //         options: ["Yes", "No"],
-  //       },
-  //       {
-  //         label: "3D Renderings or Visualizations Provided",
-  //         options: ["Yes", "No"],
-  //       },
-  //       {
-  //         label: "Recurring Service Packages Available",
-  //         options: ["Yes", "No"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   homemadefood: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Homemade Food Available",
-  //         options: [
-  //           "BAKED GOODS",
-  //           "MEALS",
-  //           "SNACKS",
-  //           "PERSONAL CHEF",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       {
-  //         label: "Service Availability",
-  //         options: ["DELIVERY", "PICKUP", "AT-HOME PREP", "ALL OF THE ABOVE"],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   insuranceservices: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Insurance Services Offered",
-  //         options: [
-  //           "HEALTH",
-  //           "AUTO",
-  //           "HOME",
-  //           "LIFE",
-  //           "BUSINESS",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   homecarehealth: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Pricing Structure", type: "text", name: "loadcapcity" },
-  //       {
-  //         label: "Service Area or Travel Radius",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       {
-  //         label: "Experience and Qualifications",
-  //         type: "text",
-  //         name: "loadcapcity",
-  //       },
-  //       { label: "Other (Specify)", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       {
-  //         label: "Payment Options",
-  //         options: ["CASH", "CREDIT CARD", "ZELLE", "VENMO", "PAYPAL", "PIX"],
-  //       },
-  //       {
-  //         label: "Types of Home Care Services Provided",
-  //         options: [
-  //           "NURSING",
-  //           "PHYSICAL THERAPY",
-  //           "COMPANIANSHIP",
-  //           "PERSONAL CARE",
-  //           "HOME MAKING",
-  //           "OTHER (SPECIFY)",
-  //         ],
-  //       },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   catering: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Cuisine Type", type: "text", name: "loadcapcity" },
-  //       { label: "Services Offered", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   chef: {
-  //     fields: [
-  //       { label: "Service Type", type: "text", name: "loadcapcity" },
-  //       { label: "Cuisine Specialty", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   influencer: {
-  //     fields: [
-  //       { label: "Platform", type: "text", name: "loadcapcity" },
-  //       { label: "Audience Size", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   acservices: {
-  //     fields: [
-  //       { label: "Services Offered", type: "text", name: "loadcapcity" },
-  //       { label: "Brand Specialization", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   personaltrainer: {
-  //     fields: [{ label: "Specialization", type: "text", name: "loadcapcity" }],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   cake: {
-  //     fields: [{ label: "Types", type: "text", name: "loadcapcity" }],
-  //     chips: [
-  //       { label: "Customization", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   fingerfood: {
-  //     fields: [
-  //       { label: "Cuisine Type", type: "text", name: "loadcapcity" },
-  //       { label: "Menu", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   buffet: {
-  //     fields: [{ label: "Cuisine Type", type: "text", name: "loadcapcity" }],
-  //     chips: [
-  //       { label: "Menu Customization", options: ["Yes", "No"] },
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  //   transportservices: {
-  //     fields: [
-  //       { label: "Vehicle Type", type: "text", name: "loadcapcity" },
-  //       { label: "Distance", type: "text", name: "loadcapcity" },
-  //     ],
-  //     chips: [
-  //       { label: "Certification", options: ["Yes", "No"] },
-  //       { label: "negotiable", options: ["YES", "NO"] },
-  //     ],
-  //   },
-  // },
 };

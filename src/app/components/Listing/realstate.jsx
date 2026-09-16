@@ -18,6 +18,7 @@ import ListingDetailModal from "./ListingDetailModal";
 import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
 const RealEstate = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -317,42 +318,39 @@ const RealEstate = () => {
         return;
       }
 
-      const form = new FormData();
 
-      // Append all form data
-      form.append("category", formData.category || "Real Estate");
-      form.append("subcategory", formData.subcategory || "Commercial");
-      form.append("title", formData.title || "");
-      form.append("description", formData.description || "");
-      form.append("location", formData.location || "");
-      form.append("property_type", formData.property_type || "Farm");
-      form.append("size", String(formData.size || "10.0"));
-      form.append("condition", formData.condition || "USED");
-      form.append("price", String(formData.price || 0));
-      form.append("negotiable", formData.negotiable || "NO");
-      form.append("lease_terms", formData.lease_terms || "LONG-TERM");
-      form.append("land_type", formData.land_type || "Rural");
-      form.append("number_of_floors", String(formData.number_of_floors || "1"));
-      form.append("bathrooms", String(formData.bathrooms || "1"));
-      form.append("bedrooms", String(formData.bedrooms || "1"));
-      form.append("from_business", formData.from_business || "false");
+      const fields = getEditFieldsForListing(
+        formData.category || "Real Estate",
+        formData.subcategory,
+        formData
+      );
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
+      }
+
+      const form = new FormData();
+      fields.forEach((field) => {
+        const raw = formData[field.name];
+        if (raw === undefined || raw === null) return;
+        const value = Array.isArray(raw) ? raw.join(",") : String(raw);
+        if (value === "" && !field.required) return;
+        form.append(field.name, value);
+      });
+
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
           '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
-      // Handle keywords
-      if (formData.keywords) {
-        form.append(
-          "keywords",
-          Array.isArray(formData.keywords)
-            ? formData.keywords.join(",")
-            : formData.keywords
-        );
-      }
-
-      // Handle images
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -432,58 +430,12 @@ const RealEstate = () => {
     }
   };
 
-  const formFields = [
-    { name: "title", label: "Title", type: "text", required: true },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      required: true,
-    },
-    { name: "property_type", label: "Property Type", type: "text", required: true },
-    { name: "size", label: "Size", type: "text", required: true },
-    { name: "price", label: "Price", type: "number", required: true },
-    {
-      name: "negotiable",
-      label: "Negotiable",
-      type: "select",
-      options: ["YES", "NO"],
-      required: true,
-    },
-    {
-      name: "condition",
-      label: "Condition",
-      type: "select",
-      options: ["NEW", "USED", "REFURBISHED"],
-      required: true,
-    },
-    {
-      name: "lease_terms",
-      label: "Lease Terms",
-      type: "select",
-      options: ["LONG-TERM", "SHORT-TERM"],
-      required: true,
-    },
-    {
-      name: "land_type",
-      label: "Land Type",
-      type: "select",
-      options: ["Rural", "Urban", "Suburban"],
-      required: true,
-    },
-    { name: "number_of_floors", label: "Number of Floors", type: "number", required: true },
-    { name: "bathrooms", label: "Bathrooms", type: "number", required: true },
-    { name: "bedrooms", label: "Bedrooms", type: "number", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "from_business", label: "From Business", type: "text", required: true },
-    {
-      name: "keywords",
-      label: "Keywords (comma separated)",
-      type: "text",
-      required: false,
-    },
-  ];
+  const formFields = getEditFieldsForListing(
+    formData.category || "Real Estate",
+    formData.subcategory,
+    formData,
+    { excludeLocation: true }
+  );
 
   if (loading) {
     return <AppLoader />;
@@ -623,7 +575,7 @@ const RealEstate = () => {
                       {field.type === "select" ? (
                         <select
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -638,7 +590,7 @@ const RealEstate = () => {
                       ) : field.type === "textarea" ? (
                         <textarea
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -656,7 +608,7 @@ const RealEstate = () => {
                         <input
                           type={field.type}
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"

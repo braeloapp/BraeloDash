@@ -1,10 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import { FaTimes } from "react-icons/fa";
-import { getData, postData, updateData } from "@/app/API/method";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  FiEdit2,
+  FiMail,
+  FiMapPin,
+  FiPhone,
+  FiShield,
+  FiUser,
+} from "react-icons/fi";
+import { getData, postData } from "@/app/API/method";
 import AppLoader from "@/app/components/ux/AppLoader";
+import AppModal from "@/app/components/ux/AppModal";
+import ProfileAvatar from "@/app/components/ux/ProfileAvatar";
+import {
+  ADMIN_DEFAULT_AVATAR,
+  adminRoleLabel,
+  getAdminToken,
+  persistAdminSession,
+  resolveAdminAvatar,
+} from "@/lib/adminAuth";
 
 const defaultUserData = {
   name: "",
@@ -13,7 +28,6 @@ const defaultUserData = {
   dob: "",
   gender: "",
   address: "",
-  complement: "",
   country: "",
   state: "",
   city: "",
@@ -21,46 +35,89 @@ const defaultUserData = {
   phoneNumber: "",
   email: "",
   bio: "",
-  image: "/report.png",
+  image: ADMIN_DEFAULT_AVATAR,
+  role: "",
 };
+
+function MetaCard({ label, children }) {
+  return (
+    <div className="user-detail-meta">
+      <p className="user-detail-meta__label">{label}</p>
+      <div className="user-detail-meta__value">{children}</div>
+    </div>
+  );
+}
+
+function displayValue(value, fallback = "Not provided") {
+  if (value == null) return fallback;
+  const text = String(value).trim();
+  return text || fallback;
+}
 
 const AdminCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(defaultUserData);
-  const [previewImage, setPreviewImage] = useState(defaultUserData.image);
-  const [password, setPassword] = useState("");
+  const [previewImage, setPreviewImage] = useState(ADMIN_DEFAULT_AVATAR);
+  const [editName, setEditName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [modalError, setModalError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         setIsLoading(true);
-        const response = await getData("/auth/user/profile");
+        setError(null);
 
-        if (response) {
-          const userData = {
-            name: response?.data?.name || "",
-            first_name: response?.data?.first_name || "",
-            last_name: response?.data?.last_name || "",
-            dob: response?.data?.dob || "",
-            gender: response?.data?.gender || "",
-            address: response?.data?.address || "",
-            country: response?.data?.country || "",
-            state: response?.data?.state || "",
-            city: response?.data?.city || "",
-            zip_code: response?.data?.zip_code || "",
-            phoneNumber: response?.data?.phone_number || "",
-            email: response?.data?.email || "",
-            bio: response?.data?.bio || "",
-            image: response?.data?.image || "/report.png",
-          };
-          setFormData(userData);
-          setPreviewImage(userData.image);
+        const [profileResponse, meResponse] = await Promise.allSettled([
+          getData("/auth/user/profile"),
+          getData("/admin-panel/me"),
+        ]);
+
+        const profile =
+          profileResponse.status === "fulfilled"
+            ? profileResponse.value?.data || profileResponse.value
+            : null;
+        const me =
+          meResponse.status === "fulfilled"
+            ? meResponse.value?.data || meResponse.value
+            : null;
+
+        if (!profile && !me) {
+          throw new Error("Failed to fetch user data");
         }
+
+        const rawImage =
+          profile?.image ||
+          profile?.profile_picture ||
+          me?.profile_picture ||
+          "";
+        const avatar = resolveAdminAvatar(rawImage);
+
+        const userData = {
+          name: me?.name || profile?.name || "",
+          first_name: profile?.first_name || "",
+          last_name: profile?.last_name || "",
+          dob: profile?.dob || "",
+          gender: profile?.gender || "",
+          address: profile?.address || "",
+          country: profile?.country || "",
+          state: profile?.state || "",
+          city: profile?.city || "",
+          zip_code: profile?.zip_code || "",
+          phoneNumber: profile?.phone_number || profile?.phone || "",
+          email: me?.email || profile?.email || "",
+          bio: profile?.bio || "",
+          image: avatar,
+          role: me?.role || "",
+        };
+
+        setFormData(userData);
+        setPreviewImage(avatar);
+        setEditName(userData.name || "");
       } catch (err) {
         setError(err.message || "Failed to fetch user data");
-        console.error("Error fetching user data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -69,67 +126,54 @@ const AdminCard = () => {
     fetchUserData();
   }, []);
 
-  const openModal = () => setIsModalOpen(true);
+  const roleLabel = useMemo(
+    () => adminRoleLabel(formData.role),
+    [formData.role]
+  );
+
+  const displayName = useMemo(() => {
+    const combined = [formData.name, formData.last_name]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (combined) return combined;
+    if (formData.first_name?.trim()) return formData.first_name.trim();
+    return "Admin";
+  }, [formData.name, formData.last_name, formData.first_name]);
+
+  const openModal = () => {
+    setEditName(formData.name || "");
+    setModalError(null);
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
+    if (isSaving) return;
     setIsModalOpen(false);
-    setError(null);
+    setModalError(null);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-        setFormData({ ...formData, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handlePasswordChange = (e) => setPassword(e.target.value);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSaveName = async () => {
     try {
-      // Prepare update payload (API expects `phone`, not `phoneNumber`)
-      const updatePayload = {
-        name: formData.name,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        phone: formData.phoneNumber || formData.phone || "",
-        ...(previewImage !== "/report.png" && formData.image
-          ? { image: formData.image }
-          : {}),
-      };
-
-      // Use postData for creating or updateData for updating
-      const response = await postData("/auth/update/profile", updatePayload);
-
-      if (response) {
-        // Update local state with the response
-        const updatedData = {
-          ...formData,
-          name: response.name || formData.name,
-          first_name: response.first_name || formData.first_name,
-          last_name: response.last_name || formData.last_name,
-          // Include all other fields similarly
-          image: response.image || previewImage,
-        };
-        setFormData(updatedData);
-        setPreviewImage(updatedData.image);
-        closeModal();
-      }
+      setIsSaving(true);
+      setModalError(null);
+      const response = await postData("/auth/update/profile", {
+        name: editName.trim(),
+      });
+      const nextName = response?.name || response?.data?.name || editName.trim();
+      setFormData((prev) => ({ ...prev, name: nextName }));
+      persistAdminSession({
+        token: getAdminToken(),
+        name: nextName,
+        role: formData.role,
+      });
+      setIsModalOpen(false);
     } catch (err) {
-      setError(
-        err.response?.data?.message || err.message || "Failed to update profile"
+      setModalError(
+        err.response?.data?.message || err.message || "Failed to update name"
       );
-      console.error("Error updating profile:", err);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -139,217 +183,166 @@ const AdminCard = () => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg text-center">
-          <h3 className="text-xl text-red-500 mb-4">Error Loading Profile</h3>
-          <p className="text-[#78828A] mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="btn-primary"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="user-detail-panel p-8 text-center">
+        <h3 className="text-lg font-semibold text-[var(--color-danger)] mb-2">
+          Error loading profile
+        </h3>
+        <p className="text-sm text-[var(--color-text-muted)] mb-5">{error}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="btn-primary"
+        >
+          Try again
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center py-4 sm:py-8">
-      <div className="w-full max-w-2xl rounded-2xl border border-[#EEF1F4] bg-white p-5 shadow-card sm:p-6">
-        <h2 className="text-xl text-[#78828A] font-semibold mb-6">
-          Personal Information
-        </h2>
-
-        {/* Profile Header */}
-        <div className="flex items-center mb-6">
-          <div className="relative w-16 h-16 rounded-full overflow-hidden mr-4">
-            <Image
+    <>
+      <section className="user-detail-panel admin-profile-panel">
+        <div className="user-detail-hero">
+          <div className="user-detail-hero__glow" aria-hidden />
+          <div className="user-detail-hero__row">
+            <ProfileAvatar
               src={previewImage}
-              alt="User Profile"
-              fill
-              className="object-cover"
-              priority
+              className="user-detail-avatar admin-profile-avatar"
+              fallbackSrc={ADMIN_DEFAULT_AVATAR}
             />
-          </div>
-          <div>
-            <h3 className="text-lg font-medium text-[#78828A]">
-              {formData.name} {formData.last_name}
-            </h3>
-            <p className="text-[#78828A] text-sm">{formData.email}</p>
-          </div>
-        </div>
 
-        {/* Personal Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="text-sm text-gray-500">Full Name</p>
-            <p className="text-[#78828A] font-medium">{formData.name}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">First Name</p>
-            <p className="text-[#78828A] font-medium">{formData.first_name}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Last Name</p>
-            <p className="text-[#78828A] font-medium">{formData.last_name}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Date of Birth</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.dob || "Not provided"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Gender</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.gender || "Not specified"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Phone Number</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.phoneNumber || "Not provided"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Email Address</p>
-            <p className="text-[#78828A] font-medium">{formData.email}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Address</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.address || "Not provided"}
-            </p>
-          </div>
-          {/* <div>
-            <p className="text-sm text-gray-500">Complement</p>
-            <p className="text-[#78828A] font-medium">{formData.complement || "Not provided"}</p>
-          </div> */}
-          <div>
-            <p className="text-sm text-gray-500">Country</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.country || "Not provided"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">State</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.state || "Not provided"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">City</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.city || "Not provided"}
-            </p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Zip Code</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.zip_code || "Not provided"}
-            </p>
-          </div>
-          <div className="md:col-span-2">
-            <p className="text-sm text-gray-500">Bio</p>
-            <p className="text-[#78828A] font-medium">
-              {formData.bio || "No bio provided"}
-            </p>
-          </div>
-        </div>
+            <div className="user-detail-hero__copy min-w-0 flex-1">
+              <div className="user-detail-kicker">
+                <FiShield size={14} aria-hidden />
+                <span>Administrator</span>
+              </div>
+              <h2 className="user-detail-name">{displayName}</h2>
+              <p className="user-detail-email">
+                <FiMail size={14} aria-hidden />
+                <span>{displayValue(formData.email, "No email on file")}</span>
+              </p>
+              <div className="user-detail-chips">
+                <span className="badge badge-brand">{roleLabel}</span>
+                <span className="badge badge-neutral">Staff access</span>
+              </div>
+            </div>
 
-        {/* Edit Button */}
-        <button
-          onClick={openModal}
-          className="btn-primary w-full"
-        >
-          Edit Profile
-        </button>
-
-        {/* Edit Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-lg w-full max-w-md relative">
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <FaTimes size={20} />
+            <div className="user-detail-hero__actions">
+              <button type="button" className="btn-primary" onClick={openModal}>
+                <FiEdit2 size={16} aria-hidden />
+                Edit profile
               </button>
+            </div>
+          </div>
+        </div>
 
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-[#78828A] mb-6">
-                  Update Name
-                </h3>
+        <div className="admin-profile-section">
+          <div className="admin-profile-section__head">
+            <h3 className="admin-profile-section__title">
+              <FiUser size={16} aria-hidden />
+              Personal information
+            </h3>
+            <p className="admin-profile-section__desc">
+              Details linked to your Braelo admin account.
+            </p>
+          </div>
 
-                {error && (
-                  <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
-                    <p>{error}</p>
-                  </div>
-                )}
-
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    try {
-                      const response = await postData("/auth/update/profile", {
-                        name: formData.name,
-                      });
-
-                      if (response) {
-                        setFormData((prev) => ({
-                          ...prev,
-                          name: response.name || prev.name,
-                        }));
-                        closeModal();
-                      }
-                    } catch (err) {
-                      setError(
-                        err.response?.data?.message ||
-                          err.message ||
-                          "Failed to update name"
-                      );
-                      console.error("Error updating name:", err);
-                    }
-                  }}
-                  className="space-y-4"
-                >
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="w-full p-2 border border-gray-300 rounded focus:ring-[#CD9403] focus:border-[#CD9403]"
-                      required
-                    />
-                  </div>
-
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={closeModal}
-                      className="btn-ghost"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn-primary"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
+          <div className="user-detail-grid">
+            <MetaCard label="Full name">
+              {displayValue(formData.name, "—")}
+            </MetaCard>
+            <MetaCard label="First name">
+              {displayValue(formData.first_name, "—")}
+            </MetaCard>
+            <MetaCard label="Last name">
+              {displayValue(formData.last_name, "—")}
+            </MetaCard>
+            <MetaCard label="Date of birth">
+              {displayValue(formData.dob)}
+            </MetaCard>
+            <MetaCard label="Gender">
+              {displayValue(formData.gender, "Not specified")}
+            </MetaCard>
+            <MetaCard label="Phone number">
+              <span className="inline-flex items-center gap-1.5">
+                <FiPhone size={14} className="opacity-60" aria-hidden />
+                {displayValue(formData.phoneNumber)}
+              </span>
+            </MetaCard>
+            <MetaCard label="Email address">
+              <span className="inline-flex items-center gap-1.5">
+                <FiMail size={14} className="opacity-60" aria-hidden />
+                {displayValue(formData.email)}
+              </span>
+            </MetaCard>
+            <MetaCard label="Address">
+              <span className="inline-flex items-center gap-1.5">
+                <FiMapPin size={14} className="opacity-60" aria-hidden />
+                {displayValue(formData.address)}
+              </span>
+            </MetaCard>
+            <MetaCard label="Country">
+              {displayValue(formData.country)}
+            </MetaCard>
+            <MetaCard label="State">{displayValue(formData.state)}</MetaCard>
+            <MetaCard label="City">{displayValue(formData.city)}</MetaCard>
+            <MetaCard label="Zip code">
+              {displayValue(formData.zip_code)}
+            </MetaCard>
+            <div className="user-detail-meta md:col-span-2">
+              <p className="user-detail-meta__label">Bio</p>
+              <div className="user-detail-meta__value">
+                {displayValue(formData.bio, "No bio provided")}
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </section>
+
+      <AppModal
+        open={isModalOpen}
+        onClose={closeModal}
+        title="Update profile"
+        description="Change the display name shown across the admin panel."
+        confirmLabel="Save changes"
+        confirmLoading={isSaving}
+        onConfirm={handleSaveName}
+        size="sm"
+      >
+        {modalError ? (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {modalError}
+          </div>
+        ) : null}
+        <div className="mb-5 flex items-center gap-3">
+          <ProfileAvatar
+            src={previewImage}
+            className="user-detail-avatar admin-profile-avatar admin-profile-avatar--sm"
+            fallbackSrc={ADMIN_DEFAULT_AVATAR}
+          />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[var(--color-text-primary)]">
+              {displayName}
+            </p>
+            <p className="truncate text-xs text-[var(--color-text-muted)]">
+              {formData.email}
+            </p>
+          </div>
+        </div>
+        <label className="field-label" htmlFor="admin-profile-name">
+          Full name
+        </label>
+        <input
+          id="admin-profile-name"
+          type="text"
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          className="field-control"
+          required
+          disabled={isSaving}
+        />
+      </AppModal>
+    </>
   );
 };
 

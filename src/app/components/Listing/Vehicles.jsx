@@ -18,6 +18,154 @@ import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 
+function getVehicleFormFields(subcategory) {
+  const sub = String(subcategory || "").toLowerCase();
+  return [
+    { name: "category", label: "Category", type: "text", required: true },
+    { name: "subcategory", label: "Subcategory", type: "text", required: true },
+    { name: "title", label: "Title", type: "text", required: true },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      required: true,
+    },
+    { name: "make", label: "Make", type: "text", required: true },
+    { name: "model", label: "Model", type: "text", required: true },
+    { name: "year", label: "Year", type: "number", required: true },
+    { name: "color", label: "Color", type: "text", required: true },
+    { name: "mileage", label: "Mileage", type: "number", required: true },
+    { name: "fuel_type", label: "Fuel Type", type: "text", required: true },
+    { name: "price", label: "Price", type: "number", required: true },
+    ...(sub === "truck"
+      ? [
+          {
+            name: "Load_capacity",
+            label: "Load Capacity",
+            type: "number",
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "bike"
+      ? [{ name: "bike_type", label: "Bike Type", type: "text", required: true }]
+      : []),
+    ...(sub === "boat"
+      ? [
+          {
+            name: "boat_length",
+            label: "Boat Length",
+            type: "number",
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "van"
+      ? [
+          {
+            name: "passenger_capacity",
+            label: "Passenger Capacity",
+            type: "number",
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "partsandaccessories"
+      ? [
+          {
+            name: "part_name",
+            label: "Part Name",
+            type: "text",
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "rentals"
+      ? [
+          {
+            name: "vehicle_type",
+            label: "Vehicle Type",
+            type: "text",
+            required: true,
+          },
+          {
+            name: "rental_duration",
+            label: "Rental Duration",
+            type: "text",
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub !== "partsandaccessories"
+      ? [
+          {
+            name: "transmission",
+            label: "Transmission",
+            type: "select",
+            options: ["MANUAL", "AUTOMATIC"],
+            required: true,
+          },
+          {
+            name: "purpose",
+            label: "Purpose",
+            type: "select",
+            options: ["SALE", "RENTAL"],
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "cars"
+      ? [
+          {
+            name: "number_of_doors",
+            label: "Number of Doors",
+            type: "select",
+            options: ["1/3", "4/5"],
+            required: true,
+          },
+        ]
+      : []),
+    ...(sub === "rentals"
+      ? [
+          {
+            name: "for_sale",
+            label: "For Sale",
+            type: "select",
+            options: ["YES", "NO"],
+            required: true,
+          },
+          {
+            name: "rentals",
+            label: "Rentals",
+            type: "select",
+            options: ["YES", "NO"],
+            required: true,
+          },
+        ]
+      : []),
+    {
+      name: "negotiable",
+      label: "Negotiable",
+      type: "select",
+      options: ["YES", "NO"],
+      required: true,
+    },
+    {
+      name: "condition",
+      label: "Condition",
+      type: "select",
+      options: ["NEW", "USED"],
+      required: true,
+    },
+    {
+      name: "keywords",
+      label: "Keywords (comma separated)",
+      type: "text",
+      required: false,
+    },
+  ];
+}
+
 const Vehicles = () => {
   // State management
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -162,6 +310,20 @@ const Vehicles = () => {
       model: originalData?.model || "",
       year: originalData?.year || "",
       color: originalData?.color || "",
+      mileage: originalData?.mileage ?? "",
+      fuel_type: originalData?.fuel_type || "",
+      transmission: originalData?.transmission || "",
+      purpose: originalData?.purpose || "",
+      number_of_doors: originalData?.number_of_doors || "",
+      Load_capacity: originalData?.Load_capacity ?? "",
+      bike_type: originalData?.bike_type || "",
+      boat_length: originalData?.boat_length ?? "",
+      passenger_capacity: originalData?.passenger_capacity ?? "",
+      part_name: originalData?.part_name || "",
+      vehicle_type: originalData?.vehicle_type || "",
+      rental_duration: originalData?.rental_duration || "",
+      for_sale: originalData?.for_sale || "",
+      rentals: originalData?.rentals || "",
       listing_coordinates: JSON.stringify(coordinates),
       location: address,
     });
@@ -324,6 +486,19 @@ const Vehicles = () => {
         return;
       }
 
+      const fields = getVehicleFormFields(formData.subcategory);
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
+      }
+
       const form = new FormData();
 
       // Append all form data
@@ -336,6 +511,33 @@ const Vehicles = () => {
       form.append("model", formData.model || "");
       form.append("year", formData.year || "");
       form.append("color", formData.color || "");
+      form.append(
+        "mileage",
+        formData.mileage === "" || formData.mileage == null
+          ? ""
+          : String(formData.mileage)
+      );
+      form.append("fuel_type", formData.fuel_type || "");
+      form.append("transmission", formData.transmission || "");
+      form.append("purpose", formData.purpose || "");
+      if (formData.number_of_doors) {
+        form.append("number_of_doors", formData.number_of_doors);
+      }
+      [
+        "Load_capacity",
+        "bike_type",
+        "boat_length",
+        "passenger_capacity",
+        "part_name",
+        "vehicle_type",
+        "rental_duration",
+        "for_sale",
+        "rentals",
+      ].forEach((key) => {
+        if (formData[key] !== undefined && formData[key] !== null && formData[key] !== "") {
+          form.append(key, String(formData[key]));
+        }
+      });
       form.append("price", String(formData.price || 0));
       form.append("negotiable", formData.negotiable || "NO");
       form.append("condition", formData.condition || "USED");
@@ -364,11 +566,7 @@ const Vehicles = () => {
         }
       });
 
-      await updateListData(`/admin-panel/vehicles/${listingId}`, form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await updateListData(`/admin-panel/vehicles/${listingId}`, form);
 
       toast.success("Listing updated successfully!");
       await fetchData(pagination.currentPage);
@@ -435,43 +633,7 @@ const Vehicles = () => {
     }
   };
 
-  // Form fields configuration
-  const formFields = [
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
-    { name: "title", label: "Title", type: "text", required: true },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      required: true,
-    },
-    { name: "make", label: "Make", type: "text", required: true },
-    { name: "model", label: "Model", type: "text", required: true },
-    { name: "year", label: "Year", type: "number", required: true },
-    { name: "color", label: "Color", type: "text", required: true },
-    { name: "price", label: "Price", type: "number", required: true },
-    {
-      name: "negotiable",
-      label: "Negotiable",
-      type: "select",
-      options: ["YES", "NO"],
-      required: true,
-    },
-    {
-      name: "condition",
-      label: "Condition",
-      type: "select",
-      options: ["NEW", "USED", "REFURBISHED"],
-      required: true,
-    },
-    {
-      name: "keywords",
-      label: "Keywords (comma separated)",
-      type: "text",
-      required: false,
-    },
-  ];
+  const formFields = getVehicleFormFields(formData.subcategory);
 
   if (loading) {
     return <AppLoader />;
@@ -617,7 +779,7 @@ const Vehicles = () => {
                     <select
                       id={`edit-${field.name}`}
                       name={field.name}
-                      value={formData[field.name] || ""}
+                      value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                       onChange={handleFormChange}
                       required={field.required}
                       className="field-control"
@@ -633,7 +795,7 @@ const Vehicles = () => {
                     <textarea
                       id={`edit-${field.name}`}
                       name={field.name}
-                      value={formData[field.name] || ""}
+                      value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                       onChange={handleFormChange}
                       required={field.required}
                       className="field-control"
@@ -653,7 +815,7 @@ const Vehicles = () => {
                       id={`edit-${field.name}`}
                       type={field.type}
                       name={field.name}
-                      value={formData[field.name] || ""}
+                      value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                       onChange={handleFormChange}
                       required={field.required}
                       className="field-control"

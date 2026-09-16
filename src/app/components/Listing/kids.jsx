@@ -17,6 +17,7 @@ import {
 } from "@/app/API/method";
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
 const Kids = () => {
   // State management
@@ -316,29 +317,39 @@ const Kids = () => {
         return;
       }
 
-      const form = new FormData();
 
-      // Append all form data
-      form.append("category", formData.category || 'Kids');
-      form.append("subcategory", formData.subcategory || 'Activities');
-      form.append("title", formData.title || '');
-      form.append("description", formData.description || '');
-      form.append("location", formData.location || '');
-      form.append("price", String(formData.price || 0));
-      form.append("negotiable", formData.negotiable || 'YES');
-      form.append("donation", formData.donation || 'NO');
-      form.append("age_range", formData.age_range || '');
-      form.append("from_business", formData.from_business ? 'true' : 'false');
-      form.append("listing_coordinates", formData.listing_coordinates || '{"type":"Point","coordinates":[74.284469,31.4494997]}');
-      
-      // Handle keywords
-      if (formData.keywords) {
-        form.append("keywords", Array.isArray(formData.keywords) 
-          ? formData.keywords.join(',') 
-          : formData.keywords);
+      const fields = getEditFieldsForListing(
+        formData.category || "Kids",
+        formData.subcategory,
+        formData
+      );
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
       }
 
-      // Handle images
+      const form = new FormData();
+      fields.forEach((field) => {
+        const raw = formData[field.name];
+        if (raw === undefined || raw === null) return;
+        const value = Array.isArray(raw) ? raw.join(",") : String(raw);
+        if (value === "" && !field.required) return;
+        form.append(field.name, value);
+      });
+
+      form.append(
+        "listing_coordinates",
+        formData.listing_coordinates ||
+          '{"type":"Point","coordinates":[74.284469,31.4494997]}'
+      );
+
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -418,41 +429,12 @@ const Kids = () => {
   };
 
   // Form fields configuration (remain the same)
-  const formFields = [
-    { name: 'title', label: 'Title', type: 'text', required: true },
-    { name: 'description', label: 'Description', type: 'textarea', required: true },
-    { name: 'price', label: 'Price', type: 'number', required: true },
-    { 
-      name: 'negotiable', 
-      label: 'Negotiable', 
-      type: 'select', 
-      options: ['YES', 'NO'],
-      required: true 
-    },
-    { 
-      name: 'donation', 
-      label: 'Donation', 
-      type: 'select', 
-      options: ['YES', 'NO'],
-      required: true 
-    },
-    { name: 'age_range', label: 'Age Range', type: 'text', required: true },
-    { name: 'keywords', label: 'Keywords (comma separated)', type: 'text', required: false },
-    { 
-      name: 'subcategory', 
-      label: 'Subcategory', 
-      type: 'select',
-      options: ['Activities', 'Clothing', 'Toys', 'Education', 'Other'],
-      required: true 
-    },
-    { 
-      name: 'from_business', 
-      label: 'From Business', 
-      type: 'checkbox', 
-      required: false 
-    },
-    { name: 'category', label: 'Category', type: 'text', required: true }
-  ];
+  const formFields = getEditFieldsForListing(
+    formData.category || "Kids",
+    formData.subcategory,
+    formData,
+    { excludeLocation: true }
+  );
 
   if (loading) {
     return <AppLoader />;
@@ -577,7 +559,7 @@ const Kids = () => {
                       {field.type === "select" ? (
                         <select
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -592,7 +574,7 @@ const Kids = () => {
                       ) : field.type === "textarea" ? (
                         <textarea
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -615,7 +597,7 @@ const Kids = () => {
                         <input
                           type={field.type}
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"

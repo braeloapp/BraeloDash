@@ -1028,9 +1028,9 @@ input[type="radio"]:focus-visible {
   }
 
   .listing-edit-footer {
-    @apply sticky bottom-0 -mx-5 mt-6 flex flex-wrap items-center justify-end gap-2 border-t px-5 py-4 sm:-mx-6 sm:px-6;
+    @apply flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 py-4 sm:px-6;
     border-color: var(--color-border);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), #fff);
+    background: #fff;
   }
 
   /* Premium support ticket details modal */
@@ -1460,6 +1460,12 @@ input[type="radio"]:focus-visible {
     word-break: break-word;
   }
 
+  .listing-detail-meta__value--empty {
+    color: #9aa5ad;
+    font-weight: 400;
+    font-style: italic;
+  }
+
   .listing-detail-gallery {
     margin-top: 18px;
     text-align: left;
@@ -1554,6 +1560,51 @@ input[type="radio"]:focus-visible {
     font-weight: 700;
     letter-spacing: 0.04em;
     flex-shrink: 0;
+  }
+
+  .admin-profile-avatar {
+    border-radius: 999px;
+    border: 2px solid rgba(205, 148, 3, 0.55);
+    box-shadow:
+      0 12px 28px rgba(205, 148, 3, 0.2),
+      0 0 0 4px rgba(255, 204, 53, 0.12);
+  }
+
+  .admin-profile-avatar--sm {
+    width: 52px;
+    height: 52px;
+    box-shadow:
+      0 8px 18px rgba(205, 148, 3, 0.16),
+      0 0 0 3px rgba(255, 204, 53, 0.12);
+  }
+
+  .admin-profile-section {
+    padding: 22px 24px 24px;
+  }
+
+  .admin-profile-section .user-detail-grid {
+    padding: 0;
+  }
+
+  .admin-profile-section__head {
+    margin-bottom: 16px;
+  }
+
+  .admin-profile-section__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .admin-profile-section__desc {
+    margin: 6px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
   }
 
   .user-detail-avatar__img {
@@ -1806,8 +1857,8 @@ input[type="radio"]:focus-visible {
 }
 
 .admin-sidebar-section {
-  border-radius: 18px;
-  padding: 2px;
+  border-radius: 14px;
+  padding: 1px;
 }
 
 .admin-sidebar-section--active {
@@ -1824,7 +1875,7 @@ input[type="radio"]:focus-visible {
   background-size: 180% 180%;
   animation: braelo-gold-flow 7s ease-in-out infinite;
   box-shadow:
-    0 12px 28px rgba(205, 148, 3, 0.34),
+    0 8px 18px rgba(205, 148, 3, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 

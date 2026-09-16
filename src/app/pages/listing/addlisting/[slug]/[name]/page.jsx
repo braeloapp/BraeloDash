@@ -80,6 +80,7 @@ const Form = () => {
     const processedChips = (subCategoryData.chips || []).map((chipGroup) => ({
       ...chipGroup,
       required:
+        chipGroup.required === true ||
         chipGroup.label === "Condition" ||
         chipGroup.label === "condition" ||
         chipGroup.name === "condition",
@@ -190,6 +191,14 @@ const Form = () => {
       errors.location = "Location is required";
     if (!imageFile) errors.images = "Image is required";
 
+    [...commonFields, ...specificFields].forEach((field) => {
+      if (!field.required || field.type === "file") return;
+      const value = document.getElementById(field.name)?.value?.trim?.() || "";
+      if (!value) {
+        errors[field.name] = `${field.label} is required`;
+      }
+    });
+
     chips.forEach((chipGroup) => {
       if (chipGroup.required && !selectedChips[chipGroup.label]) {
         errors[chipGroup.label] = `${chipGroup.label} is required`;
@@ -216,7 +225,9 @@ const Form = () => {
       }
 
       [...commonFields, ...specificFields].forEach((field) => {
+        if (field.type === "file") return;
         const value = document.getElementById(field.name)?.value || "";
+        if (value === "" && !field.required) return;
         formPayload.append(field.name, value);
       });
 
@@ -293,17 +304,16 @@ const Form = () => {
     <div key={field.name} className="mb-4">
       <label htmlFor={field.name} className="field-label">
         {field.label}
-        {(field.name === "location" || field.name === "image") && (
-          <span className="text-red-500"> *</span>
-        )}
+        {field.required ? <span className="text-red-500"> *</span> : null}
       </label>
       {field.type === "textarea" ? (
         <textarea
           id={field.name}
           name={field.name}
           rows={4}
-          className="field-control"
+          className={`field-control${formErrors[field.name] ? " field-control--error" : ""}`}
           placeholder={field.label}
+          required={Boolean(field.required)}
         />
       ) : field.type === "file" ? (
         <>
@@ -314,6 +324,7 @@ const Form = () => {
             onChange={handleImageChange}
             className="field-control"
             accept="image/*"
+            required={Boolean(field.required) && !imageFile}
           />
           {formErrors.images && (
             <p className="field-error">{formErrors.images}</p>
@@ -324,14 +335,20 @@ const Form = () => {
           type={field.type || "text"}
           id={field.name}
           name={field.name}
-          className="field-control"
+          className={`field-control${formErrors[field.name] ? " field-control--error" : ""}`}
           placeholder={field.label}
           autoComplete={field.name === "location" ? "off" : undefined}
+          required={Boolean(field.required)}
         />
       )}
-      {field.name === "location" && formErrors.location && (
-        <p className="field-error">{formErrors.location}</p>
+      {formErrors[field.name] && (
+        <p className="field-error">{formErrors[field.name]}</p>
       )}
+      {field.name === "location" &&
+        formErrors.location &&
+        !formErrors[field.name] && (
+          <p className="field-error">{formErrors.location}</p>
+        )}
     </div>
   );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 import {
@@ -8,17 +8,209 @@ import {
   listingIdFrom,
   shortListingId,
 } from "@/lib/listingCards";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
-function MetaRow({ label, value }) {
-  if (value == null || value === "") return null;
-  const display =
-    typeof value === "object" ? JSON.stringify(value) : String(value);
+function MetaRow({ label, value, showEmpty = false }) {
+  const empty = value == null || value === "";
+  if (empty && !showEmpty) return null;
   return (
     <div className="listing-detail-meta">
       <span className="listing-detail-meta__label">{label}</span>
-      <span className="listing-detail-meta__value">{display}</span>
+      <span
+        className={`listing-detail-meta__value${empty ? " listing-detail-meta__value--empty" : ""}`}
+      >
+        {empty ? "Not specified" : String(value)}
+      </span>
     </div>
   );
+}
+
+const SYSTEM_KEYS = new Set([
+  "id",
+  "listing_id",
+  "user_id",
+  "pictures",
+  "listing_coordinates",
+  "created_at",
+  "updated_at",
+  "is_saved",
+  "originalData",
+  "image",
+  "icons",
+  "status",
+  "toggle",
+]);
+
+const LABEL_OVERRIDES = {
+  listing_id: "Listing ID",
+  job_tittle: "Job Title",
+  mileage: "Mileage",
+  fuel_type: "Fuel Type",
+  number_of_doors: "Number of Doors",
+  Load_capacity: "Load Capacity",
+  service_fee: "Service Fee",
+  ticket_price: "Ticket Price",
+  expected_audience: "Expected Audience",
+  special_feature: "Special Feature",
+  event_date: "Event Date",
+  event_type: "Event Type",
+  property_type: "Property Type",
+  parking_and_cost: "Parking / Cost",
+  maintenance_policy: "Maintenance Policy",
+  renters_insurance_requirement: "Renters Insurance",
+  bedroom_additional_Fees: "Bedroom Fees",
+  material_furniture_Selection: "Material / Furniture Selection",
+  personalised_fitness_plan: "Personalized Fitness Plan",
+  ac_Services: "AC Services",
+  item_type: "Item Type",
+  activity_type: "Activity Type",
+  age_range: "Age Range",
+  from_business: "From Business",
+  is_active: "Status",
+  listing_clicks: "Clicks",
+  gem_stone: "Gem Stone",
+  shoe_type: "Shoe Type",
+  skin_type: "Skin Type",
+  expiry_date: "Expiry Date",
+  metal_type: "Metal Type",
+  operating_system: "Operating System",
+  carrier_lock: "Carrier Lock",
+  storage_type: "Storage Type",
+  energy_rating: "Energy Rating",
+  compatible_model: "Compatible Model",
+  mattress_included: "Mattress Included",
+  seating_capacity: "Seating Capacity",
+  upholstery_material: "Upholstery",
+  weight_capacity: "Weight Capacity",
+  accessories_type: "Accessories Type",
+  babysitter_experience: "Babysitter Experience",
+  activities_offered: "Activities Offered",
+  equipment_required: "Equipment Required",
+  no_of_children: "No. of Children",
+  required_skills: "Required Skills",
+  experience_level: "Experience Level",
+  employment_type: "Employment Type",
+  salary_range: "Salary Range",
+  working_hours: "Working Hours",
+  benefits_offered: "Benefits",
+  remote_work_tools: "Remote Work Tools",
+  helper_pay: "Helper Pay",
+  jenry: "Genre",
+  dimension: "Dimensions",
+  dimensions: "Dimensions",
+  size: "Size",
+};
+
+function humanizeKey(key) {
+  if (LABEL_OVERRIDES[key]) return LABEL_OVERRIDES[key];
+  return String(key)
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatDetailValue(key, value) {
+  if (value == null || value === "") return null;
+  if (key === "from_business") return value ? "Yes" : "No";
+  if (key === "is_active") return value ? "Active" : "Inactive";
+  if (Array.isArray(value)) return value.join(", ");
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function buildDetailRows(listing) {
+  const rows = [];
+  const seen = new Set();
+
+  const push = (key, label, value, { always = false } = {}) => {
+    if (seen.has(key)) return;
+    const display = formatDetailValue(key, value);
+    if ((display == null || display === "") && !always) return;
+    seen.add(key);
+    rows.push({
+      key,
+      label,
+      value: display == null || display === "" ? null : display,
+      showEmpty: always,
+    });
+  };
+
+  push("listing_id_short", "Listing ID", shortListingId(listing));
+  push("listing_id_full", "Full ID", listingIdFrom(listing));
+  push("category", "Category", listing.category);
+  push("subcategory", "Subcategory", listing.subcategory);
+  push("location", "Location", listing.location);
+  push("description", "Description", listing.description);
+
+  const schemaFields = getEditFieldsForListing(
+    listing.category,
+    listing.subcategory
+  );
+  schemaFields.forEach((field) => {
+    if (
+      ["category", "subcategory", "location", "description", "image"].includes(
+        field.name
+      )
+    ) {
+      return;
+    }
+    // Always show category schema fields (e.g. mileage) even when empty
+    push(
+      field.name,
+      field.label || humanizeKey(field.name),
+      listing[field.name],
+      { always: true }
+    );
+  });
+
+  // Any remaining API keys not covered by schema (keeps detail complete)
+  Object.keys(listing || {}).forEach((key) => {
+    if (SYSTEM_KEYS.has(key)) return;
+    if (
+      [
+        "category",
+        "subcategory",
+        "location",
+        "description",
+        "title",
+        "keywords",
+      ].includes(key)
+    ) {
+      return;
+    }
+    push(key, humanizeKey(key), listing[key]);
+  });
+
+  push(
+    "keywords",
+    "Keywords",
+    Array.isArray(listing.keywords)
+      ? listing.keywords.join(", ")
+      : listing.keywords
+  );
+  push("from_business", "From Business", listing.from_business, {
+    always: true,
+  });
+  push("is_active", "Status", listing.is_active, { always: true });
+  push("listing_clicks", "Clicks", listing.listing_clicks ?? 0, {
+    always: true,
+  });
+
+  if (listing.created_at) {
+    push(
+      "created_at",
+      "Created",
+      new Date(listing.created_at).toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+    );
+  }
+
+  return rows;
 }
 
 /**
@@ -46,27 +238,15 @@ export default function ListingDetailModal({ open, listing, onClose }) {
     };
   }, [open, onClose]);
 
+  const detailRows = useMemo(
+    () => (listing ? buildDetailRows(listing) : []),
+    [listing]
+  );
+
   if (!open || !listing || !mounted) return null;
 
   const pictures = Array.isArray(listing.pictures) ? listing.pictures : [];
   const priceLabel = formatListingPrice(listing) || "Price not set";
-  const created = listing.created_at
-    ? new Date(listing.created_at).toLocaleString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
-    : null;
-  const keywords = Array.isArray(listing.keywords)
-    ? listing.keywords.join(", ")
-    : listing.keywords;
-  const location =
-    typeof listing.location === "string" && listing.location.trim()
-      ? listing.location.trim()
-      : null;
 
   return createPortal(
     <div
@@ -108,22 +288,14 @@ export default function ListingDetailModal({ open, listing, onClose }) {
 
         <div className="listing-detail-body">
           <div className="listing-detail-grid">
-            <MetaRow label="Listing ID" value={shortListingId(listing)} />
-            <MetaRow label="Full ID" value={listingIdFrom(listing)} />
-            <MetaRow label="Category" value={listing.category} />
-            <MetaRow label="Subcategory" value={listing.subcategory} />
-            <MetaRow label="Location" value={location} />
-            <MetaRow label="Keywords" value={keywords} />
-            <MetaRow
-              label="From Business"
-              value={listing.from_business ? "Yes" : "No"}
-            />
-            <MetaRow
-              label="Status"
-              value={listing.is_active ? "Active" : "Inactive"}
-            />
-            <MetaRow label="Clicks" value={listing.listing_clicks ?? 0} />
-            <MetaRow label="Created" value={created} />
+            {detailRows.map((row) => (
+              <MetaRow
+                key={row.key}
+                label={row.label}
+                value={row.value}
+                showEmpty={row.showEmpty}
+              />
+            ))}
           </div>
 
           {pictures.length > 0 ? (

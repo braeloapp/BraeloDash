@@ -165,17 +165,16 @@ const FeedbackCard = () => {
             paginator
             first={first}
             rows={rows}
-            rowsPerPageOptions={[5, 10, 20, 50]}
             onPage={(event) => {
               setFirst(event.first);
               setRows(event.rows);
             }}
             loading={loading}
             emptyMessage="No feedback yet. Feedback appears here when users submit reactions in the main app."
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             tableStyle={{ width: "100%" }}
-            paginatorClassName="user-paginator"
+            paginatorClassName="business-paginator app-paginator m-5"
             className="p-datatable-striped"
           >
             <Column

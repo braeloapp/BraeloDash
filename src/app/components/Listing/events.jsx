@@ -17,6 +17,7 @@ import ListingDetailModal from "./ListingDetailModal";
 import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
+import { getEditFieldsForListing } from "@/lib/listingFormFields";
 
 const Events = () => {
   // State management
@@ -326,39 +327,39 @@ const Events = () => {
         return;
       }
 
-      const form = new FormData();
 
-      // Append all form data
-      form.append("category", formData.category || "Events");
-      form.append("subcategory", formData.subcategory || "");
-      form.append("title", formData.title || "");
-      form.append("description", formData.description || "");
-      form.append("location", formData.location || "");
-      form.append("event_type", formData.event_type || "");
-      form.append("event_date", formData.event_date || "");
-      form.append("expected_audience", String(formData.expected_audience || 0));
-      form.append("special_feature", formData.special_feature || "");
-      form.append("ticket_price", String(formData.ticket_price || 0));
-      form.append("negotiable", formData.negotiable || "NO");
-      form.append("industry_focus", formData.industry_focus || "");
-      form.append("from_business", formData.from_business ? "true" : "false");
+      const fields = getEditFieldsForListing(
+        formData.category || "Events",
+        formData.subcategory,
+        formData
+      );
+      const missing = fields
+        .filter((field) => field.required)
+        .find((field) => {
+          const value = formData[field.name];
+          return value === undefined || value === null || String(value).trim() === "";
+        });
+      if (missing) {
+        toast.error(`${missing.label} is required`);
+        setIsUpdating(false);
+        return;
+      }
+
+      const form = new FormData();
+      fields.forEach((field) => {
+        const raw = formData[field.name];
+        if (raw === undefined || raw === null) return;
+        const value = Array.isArray(raw) ? raw.join(",") : String(raw);
+        if (value === "" && !field.required) return;
+        form.append(field.name, value);
+      });
+
       form.append(
         "listing_coordinates",
         formData.listing_coordinates ||
           '{"type":"Point","coordinates":[74.284469,31.4494997]}'
       );
 
-      // Handle keywords
-      if (formData.keywords) {
-        form.append(
-          "keywords",
-          Array.isArray(formData.keywords)
-            ? formData.keywords.join(",")
-            : formData.keywords
-        );
-      }
-
-      // Handle images
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -439,42 +440,12 @@ const Events = () => {
   };
 
   // Form fields configuration
-  const formFields = [
-    { name: "title", label: "Title", type: "text", required: true },
-    {
-      name: "description",
-      label: "Description",
-      type: "textarea",
-      required: true,
-    },
-    { name: "event_type", label: "Event Type", type: "text", required: true },
-    { name: "event_date", label: "Event Date", type: "datetime-local", required: true },
-    { name: "expected_audience", label: "Expected Audience", type: "number", required: true },
-    { name: "special_feature", label: "Special Feature", type: "text", required: true },
-    { name: "ticket_price", label: "Ticket Price", type: "number", required: true },
-    {
-      name: "negotiable",
-      label: "Negotiable",
-      type: "select",
-      options: ["YES", "NO"],
-      required: true,
-    },
-    { name: "industry_focus", label: "Industry Focus", type: "text", required: true },
-    {
-      name: "keywords",
-      label: "Keywords (comma separated)",
-      type: "text",
-      required: false,
-    },
-    {
-      name: "from_business",
-      label: "From Business",
-      type: "checkbox",
-      required: false,
-    },
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
-  ];
+  const formFields = getEditFieldsForListing(
+    formData.category || "Events",
+    formData.subcategory,
+    formData,
+    { excludeLocation: true }
+  );
 
   if (loading) {
     return <AppLoader />;
@@ -601,7 +572,7 @@ const Events = () => {
                       {field.type === "select" ? (
                         <select
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -616,7 +587,7 @@ const Events = () => {
                       ) : field.type === "textarea" ? (
                         <textarea
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
@@ -634,7 +605,7 @@ const Events = () => {
                         <input
                           type={field.type}
                           name={field.name}
-                          value={formData[field.name] || ""}
+                          value={Array.isArray(formData[field.name]) ? formData[field.name].join(", ") : (formData[field.name] ?? "")}
                           onChange={handleFormChange}
                           required={field.required}
                           className="field-control"
