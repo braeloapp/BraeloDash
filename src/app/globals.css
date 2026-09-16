@@ -1655,6 +1655,11 @@ input[type="radio"]:focus-visible {
   }
 
   .user-detail-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
     margin-left: auto;
   }
 
@@ -1730,10 +1735,12 @@ input[type="radio"]:focus-visible {
     .user-detail-hero__actions {
       margin-left: 0;
       width: 100%;
+      justify-content: stretch;
     }
 
-    .user-detail-hero__actions .btn-primary {
-      width: 100%;
+    .user-detail-hero__actions .btn-primary,
+    .user-detail-hero__actions .btn-ghost {
+      flex: 1 1 auto;
       justify-content: center;
     }
   }
