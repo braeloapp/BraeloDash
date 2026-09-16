@@ -1,10 +1,28 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import { FiChevronDown, FiX } from "react-icons/fi";
+import {
+  FiBell,
+  FiChevronDown,
+  FiChevronUp,
+  FiLogOut,
+  FiUser,
+  FiX,
+} from "react-icons/fi";
+import { getApiBaseUrl } from "@/lib/apiConfig";
+import {
+  adminRoleLabel,
+  clearAdminSession,
+  persistAdminSession,
+} from "@/lib/adminAuth";
+import { getData } from "@/app/API/method";
+import {
+  isNotificationUnread,
+  NOTIFICATIONS_CHANGED,
+} from "@/lib/adminNotifications";
 import { sidebarGroups, sidebarItems } from "./navItems";
 
 const COLLAPSE_KEY = "braelo_admin_sidebar_collapsed";
@@ -27,7 +45,13 @@ function loadCollapsed() {
 
 const Sidebar = ({ open = false, onClose }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState({});
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [userName, setUserName] = useState("Admin");
+  const [roleLabel, setRoleLabel] = useState("Administrator");
+  const [unreadCount, setUnreadCount] = useState(0);
+  const accountRef = useRef(null);
 
   const grouped = useMemo(() => {
     return sidebarGroups
@@ -59,6 +83,80 @@ const Sidebar = ({ open = false, onClose }) => {
     });
   }, [pathname]);
 
+  useEffect(() => {
+    setAccountOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const cachedName = localStorage.getItem("admin_name");
+      const cachedRole = localStorage.getItem("admin_role");
+      if (cachedName) setUserName(cachedName);
+      if (cachedRole) setRoleLabel(adminRoleLabel(cachedRole));
+
+      try {
+        const response = await fetch(`${getApiBaseUrl()}/admin-panel/me`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const profile = data?.data || data;
+        setUserName(profile?.name || "Admin");
+        setRoleLabel(adminRoleLabel(profile?.role));
+        persistAdminSession({
+          token,
+          role: profile?.role,
+          name: profile?.name,
+        });
+      } catch {
+        /* keep cached */
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const loadUnread = async () => {
+      try {
+        const data = await getData("/admin-panel/notifications?page=1");
+        const results = data?.data?.results || [];
+        setUnreadCount(
+          results.filter((item) => isNotificationUnread(item)).length
+        );
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+
+    loadUnread();
+    window.addEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+    return () => window.removeEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+  }, []);
+
+  useEffect(() => {
+    const onPointerDown = (event) => {
+      if (accountRef.current && !accountRef.current.contains(event.target)) {
+        setAccountOpen(false);
+      }
+    };
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+
   const toggleGroup = (group) => {
     setCollapsed((prev) => {
       const next = { ...prev, [group]: !prev[group] };
@@ -70,6 +168,20 @@ const Sidebar = ({ open = false, onClose }) => {
       return next;
     });
   };
+
+  const goTo = (path) => {
+    setAccountOpen(false);
+    onClose?.();
+    router.push(path);
+  };
+
+  const handleLogout = () => {
+    setAccountOpen(false);
+    clearAdminSession();
+    router.push("/");
+  };
+
+  const initial = (userName || "A").trim().charAt(0).toUpperCase();
 
   return (
     <aside
@@ -89,7 +201,7 @@ const Sidebar = ({ open = false, onClose }) => {
         <div className="admin-sidebar-brand__orb admin-sidebar-brand__orb--b" aria-hidden />
         <div className="relative z-[1] flex items-center justify-center">
           <Image
-            src="/braelo-logo.png"
+            src="/braelo-logo.png?v=2"
             alt="braelo"
             width={200}
             height={56}
@@ -109,7 +221,6 @@ const Sidebar = ({ open = false, onClose }) => {
         ) : null}
       </div>
 
-      {/* Soft gold seam under brand */}
       <div className="admin-sidebar__seam" aria-hidden />
 
       {/* Nav */}
@@ -158,7 +269,9 @@ const Sidebar = ({ open = false, onClose }) => {
                   <FiChevronDown
                     size={14}
                     className={`shrink-0 transition-all duration-200 ${
-                      hasActive ? "text-[#FFCC35]/80" : "text-white/30 group-hover:text-white/50"
+                      hasActive
+                        ? "text-[#FFCC35]/80"
+                        : "text-white/30 group-hover:text-white/50"
                     } ${isCollapsed ? "-rotate-90" : "rotate-0"}`}
                     aria-hidden
                   />
@@ -238,24 +351,104 @@ const Sidebar = ({ open = false, onClose }) => {
         </nav>
       </div>
 
-      {/* Footer */}
-      <div className="relative z-[1] shrink-0 px-3.5 pb-4 pt-1">
-        <div className="admin-sidebar-footer overflow-hidden rounded-2xl px-3.5 py-3">
-          <div className="admin-sidebar-footer__glow" aria-hidden />
-          <div className="relative z-[1] flex items-center gap-3">
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#FFCC35] to-[#CD9403] text-sm font-bold text-[#2a2208] shadow-[0_6px_16px_rgba(205,148,3,0.35)]">
-              B
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-[#FFCC35]">
-                Braelo Admin
+      {/* Account footer dropdown */}
+      <div className="relative z-[2] shrink-0 px-3.5 pb-4 pt-1" ref={accountRef}>
+        {accountOpen ? (
+          <div
+            className="admin-account-menu mb-2 overflow-hidden rounded-2xl"
+            role="menu"
+            aria-label="Account menu"
+          >
+            <div className="border-b border-white/10 px-3.5 py-3">
+              <p className="truncate text-sm font-semibold text-white">
+                {userName}
               </p>
-              <p className="mt-0.5 truncate text-[11px] text-white/45">
-                Operations console
+              <p className="mt-0.5 truncate text-[11px] text-[#FFCC35]/90">
+                {roleLabel}
               </p>
             </div>
+
+            <button
+              type="button"
+              role="menuitem"
+              className="admin-account-menu__item"
+              onClick={() => goTo("/pages/adminprofile")}
+            >
+              <FiUser size={16} />
+              <span>Profile settings</span>
+            </button>
+
+            <button
+              type="button"
+              role="menuitem"
+              className="admin-account-menu__item"
+              onClick={() => goTo("/pages/notifications")}
+            >
+              <FiBell size={16} />
+              <span className="flex-1 text-left">Notifications</span>
+              {unreadCount > 0 ? (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CD9403] px-1.5 text-[10px] font-semibold text-white">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              ) : null}
+            </button>
+
+            <div className="mx-3 border-t border-white/10" />
+
+            <button
+              type="button"
+              role="menuitem"
+              className="admin-account-menu__item admin-account-menu__item--danger"
+              onClick={handleLogout}
+            >
+              <FiLogOut size={16} />
+              <span>Logout</span>
+            </button>
           </div>
-        </div>
+        ) : null}
+
+        <button
+          type="button"
+          className={`admin-sidebar-footer group relative w-full overflow-hidden rounded-2xl px-3 py-2.5 text-left transition ${
+            accountOpen ? "ring-1 ring-[#FFCC35]/40" : ""
+          }`}
+          aria-expanded={accountOpen}
+          aria-haspopup="menu"
+          onClick={() => setAccountOpen((prev) => !prev)}
+        >
+          <div className="admin-sidebar-footer__glow" aria-hidden />
+          <div className="relative z-[1] flex items-center gap-3">
+            <span className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full ring-2 ring-[#FFCC35]/55">
+              <Image
+                src="/images/profile (1).png"
+                alt=""
+                fill
+                className="object-cover"
+              />
+              <span className="sr-only">{initial}</span>
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-white">
+                {userName}
+              </p>
+              <p className="mt-0.5 truncate text-[11px] text-[#FFCC35]/90">
+                {roleLabel}
+              </p>
+            </div>
+            <span className="relative inline-flex items-center gap-1.5">
+              {unreadCount > 0 && !accountOpen ? (
+                <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CD9403] px-1 text-[10px] font-semibold text-white shadow-[0_0_10px_rgba(205,148,3,0.55)]">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              ) : null}
+              {accountOpen ? (
+                <FiChevronUp size={16} className="text-white/70" />
+              ) : (
+                <FiChevronDown size={16} className="text-white/55 group-hover:text-white/80" />
+              )}
+            </span>
+          </div>
+        </button>
       </div>
     </aside>
   );
