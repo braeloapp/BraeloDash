@@ -13,6 +13,8 @@ import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
 import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
+import ListingDetailModal from "./ListingDetailModal";
+import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 
@@ -137,9 +139,13 @@ const Jobs = () => {
       console.error("Error parsing coordinates:", e);
     }
 
-    // Get address from coordinates
-    let address = originalData.location || "";
-    if (coordinates.coordinates && coordinates.coordinates.length === 2) {
+    // Prefer API human-readable location; only reverse-geocode as fallback
+    let address = String(originalData.location || "").trim();
+    if (
+      !address &&
+      coordinates.coordinates &&
+      coordinates.coordinates.length === 2
+    ) {
       const geocodedAddress = await reverseGeocode(coordinates.coordinates);
       if (geocodedAddress) {
         address = geocodedAddress;
@@ -500,93 +506,11 @@ const Jobs = () => {
         )}
 
         {/* Detail Modal */}
-        {isDetailModalOpen && (
-          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Job Details</h2>
-                <button
-                  onClick={handleCloseDetailModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="p-6">
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">
-                    {selectedCard?.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {selectedCard?.description}
-                  </p>
-                  <p className="text-xl font-bold text-[#CD9403] mb-4">
-                    {selectedCard?.salary_range || "Salary not specified"}
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedCard?.company && (
-                      <DetailItem label="Company" value={selectedCard.company} />
-                    )}
-                    {selectedCard?.experience_level && (
-                      <DetailItem label="Experience Level" value={selectedCard.experience_level} />
-                    )}
-                    {selectedCard?.job_type && (
-                      <DetailItem label="Job Type" value={selectedCard.job_type} />
-                    )}
-                    {selectedCard?.job_title && (
-                      <DetailItem label="Job Title" value={selectedCard.job_title} />
-                    )}
-                    {selectedCard?.required_skills && (
-                      <DetailItem label="Required Skills" value={selectedCard.required_skills} />
-                    )}
-                    {selectedCard?.employment_type && (
-                      <DetailItem label="Employment Type" value={selectedCard.employment_type} />
-                    )}
-                    {selectedCard?.working_hours && (
-                      <DetailItem label="Working Hours" value={selectedCard.working_hours} />
-                    )}
-                    {selectedCard?.location && (
-                      <DetailItem label="Location" value={selectedCard.location} />
-                    )}
-                    {selectedCard?.negotiable && (
-                      <DetailItem label="Negotiable" value={selectedCard.negotiable} />
-                    )}
-                    {selectedCard?.subcategory && (
-                      <DetailItem label="Subcategory" value={selectedCard.subcategory} />
-                    )}
-                    {selectedCard?.listing_coordinates && (
-                      <CoordinatesDetail
-                        coordinates={
-                          typeof selectedCard.listing_coordinates === "string"
-                            ? JSON.parse(selectedCard.listing_coordinates)
-                            : selectedCard.listing_coordinates
-                        }
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {selectedCard?.pictures && selectedCard.pictures.length > 0 && (
-                  <div>
-                    <h4 className="text-md font-medium mb-2">Images</h4>
-                    <div className="flex flex-wrap gap-4">
-                      {selectedCard.pictures.map((img, index) => (
-                        <img
-                          key={index}
-                          src={img}
-                          alt={`Job ${index}`}
-                          className="w-32 h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ListingDetailModal
+          open={isDetailModalOpen}
+          listing={selectedCard}
+          onClose={handleCloseDetailModal}
+        />
 
         <ConfirmDeleteDialog
           visible={isDeleteModalOpen}
@@ -596,24 +520,16 @@ const Jobs = () => {
         />
 
         {/* Edit Modal */}
-        {isEditModalOpen && (
-          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Edit Job Listing</h2>
-                <button
-                  onClick={handleCloseEditModal}
-                  className="text-gray-500 hover:text-gray-700"
-                  disabled={isUpdating}
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleUpdateListing} className="p-6">
+        <ListingEditShell
+          open={isEditModalOpen}
+          title="Edit Job Listing"
+          onClose={handleCloseEditModal}
+          disabled={isUpdating}
+        >
+          <form onSubmit={handleUpdateListing}>
                 {/* Image Upload Section */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="field-label">
                     Job Images
                   </label>
                   <div className="flex flex-wrap gap-4 mb-4">
@@ -634,7 +550,7 @@ const Jobs = () => {
                       </div>
                     ))}
                   </div>
-                  <label className="flex flex-col items-center px-4 py-6 bg-white rounded-md border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
+                  <label className="listing-edit-upload">
                     <svg
                       className="w-8 h-8 text-gray-400 mb-2"
                       fill="none"
@@ -659,7 +575,7 @@ const Jobs = () => {
                       accept="image/*"
                     />
                   </label>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="field-hint">
                     Upload high-quality images (max 10 images)
                   </p>
                 </div>
@@ -668,7 +584,7 @@ const Jobs = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {formFields.map((field) => (
                     <div key={field.name} className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="field-label">
                         {field.label}
                         {field.required && (
                           <span className="text-red-500">*</span>
@@ -681,7 +597,7 @@ const Jobs = () => {
                           value={formData[field.name] || ""}
                           onChange={handleFormChange}
                           required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                          className="field-control"
                         >
                           <option value="">Select {field.label}</option>
                           {field.options.map((option) => (
@@ -696,7 +612,7 @@ const Jobs = () => {
                           value={formData[field.name] || ""}
                           onChange={handleFormChange}
                           required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                          className="field-control"
                           rows={3}
                         />
                       ) : (
@@ -706,7 +622,7 @@ const Jobs = () => {
                           value={formData[field.name] || ""}
                           onChange={handleFormChange}
                           required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                          className="field-control"
                         />
                       )}
                     </div>
@@ -714,7 +630,7 @@ const Jobs = () => {
 
                   {/* Location Field with Autocomplete */}
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="field-label">
                       Location
                       <span className="text-red-500">*</span>
                     </label>
@@ -725,10 +641,10 @@ const Jobs = () => {
                       value={formData.location || ""}
                       onChange={handleFormChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-                      placeholder="Enter location"
+                      className="field-control"
+                      placeholder="e.g. Lahore, Pakistan"
                     />
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="field-hint">
                       Start typing to select a location from Google Maps
                     </p>
                   </div>
@@ -736,7 +652,7 @@ const Jobs = () => {
                   {/* Display Coordinates */}
                   {formData.listing_coordinates && (
                     <div className="mb-4 col-span-full">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="field-label">
                         Coordinates
                       </label>
                       <div className="p-2 bg-gray-100 rounded-md">
@@ -796,9 +712,7 @@ const Jobs = () => {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
+        </ListingEditShell>
 
         {data.length > 0 && (
           <div className="flex justify-end items-center mt-4">
@@ -862,64 +776,6 @@ const Jobs = () => {
   );
 };
 
-const CoordinatesDetail = ({ coordinates }) => {
-  const [address, setAddress] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (
-      coordinates?.coordinates &&
-      coordinates.coordinates.length === 2 &&
-      window.google
-    ) {
-      setLoading(true);
-      const geocoder = new window.google.maps.Geocoder();
-      const latLng = {
-        lat: coordinates.coordinates[1],
-        lng: coordinates.coordinates[0],
-      };
-
-      geocoder.geocode({ location: latLng }, (results, status) => {
-        setLoading(false);
-        if (status === "OK" && results[0]) {
-          setAddress(results[0].formatted_address);
-        }
-      });
-    }
-  }, [coordinates]);
-
-  return (
-    <div className="col-span-full mb-4">
-      <div className="text-sm font-medium text-gray-700 mb-1">
-        Location Details
-      </div>
-      <div className="bg-gray-50 p-3 rounded-md">
-        {loading ? (
-          <div className="text-gray-500 italic">Loading address...</div>
-        ) : address ? (
-          <div>
-            <span className="font-medium">Address:</span> {address}
-          </div>
-        ) : (
-          <div className="text-gray-500 italic">
-            Could not determine address
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const DetailItem = ({ label, value }) => {
-  const displayValue =
-    typeof value === "object" ? JSON.stringify(value) : value;
-
-  return (
-    <div className="mb-2">
-      <span className="text-sm font-medium text-gray-500">{label}: </span>
-      <span className="text-sm text-gray-800">{displayValue}</span>
-    </div>
-  );
-};
 
 export default Jobs;

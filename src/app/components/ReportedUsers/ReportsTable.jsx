@@ -11,6 +11,7 @@ import { getData, postData } from "@/app/API/method";
 import { extractResultsList, getApiErrorMessage } from "@/lib/apiResponse";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 
 const REPORTS_ENDPOINT = "/admin-panel/report/action";
 
@@ -158,21 +159,22 @@ const ReportsTable = ({
   const actionBodyTemplate = (rowData) => {
     const busy = actionLoadingId === rowData.id;
     return (
-      <select
-        key={`${rowData.id}-${busy ? "1" : "0"}`}
+      <ActionMenu
         disabled={busy}
-        defaultValue=""
-        onChange={(e) => {
-          const v = e.target.value;
-          if (v === "view") showReportDetails(rowData);
-          if (v === "action") void handleReportAction(rowData);
-        }}
-        className="border rounded-md p-1 text-sm max-w-[11rem]"
-      >
-        <option value="">Actions</option>
-        <option value="view">View Details</option>
-        <option value="action">Take action</option>
-      </select>
+        label="Report actions"
+        items={[
+          {
+            label: "View details",
+            onClick: () => showReportDetails(rowData),
+          },
+          {
+            label: "Take action",
+            onClick: () => {
+              void handleReportAction(rowData);
+            },
+          },
+        ]}
+      />
     );
   };
 

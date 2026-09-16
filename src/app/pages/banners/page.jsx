@@ -389,7 +389,7 @@ export default function BannerManagement() {
                 <label className="field-label">Banner Image</label>
                 <div className="mb-2 h-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
                   <img 
-                    src={selectedBanner.business_banner?.[0] || "https://via.placeholder.com/300"} 
+                    src={selectedBanner.business_banner?.[0] || "/b6.png"} 
                     alt="Banner" 
                     className="max-h-full max-w-full object-contain"
                   />

@@ -15,6 +15,7 @@ import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
 import ListingDetailModal from "./ListingDetailModal";
+import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 import { Update_data } from "./Data";
@@ -223,8 +224,13 @@ const ActiveBusiListing = ({ user_id }) => {
       coordinates: [-0.1275862, 51.5072178]
     };
 
-    let address = "";
-    if (coordinates.coordinates && coordinates.coordinates.length === 2) {
+    // Prefer API human-readable location; only reverse-geocode as fallback
+    let address = String(originalData.location || "").trim();
+    if (
+      !address &&
+      coordinates.coordinates &&
+      coordinates.coordinates.length === 2
+    ) {
       const geocodedAddress = await reverseGeocode(coordinates.coordinates);
       if (geocodedAddress) {
         address = geocodedAddress;
@@ -519,7 +525,7 @@ const ActiveBusiListing = ({ user_id }) => {
             value={formData[field.name] || ""}
             onChange={handleFormChange}
             required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+            className="field-control"
           >
             <option value="">Select {field.label}</option>
             {field.options.map((option) => (
@@ -536,7 +542,7 @@ const ActiveBusiListing = ({ user_id }) => {
             value={formData[field.name] || ""}
             onChange={handleFormChange}
             required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+            className="field-control"
             rows={3}
           />
         );
@@ -563,7 +569,7 @@ const ActiveBusiListing = ({ user_id }) => {
             value={formData[field.name] || ""}
             onChange={handleFormChange}
             required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+            className="field-control"
           />
         );
       default:
@@ -574,7 +580,7 @@ const ActiveBusiListing = ({ user_id }) => {
             value={formData[field.name] || ""}
             onChange={handleFormChange}
             required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+            className="field-control"
           />
         );
     }
@@ -669,23 +675,15 @@ const ActiveBusiListing = ({ user_id }) => {
           title="Are you sure you want to delete this listing?"
         />
 
-        {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Edit Listing</h2>
-                <button
-                  onClick={handleCloseEditModal}
-                  className="text-gray-500 hover:text-gray-700"
-                  disabled={isUpdating}
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleUpdateListing} className="p-6">
+        <ListingEditShell
+          open={isEditModalOpen}
+          title="Edit Listing"
+          onClose={handleCloseEditModal}
+          disabled={isUpdating}
+        >
+          <form onSubmit={handleUpdateListing}>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="field-label">
                     Listing Images
                   </label>
                   <div className="flex flex-wrap gap-4 mb-4">
@@ -739,7 +737,7 @@ const ActiveBusiListing = ({ user_id }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {currentFormFields.map((field) => (
                     <div key={field.name} className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="field-label">
                         {field.label}
                         {field.required && (
                           <span className="text-red-500">*</span>
@@ -750,7 +748,7 @@ const ActiveBusiListing = ({ user_id }) => {
                   ))}
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="field-label">
                       Location
                       <span className="text-red-500">*</span>
                     </label>
@@ -761,7 +759,7 @@ const ActiveBusiListing = ({ user_id }) => {
                       value={formData.location || ""}
                       onChange={handleFormChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                      className="field-control"
                       placeholder="Enter location"
                     />
                     <p className="mt-1 text-xs text-gray-500">
@@ -771,7 +769,7 @@ const ActiveBusiListing = ({ user_id }) => {
 
                   {formData.listing_coordinates && (
                     <div className="mb-4 col-span-full">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="field-label">
                         Coordinates
                       </label>
                       <div className="p-2 bg-gray-100 rounded-md">
@@ -831,9 +829,7 @@ const ActiveBusiListing = ({ user_id }) => {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
+        </ListingEditShell>
       </div>
 
       <ToastContainer

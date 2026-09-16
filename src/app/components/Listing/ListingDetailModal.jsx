@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiX } from "react-icons/fi";
 import {
   formatListingPrice,
@@ -22,8 +23,15 @@ function MetaRow({ label, value }) {
 
 /**
  * Premium listing details overlay shared by business listing tabs.
+ * Portaled to document.body so page-shell overflow cannot clip the mask.
  */
 export default function ListingDetailModal({ open, listing, onClose }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (event) => {
@@ -38,18 +46,29 @@ export default function ListingDetailModal({ open, listing, onClose }) {
     };
   }, [open, onClose]);
 
-  if (!open || !listing) return null;
+  if (!open || !listing || !mounted) return null;
 
   const pictures = Array.isArray(listing.pictures) ? listing.pictures : [];
   const priceLabel = formatListingPrice(listing) || "Price not set";
   const created = listing.created_at
-    ? new Date(listing.created_at).toLocaleString()
+    ? new Date(listing.created_at).toLocaleString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
     : null;
   const keywords = Array.isArray(listing.keywords)
     ? listing.keywords.join(", ")
     : listing.keywords;
+  const location =
+    typeof listing.location === "string" && listing.location.trim()
+      ? listing.location.trim()
+      : null;
 
-  return (
+  return createPortal(
     <div
       className="listing-detail-mask"
       role="presentation"
@@ -93,6 +112,7 @@ export default function ListingDetailModal({ open, listing, onClose }) {
             <MetaRow label="Full ID" value={listingIdFrom(listing)} />
             <MetaRow label="Category" value={listing.category} />
             <MetaRow label="Subcategory" value={listing.subcategory} />
+            <MetaRow label="Location" value={location} />
             <MetaRow label="Keywords" value={keywords} />
             <MetaRow
               label="From Business"
@@ -124,6 +144,7 @@ export default function ListingDetailModal({ open, listing, onClose }) {
           ) : null}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

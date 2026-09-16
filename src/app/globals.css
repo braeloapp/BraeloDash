@@ -412,6 +412,30 @@ input[type="radio"]:focus-visible {
     box-shadow: 0 10px 40px rgba(58, 66, 72, 0.05);
   }
 
+  /* Google Places dropdown is appended to body; keep it above admin chrome
+     and never leave a ghost box over scrolled form fields. */
+  .pac-container {
+    z-index: 10000 !important;
+    border-radius: 12px !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: 0 12px 32px rgba(58, 66, 72, 0.12) !important;
+    margin-top: 4px;
+    font-family: inherit;
+  }
+
+  .pac-item {
+    padding: 10px 12px !important;
+    cursor: pointer;
+  }
+
+  .pac-item:hover {
+    background: #fff8e8 !important;
+  }
+
+  .pac-logo:after {
+    display: none !important;
+  }
+
   .page-header {
     @apply flex flex-wrap items-start justify-between gap-3 px-4 py-4 sm:px-5;
     border-bottom: 1px solid var(--color-border);
@@ -762,10 +786,17 @@ input[type="radio"]:focus-visible {
     background: var(--color-surface-elevated);
   }
 
-  /* Premium confirm dialog */
+  /* Premium confirm dialog — portaled to body; cover full viewport */
   .confirm-modal-mask {
     @apply fixed inset-0 flex items-center justify-center p-4;
-    z-index: 60;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 100;
+    margin: 0;
     background:
       radial-gradient(120% 80% at 50% 0%, rgba(205, 148, 3, 0.12), transparent 55%),
       rgba(26, 32, 36, 0.55);
@@ -903,10 +934,116 @@ input[type="radio"]:focus-visible {
     }
   }
 
-  /* Premium listing details modal */
+  /* Premium listing edit modal — portaled to body */
+  .listing-edit-mask {
+    @apply fixed inset-0 flex items-center justify-center p-3 sm:p-5;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 100;
+    margin: 0;
+    background:
+      radial-gradient(120% 80% at 50% 0%, rgba(205, 148, 3, 0.1), transparent 55%),
+      rgba(26, 32, 36, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .listing-edit-modal {
+    width: 100%;
+    max-width: 720px;
+    max-height: min(92dvh, 880px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 24px;
+    background: #fff;
+    border: 1px solid rgba(238, 241, 244, 0.95);
+    box-shadow:
+      0 24px 60px rgba(23, 30, 34, 0.22),
+      0 2px 8px rgba(23, 30, 34, 0.06);
+    animation: confirm-modal-in 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .listing-edit-header {
+    @apply flex items-start justify-between gap-3 px-5 py-4 sm:px-6;
+    border-bottom: 1px solid var(--color-border);
+    background:
+      linear-gradient(180deg, #fffdf8 0%, #ffffff 70%);
+  }
+
+  .listing-edit-kicker {
+    @apply mb-1 text-[11px] font-semibold uppercase tracking-[0.14em];
+    color: var(--color-brand);
+  }
+
+  .listing-edit-title {
+    @apply text-lg font-semibold sm:text-xl;
+    color: var(--color-text-primary);
+  }
+
+  .listing-edit-close {
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition;
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+    background: #fff;
+  }
+
+  .listing-edit-close:hover:not(:disabled) {
+    border-color: #f0e2b3;
+    color: var(--color-brand);
+    background: #fff8e8;
+  }
+
+  .listing-edit-close:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .listing-edit-body {
+    @apply min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6;
+  }
+
+  .listing-edit-upload {
+    @apply flex flex-col items-center justify-center rounded-xl border border-dashed px-4 py-8 cursor-pointer transition;
+    border-color: #e8edf2;
+    background: #fbfcfe;
+  }
+
+  .listing-edit-upload:hover {
+    border-color: #f0e2b3;
+    background: #fff8e8;
+  }
+
+  .listing-edit-thumb {
+    @apply relative h-24 w-24 overflow-hidden rounded-xl border;
+    border-color: var(--color-border);
+  }
+
+  .listing-edit-thumb img {
+    @apply h-full w-full object-cover;
+  }
+
+  .listing-edit-footer {
+    @apply sticky bottom-0 -mx-5 mt-6 flex flex-wrap items-center justify-end gap-2 border-t px-5 py-4 sm:-mx-6 sm:px-6;
+    border-color: var(--color-border);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), #fff);
+  }
+
+  /* Premium listing details modal — portaled to body; cover full viewport */
   .listing-detail-mask {
     @apply fixed inset-0 flex items-center justify-center p-4;
-    z-index: 60;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 100;
+    margin: 0;
     background:
       radial-gradient(120% 80% at 50% 0%, rgba(205, 148, 3, 0.1), transparent 55%),
       rgba(26, 32, 36, 0.55);
@@ -932,6 +1069,8 @@ input[type="radio"]:focus-visible {
 
   .listing-detail-hero {
     position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
     min-height: 180px;
     background: linear-gradient(135deg, #3a4248 0%, #232f30 100%);
   }
@@ -953,6 +1092,7 @@ input[type="radio"]:focus-visible {
   .listing-detail-hero__shade {
     position: absolute;
     inset: 0;
+    pointer-events: none;
     background: linear-gradient(180deg, rgba(23, 30, 34, 0.1) 0%, rgba(23, 30, 34, 0.72) 100%);
   }
 
@@ -1011,8 +1151,13 @@ input[type="radio"]:focus-visible {
   }
 
   .listing-detail-body {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
     padding: 20px 22px 24px;
+    position: relative;
+    z-index: 1;
+    background: #fff;
   }
 
   .listing-detail-grid {

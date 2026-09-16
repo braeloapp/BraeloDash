@@ -13,6 +13,8 @@ import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
 import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
+import ListingDetailModal from "./ListingDetailModal";
+import ListingEditShell from "./ListingEditShell";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 
@@ -137,9 +139,13 @@ const Vehicles = () => {
       console.error("Error parsing coordinates:", e);
     }
 
-    // Get address from coordinates
-    let address = originalData.location || "";
-    if (coordinates.coordinates && coordinates.coordinates.length === 2) {
+    // Prefer API human-readable location; only reverse-geocode as fallback
+    let address = String(originalData.location || "").trim();
+    if (
+      !address &&
+      coordinates.coordinates &&
+      coordinates.coordinates.length === 2
+    ) {
       const geocodedAddress = await reverseGeocode(coordinates.coordinates);
       if (geocodedAddress) {
         address = geocodedAddress;
@@ -431,6 +437,8 @@ const Vehicles = () => {
 
   // Form fields configuration
   const formFields = [
+    { name: "category", label: "Category", type: "text", required: true },
+    { name: "subcategory", label: "Subcategory", type: "text", required: true },
     { name: "title", label: "Title", type: "text", required: true },
     {
       name: "description",
@@ -463,8 +471,6 @@ const Vehicles = () => {
       type: "text",
       required: false,
     },
-    { name: "category", label: "Category", type: "text", required: true },
-    { name: "subcategory", label: "Subcategory", type: "text", required: true },
   ];
 
   if (loading) {
@@ -526,93 +532,11 @@ const Vehicles = () => {
         )}
 
         {/* Detail Modal */}
-        {isDetailModalOpen && (
-          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Vehicle Details</h2>
-                <button
-                  onClick={handleCloseDetailModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="p-6">
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">
-                    {selectedCard?.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {selectedCard?.description}
-                  </p>
-                  <p className="text-xl font-bold text-[#CD9403] mb-4">
-                    {selectedCard?.price ? selectedCard.price : "Price not set"}
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedCard?.make && (
-                      <DetailItem label="Make" value={selectedCard.make} />
-                    )}
-                    {selectedCard?.model && (
-                      <DetailItem label="Model" value={selectedCard.model} />
-                    )}
-                    {selectedCard?.year && (
-                      <DetailItem label="Year" value={selectedCard.year} />
-                    )}
-                    {selectedCard?.color && (
-                      <DetailItem label="Color" value={selectedCard.color} />
-                    )}
-                    {selectedCard?.condition && (
-                      <DetailItem
-                        label="Condition"
-                        value={selectedCard.condition}
-                      />
-                    )}
-                    {selectedCard?.location && (
-                      <DetailItem
-                        label="Location"
-                        value={selectedCard.location}
-                      />
-                    )}
-                    {selectedCard?.negotiable && (
-                      <DetailItem
-                        label="Negotiable"
-                        value={selectedCard.negotiable}
-                      />
-                    )}
-                    {selectedCard?.listing_coordinates && (
-                      <CoordinatesDetail
-                        coordinates={
-                          typeof selectedCard.listing_coordinates === "string"
-                            ? JSON.parse(selectedCard.listing_coordinates)
-                            : selectedCard.listing_coordinates
-                        }
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {selectedCard?.pictures && selectedCard.pictures.length > 0 && (
-                  <div>
-                    <h4 className="text-md font-medium mb-2">Images</h4>
-                    <div className="flex flex-wrap gap-4">
-                      {selectedCard.pictures.map((img, index) => (
-                        <img
-                          key={index}
-                          src={img}
-                          alt={`Vehicle ${index}`}
-                          className="w-32 h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ListingDetailModal
+          open={isDetailModalOpen}
+          listing={selectedCard}
+          onClose={handleCloseDetailModal}
+        />
 
         <ConfirmDeleteDialog
           visible={isDeleteModalOpen}
@@ -622,217 +546,164 @@ const Vehicles = () => {
         />
 
         {/* Edit Modal */}
-        {isEditModalOpen && (
-          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Edit Vehicle Listing</h2>
-                <button
-                  onClick={handleCloseEditModal}
-                  className="text-gray-500 hover:text-gray-700"
-                  disabled={isUpdating}
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleUpdateListing} className="p-6">
-                {/* Image Upload Section */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vehicle Images
-                  </label>
-                  <div className="flex flex-wrap gap-4 mb-4">
-                    {imagePreviews.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <img
-                          src={img.preview || img.url}
-                          alt={`Preview ${index}`}
-                          className="w-24 h-24 object-cover rounded-md border"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute -top-2 -right-2 bg-brand-danger text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <label className="flex flex-col items-center px-4 py-6 bg-white rounded-md border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
-                    <svg
-                      className="w-8 h-8 text-gray-400 mb-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+        <ListingEditShell
+          open={isEditModalOpen}
+          title="Edit Vehicle Listing"
+          onClose={handleCloseEditModal}
+          disabled={isUpdating}
+        >
+          <form onSubmit={handleUpdateListing}>
+            <div className="mb-6">
+              <label className="field-label">Vehicle Images</label>
+              <div className="mb-4 flex flex-wrap gap-3">
+                {imagePreviews.map((img, index) => (
+                  <div key={index} className="listing-edit-thumb group">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.preview || img.url} alt={`Preview ${index}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-danger)] text-xs text-white opacity-0 transition group-hover:opacity-100"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <span className="text-sm text-gray-600">
-                      Click to upload images
-                    </span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={handleImageChange}
-                      multiple
-                      accept="image/*"
-                    />
-                  </label>
-                  <p className="mt-1 text-xs text-gray-500">
-                    Upload high-quality images of your vehicle (max 10 images)
-                  </p>
-                </div>
-
-                {/* Form Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {formFields.map((field) => (
-                    <div key={field.name} className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {field.label}
-                        {field.required && (
-                          <span className="text-red-500">*</span>
-                        )}
-                      </label>
-
-                      {field.type === "select" ? (
-                        <select
-                          name={field.name}
-                          value={formData[field.name] || ""}
-                          onChange={handleFormChange}
-                          required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-                        >
-                          <option value="">Select {field.label}</option>
-                          {field.options.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : field.type === "textarea" ? (
-                        <textarea
-                          name={field.name}
-                          value={formData[field.name] || ""}
-                          onChange={handleFormChange}
-                          required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-                          rows={3}
-                        />
-                      ) : field.type === "checkbox" ? (
-                        <input
-                          type="checkbox"
-                          name={field.name}
-                          checked={formData[field.name] || false}
-                          onChange={handleFormChange}
-                          className="h-4 w-4 text-[#CD9403] focus:ring-[#CD9403] border-gray-300 rounded"
-                        />
-                      ) : (
-                        <input
-                          type={field.type}
-                          name={field.name}
-                          value={formData[field.name] || ""}
-                          onChange={handleFormChange}
-                          required={field.required}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-                        />
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Location Field with Autocomplete */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Location
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="location-autocomplete"
-                      type="text"
-                      name="location"
-                      value={formData.location || ""}
-                      onChange={handleFormChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-                      placeholder="Enter location"
-                    />
-                    <p className="mt-1 text-xs text-gray-500">
-                      Start typing to select a location from Google Maps
-                    </p>
+                      ×
+                    </button>
                   </div>
-
-                  {/* Display Coordinates */}
-                  {/* {formData.listing_coordinates && (
-                    <div className="mb-4 col-span-full">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Coordinates
-                      </label>
-                      <div className="p-2 bg-gray-100 rounded-md">
-                        <pre className="text-xs break-all">
-                          {JSON.stringify(
-                            JSON.parse(formData.listing_coordinates),
-                            null,
-                            2
-                          )}
-                        </pre>
-                      </div>
-                    </div>
-                  )} */}
-                </div>
-
-                <div className="flex justify-end space-x-3 mt-6 border-t pt-4">
-                  <button
-                    type="button"
-                    onClick={handleCloseEditModal}
-                    disabled={isUpdating}
-                    className="btn-ghost"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUpdating}
-                    className="btn-primary"
-                  >
-                    {isUpdating ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Saving...
-                      </>
-                    ) : (
-                      "Save Changes"
-                    )}
-                  </button>
-                </div>
-              </form>
+                ))}
+              </div>
+              <label className="listing-edit-upload">
+                <svg
+                  className="mb-2 h-8 w-8 text-[var(--color-text-muted)]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                <span className="text-sm text-[var(--color-text-secondary)]">
+                  Click to upload images
+                </span>
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={handleImageChange}
+                  multiple
+                  accept="image/*"
+                />
+              </label>
+              <p className="field-hint">
+                Upload high-quality images of your vehicle (max 10 images)
+              </p>
             </div>
-          </div>
-        )}
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {formFields.map((field) => (
+                <div
+                  key={field.name}
+                  className={field.type === "textarea" ? "md:col-span-2" : ""}
+                >
+                  <label className="field-label" htmlFor={`edit-${field.name}`}>
+                    {field.label}
+                    {field.required ? (
+                      <span className="text-red-500"> *</span>
+                    ) : null}
+                  </label>
+
+                  {field.type === "select" ? (
+                    <select
+                      id={`edit-${field.name}`}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleFormChange}
+                      required={field.required}
+                      className="field-control"
+                    >
+                      <option value="">Select {field.label}</option>
+                      {field.options.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  ) : field.type === "textarea" ? (
+                    <textarea
+                      id={`edit-${field.name}`}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleFormChange}
+                      required={field.required}
+                      className="field-control"
+                      rows={3}
+                    />
+                  ) : field.type === "checkbox" ? (
+                    <input
+                      id={`edit-${field.name}`}
+                      type="checkbox"
+                      name={field.name}
+                      checked={formData[field.name] || false}
+                      onChange={handleFormChange}
+                      className="h-4 w-4 rounded border-gray-300 text-[#CD9403] focus:ring-[#CD9403]"
+                    />
+                  ) : (
+                    <input
+                      id={`edit-${field.name}`}
+                      type={field.type}
+                      name={field.name}
+                      value={formData[field.name] || ""}
+                      onChange={handleFormChange}
+                      required={field.required}
+                      className="field-control"
+                    />
+                  )}
+                </div>
+              ))}
+
+              <div className="md:col-span-2">
+                <label className="field-label" htmlFor="location-autocomplete">
+                  Location
+                  <span className="text-red-500"> *</span>
+                </label>
+                <input
+                  id="location-autocomplete"
+                  type="text"
+                  name="location"
+                  value={formData.location || ""}
+                  onChange={handleFormChange}
+                  required
+                  className="field-control"
+                  placeholder="e.g. Lahore, Pakistan"
+                  autoComplete="off"
+                />
+                <p className="field-hint">
+                  Uses the listing location from the API. Start typing to pick a
+                  new place from Google Maps.
+                </p>
+              </div>
+            </div>
+
+            <div className="listing-edit-footer">
+              <button
+                type="button"
+                onClick={handleCloseEditModal}
+                disabled={isUpdating}
+                className="btn-ghost"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isUpdating}
+                className="btn-primary"
+              >
+                {isUpdating ? "Saving…" : "Save Changes"}
+              </button>
+            </div>
+          </form>
+        </ListingEditShell>
         {data.length > 0 && (
           <div className="flex justify-end items-center mt-4">
             <div className="flex space-x-2 items-center justify-ends">
@@ -896,68 +767,6 @@ const Vehicles = () => {
   );
 };
 
-const CoordinatesDetail = ({ coordinates }) => {
-  const [address, setAddress] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (
-      coordinates?.coordinates &&
-      coordinates.coordinates.length === 2 &&
-      window.google
-    ) {
-      setLoading(true);
-      const geocoder = new window.google.maps.Geocoder();
-      const latLng = {
-        lat: coordinates.coordinates[1],
-        lng: coordinates.coordinates[0],
-      };
-
-      geocoder.geocode({ location: latLng }, (results, status) => {
-        setLoading(false);
-        if (status === "OK" && results[0]) {
-          setAddress(results[0].formatted_address);
-        }
-      });
-    }
-  }, [coordinates]);
-
-  return (
-    <div className="col-span-full mb-4">
-      <div className="text-sm font-medium text-gray-700 mb-1">
-        Location Details
-      </div>
-      <div className="bg-gray-50 p-3 rounded-md">
-        {/* <div className="mb-2">
-          <span className="font-medium">Coordinates:</span> [
-          {coordinates?.coordinates?.[0]?.toFixed(6) || 'N/A'}, {coordinates?.coordinates?.[1]?.toFixed(6) || 'N/A'}]
-        </div> */}
-        {loading ? (
-          <div className="text-gray-500 italic">Loading address...</div>
-        ) : address ? (
-          <div>
-            <span className="font-medium">Address:</span> {address}
-          </div>
-        ) : (
-          <div className="text-gray-500 italic">
-            Could not determine address
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const DetailItem = ({ label, value }) => {
-  const displayValue =
-    typeof value === "object" ? JSON.stringify(value) : value;
-
-  return (
-    <div className="mb-2">
-      <span className="text-sm font-medium text-gray-500">{label}: </span>
-      <span className="text-sm text-gray-800">{displayValue}</span>
-    </div>
-  );
-};
 
 export default Vehicles;

@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { FiAlertTriangle, FiX } from "react-icons/fi";
 import Button from "./Button";
 
 /**
  * Premium confirm / destructive dialog used across the admin panel.
+ * Portaled to document.body so page-shell overflow cannot clip the mask.
  */
 export default function ConfirmDialog({
   visible,
@@ -18,6 +20,12 @@ export default function ConfirmDialog({
   confirmLoading = false,
   confirmVariant = "danger",
 }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!visible) return undefined;
     const onKey = (event) => {
@@ -32,11 +40,11 @@ export default function ConfirmDialog({
     };
   }, [visible, onHide, confirmLoading]);
 
-  if (!visible) return null;
+  if (!visible || !mounted) return null;
 
   const isDanger = confirmVariant === "danger";
 
-  return (
+  return createPortal(
     <div
       className="confirm-modal-mask"
       role="presentation"
@@ -97,6 +105,7 @@ export default function ConfirmDialog({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

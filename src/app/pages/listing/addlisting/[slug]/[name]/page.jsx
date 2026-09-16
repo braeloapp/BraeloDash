@@ -89,24 +89,37 @@ const Form = () => {
 
   // Initialize Google Maps autocomplete (shared loader — one script per app)
   useEffect(() => {
-    const locationField = document.getElementById("location");
-    if (!locationField || autocompleteRef.current) return;
+    if (!commonFields.some((f) => f.name === "location")) return;
 
     let cancelled = false;
+    let scrollRoot = null;
+    let placeListener = null;
+
+    const hidePac = () => {
+      document.querySelectorAll(".pac-container").forEach((el) => {
+        el.style.display = "none";
+      });
+    };
+
+    const showPac = () => {
+      document.querySelectorAll(".pac-container").forEach((el) => {
+        el.style.display = "";
+      });
+    };
 
     function initializeAutocomplete() {
       if (cancelled || autocompleteRef.current) return;
       const input = document.getElementById("location");
-      if (!input) return;
+      if (!input || !window.google?.maps?.places) return;
 
       autocompleteRef.current = new window.google.maps.places.Autocomplete(
         input,
         { types: ["geocode"], fields: ["formatted_address", "geometry"] }
       );
 
-      autocompleteRef.current.addListener("place_changed", () => {
-        const place = autocompleteRef.current.getPlace();
-        if (place.geometry) {
+      placeListener = autocompleteRef.current.addListener("place_changed", () => {
+        const place = autocompleteRef.current?.getPlace();
+        if (place?.geometry) {
           setCoordinates({
             type: "Point",
             coordinates: [
@@ -116,13 +129,54 @@ const Form = () => {
           });
           setFormErrors((prev) => ({ ...prev, location: "" }));
         }
+        hidePac();
       });
+
+      const onBlur = () => {
+        window.setTimeout(hidePac, 200);
+      };
+      input.addEventListener("focus", showPac);
+      input.addEventListener("blur", onBlur);
+      input._pacBlurHandler = onBlur;
     }
 
     loadGoogleMaps().then(initializeAutocomplete);
 
+    // pac-container is position:absolute on body — hide on scroll so it
+    // cannot sit over Price/Model/Year after Location is used.
+    const attachScrollHide = () => {
+      const input = document.getElementById("location");
+      scrollRoot =
+        input?.closest(".overflow-y-auto") ||
+        input?.closest("[class*='overflow-y']") ||
+        document.querySelector("main") ||
+        window;
+      scrollRoot.addEventListener("scroll", hidePac, true);
+    };
+    attachScrollHide();
+
     return () => {
       cancelled = true;
+      if (scrollRoot) {
+        scrollRoot.removeEventListener("scroll", hidePac, true);
+      }
+      const input = document.getElementById("location");
+      if (input) {
+        input.removeEventListener("focus", showPac);
+        if (input._pacBlurHandler) {
+          input.removeEventListener("blur", input._pacBlurHandler);
+          delete input._pacBlurHandler;
+        }
+      }
+      if (placeListener && window.google?.maps?.event) {
+        window.google.maps.event.removeListener(placeListener);
+      }
+      if (autocompleteRef.current && window.google?.maps?.event) {
+        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+      }
+      autocompleteRef.current = null;
+      hidePac();
+      document.querySelectorAll(".pac-container").forEach((el) => el.remove());
     };
   }, [commonFields]);
 
@@ -237,69 +291,81 @@ const Form = () => {
   };
   const renderField = (field) => (
     <div key={field.name} className="mb-4">
-      <label htmlFor={field.name} className="block font-medium mb-1">
+      <label htmlFor={field.name} className="field-label">
         {field.label}
         {(field.name === "location" || field.name === "image") && (
-          <span className="text-red-500">*</span>
+          <span className="text-red-500"> *</span>
         )}
       </label>
       {field.type === "textarea" ? (
-        <textarea id={field.name} className="w-full p-2 border rounded" />
+        <textarea
+          id={field.name}
+          name={field.name}
+          rows={4}
+          className="field-control"
+          placeholder={field.label}
+        />
       ) : field.type === "file" ? (
         <>
           <input
             type="file"
             id={field.name}
+            name={field.name}
             onChange={handleImageChange}
-            className="w-full p-2 border rounded"
+            className="field-control"
             accept="image/*"
           />
           {formErrors.images && (
-            <p className="text-red-500 text-sm mt-1">{formErrors.images}</p>
+            <p className="field-error">{formErrors.images}</p>
           )}
         </>
       ) : (
         <input
           type={field.type || "text"}
           id={field.name}
-          className="w-full p-2 border rounded"
+          name={field.name}
+          className="field-control"
+          placeholder={field.label}
+          autoComplete={field.name === "location" ? "off" : undefined}
         />
       )}
       {field.name === "location" && formErrors.location && (
-        <p className="text-red-500 text-sm mt-1">{formErrors.location}</p>
+        <p className="field-error">{formErrors.location}</p>
       )}
     </div>
   );
 
-  const renderChipGroup = (chipGroup) => (
-    <div key={chipGroup.label} className="mb-4">
-      <h3 className="font-medium mb-2">
-        {chipGroup.label}
-        {chipGroup.required && <span className="text-red-500">*</span>}
-      </h3>
-      <div className="flex flex-wrap gap-2">
-        {chipGroup.options.map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => handleChipSelection(chipGroup.label, option)}
-            className={`px-3 py-1 rounded-full text-sm ${
-              selectedChips[chipGroup.label] === option
-                ? "bg-[#CD9403] text-white"
-                : "bg-gray-200 hover:bg-gray-300"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
+  const renderChipGroup = (chipGroup) => {
+    const title =
+      chipGroup.label.charAt(0).toUpperCase() + chipGroup.label.slice(1);
+    return (
+      <div key={chipGroup.label} className="mb-4">
+        <h3 className="field-label">
+          {title}
+          {chipGroup.required && <span className="text-red-500"> *</span>}
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {chipGroup.options.map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => handleChipSelection(chipGroup.label, option)}
+              className={`rounded-full px-3 py-1.5 text-sm transition ${
+                selectedChips[chipGroup.label] === option
+                  ? "bg-[#CD9403] text-white"
+                  : "bg-[#F3F5F7] text-[var(--color-text-secondary)] hover:bg-[#E8EDF2]"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+        {formErrors[chipGroup.label] && (
+          <p className="field-error">{formErrors[chipGroup.label]}</p>
+        )}
       </div>
-      {formErrors[chipGroup.label] && (
-        <p className="text-red-500 text-sm mt-1">
-          {formErrors[chipGroup.label]}
-        </p>
-      )}
-    </div>
-  );
+    );
+  };
 
   const pageTitle = [
     category || (slug ? String(slug).charAt(0).toUpperCase() + String(slug).slice(1) : ""),

@@ -32,9 +32,9 @@ const Layout = ({ children }) => {
           <Sidebar open={navOpen} onClose={() => setNavOpen(false)} />
           <div className="hidden w-[280px] shrink-0 md:block" aria-hidden />
 
-          <div className="admin-main flex min-w-0 flex-1 flex-col border bg-white/95 md:my-3 md:mr-3 md:rounded-panel md:border md:shadow-panel">
+          <div className="admin-main flex min-w-0 flex-1 flex-col border bg-white/95 md:mb-3 md:mr-3 md:mt-0 md:rounded-panel md:border md:shadow-panel">
             <NavBar onMenuClick={() => setNavOpen(true)} />
-            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5">
+            <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-0 sm:px-5 sm:pb-5 sm:pt-0">
               {children}
             </div>
           </div>

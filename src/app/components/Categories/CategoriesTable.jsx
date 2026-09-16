@@ -14,6 +14,7 @@ import {
 } from "@/lib/taxonomy";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import ActionMenu from "@/app/components/ux/ActionMenu";
+import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 
 const CategoriesTable = () => {
   const [categories, setCategories] = useState([]);
@@ -21,6 +22,8 @@ const CategoriesTable = () => {
   const [savingKey, setSavingKey] = useState(null);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   const loadTaxonomy = async () => {
@@ -56,22 +59,22 @@ const CategoriesTable = () => {
     }
   };
 
-  const removeCategory = async (category) => {
-    const confirmed = window.confirm(
-      `Remove category "${category.label || category.key}" and its subcategories?`
-    );
-    if (!confirmed) return;
+  const removeCategory = async () => {
+    if (!pendingDelete) return;
     try {
-      setSavingKey(category.key);
+      setDeleting(true);
+      setSavingKey(pendingDelete.key);
       const next = await deleteAdminTaxonomy({
         kind: "category",
-        key: category.key,
+        key: pendingDelete.key,
       });
       setCategories(next);
       toast.success("Category removed");
+      setPendingDelete(null);
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Failed to remove category"));
     } finally {
+      setDeleting(false);
       setSavingKey(null);
     }
   };
@@ -155,7 +158,7 @@ const CategoriesTable = () => {
                 {
                   label: "Delete",
                   danger: true,
-                  onClick: () => removeCategory(rowData),
+                  onClick: () => setPendingDelete(rowData),
                 },
               ]}
             />
@@ -164,6 +167,17 @@ const CategoriesTable = () => {
           bodyStyle={getBodyStyle()}
         />
       </DataTable>
+      <ConfirmDeleteDialog
+        visible={Boolean(pendingDelete)}
+        onHide={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+        onConfirm={removeCategory}
+        title={`Remove category "${pendingDelete?.label || pendingDelete?.key || ""}"?`}
+        message="This removes the category and its subcategories from the admin catalog."
+        confirmLabel="Remove"
+        confirmLoading={deleting}
+      />
     </div>
   );
 };

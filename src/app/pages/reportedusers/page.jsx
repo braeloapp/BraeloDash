@@ -9,6 +9,7 @@ import { extractResultsList, getApiErrorMessage } from "@/lib/apiResponse";
 import { getData, postData } from "@/app/API/method";
 import Image from "next/image";
 import PageHeader from "@/app/components/ux/PageHeader";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
@@ -345,27 +346,40 @@ const ReportedUser = () => {
   const actionBodyTemplate = (rowData) => {
     const busy = actionLoadingId === rowData.id;
     return (
-      <select
-        key={`${rowData.id}-${busy ? "1" : "0"}`}
+      <ActionMenu
         disabled={busy}
-        defaultValue=""
-        onChange={(e) => {
-          const v = e.target.value;
-          if (v === "view") showReportDetails(rowData);
-          if (v === "warn" || v === "ban" || v === "ignore") {
-            setModerationTarget(rowData);
-            setModerationAction(v);
-            setModerationNotes("");
-          }
-        }}
-        className="status-select"
-      >
-        <option value="">Actions</option>
-        <option value="view">View Details</option>
-        <option value="warn">Warn</option>
-        <option value="ban">Ban</option>
-        <option value="ignore">Ignore</option>
-      </select>
+        label="Report actions"
+        items={[
+          {
+            label: "View details",
+            onClick: () => showReportDetails(rowData),
+          },
+          {
+            label: "Warn",
+            onClick: () => {
+              setModerationTarget(rowData);
+              setModerationAction("warn");
+              setModerationNotes("");
+            },
+          },
+          {
+            label: "Ban",
+            onClick: () => {
+              setModerationTarget(rowData);
+              setModerationAction("ban");
+              setModerationNotes("");
+            },
+          },
+          {
+            label: "Ignore",
+            onClick: () => {
+              setModerationTarget(rowData);
+              setModerationAction("ignore");
+              setModerationNotes("");
+            },
+          },
+        ]}
+      />
     );
   };
 

@@ -6,13 +6,48 @@ import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import PageHeader from "@/app/components/ux/PageHeader";
 import PageState from "@/app/components/ux/PageState";
 import ActionMenu from "@/app/components/ux/ActionMenu";
-import Image from "next/image";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaTimes } from "react-icons/fa";
+import {
+  FiEdit2,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiGlobe,
+  FiBriefcase,
+  FiClock,
+} from "react-icons/fi";
 import { postBusiData, getData } from "@/app/API/method";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
+
+function formatDate(value) {
+  if (!value) return "N/A";
+  try {
+    return new Date(value).toLocaleString();
+  } catch {
+    return "N/A";
+  }
+}
+
+function initialsFrom(name) {
+  const source = String(name || "B").trim();
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+  }
+  return source.slice(0, 2).toUpperCase();
+}
+
+function MetaCard({ label, children }) {
+  return (
+    <div className="user-detail-meta">
+      <span className="user-detail-meta__label">{label}</span>
+      <div className="user-detail-meta__value">{children}</div>
+    </div>
+  );
+}
 
 const categories = [
   {
@@ -315,12 +350,20 @@ const BusinessDetails = () => {
     );
   }
 
+  const logoUrl = Array.isArray(businessData.business_logo)
+    ? businessData.business_logo[0]
+    : businessData.business_logo;
+  const bannerUrl = Array.isArray(businessData.business_banner)
+    ? businessData.business_banner[0]
+    : businessData.business_banner;
+  const isActive = businessData.Status === "Active";
+
   return (
     <>
-      <div className="page-shell">
+      <div className="page-shell user-detail-page">
         <PageHeader
           showBack
-          title={`${businessData.BusinessName} Details`}
+          title="Business Details"
           description="Review business profile, export records, and manage related listings."
           actions={
             <ActionMenu
@@ -333,129 +376,136 @@ const BusinessDetails = () => {
           }
         />
 
-        <div
-          className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-4 sm:px-5"
-          style={{ borderColor: "var(--color-border)" }}
-        >
-          <div className="flex items-center gap-2">
-            <div className="rounded-full px-2">
-              {businessData.business_logo?.[0] ? (
-                <img
-                  src={businessData.business_logo[0]}
-                  alt="logo"
-                  width={20}
-                  height={20}
-                  className="h-8 w-8 rounded-full"
-                  onError={(e) => (e.target.src = "/c1.png")}
-                />
-              ) : (
-                <Image src="/c1.png" alt="logo" width={20} height={20} />
-              )}
+        <section className="user-detail-panel">
+          {bannerUrl ? (
+            <div className="overflow-hidden rounded-t-[inherit]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerUrl}
+                alt=""
+                className="h-36 w-full object-cover sm:h-44"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                }}
+              />
             </div>
-            <h2 className="text-[18px] font-[700] text-[#75818D]">
-              {businessData.BusinessName}
-            </h2>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setEditModalOpen(true)}
-              className="btn-primary"
-            >
-              <img src="/a17.png" alt="" />
-              Edit
-            </button>
-          </div>
-        </div>
+          ) : null}
 
-        <div className="border-b p-4 sm:p-5" style={{ borderColor: "var(--color-border)" }}>
-          <div className="flex flex-wrap gap-3">
-            {businessData.business_images?.map((image, index) => (
-              <div
-                key={index}
-                className="flex h-[134px] w-[154px] justify-center rounded-lg border border-dashed border-[#CD940380] p-10"
-              >
-                <img
-                  src={image}
-                  alt={`business ${index}`}
-                  width={50}
-                  height={50}
-                  className="object-cover"
-                  onError={(e) => (e.target.src = "/b6.png")}
-                />
+          <div className="user-detail-hero">
+            <div className="user-detail-hero__glow" aria-hidden />
+            <div className="user-detail-hero__row">
+              <div className="user-detail-avatar" aria-hidden>
+                {logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    className="user-detail-avatar__img"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <span className="user-detail-avatar__initials">
+                    {initialsFrom(businessData.BusinessName)}
+                  </span>
+                )}
               </div>
-            ))}
+
+              <div className="user-detail-hero__copy min-w-0 flex-1">
+                <div className="user-detail-kicker">
+                  <FiBriefcase size={14} aria-hidden />
+                  <span>Business profile</span>
+                </div>
+                <h2 className="user-detail-name">
+                  {businessData.BusinessName || "Business"}
+                </h2>
+                <p className="user-detail-email">
+                  <FiMail size={14} aria-hidden />
+                  <span>{businessData.Email || "N/A"}</span>
+                </p>
+                <div className="user-detail-chips">
+                  <span
+                    className={`badge ${
+                      isActive ? "badge-active" : "badge-danger"
+                    }`}
+                  >
+                    {businessData.Status || "Unknown"}
+                  </span>
+                  {businessData.BusinessType ? (
+                    <span className="badge badge-brand">
+                      {businessData.BusinessType}
+                    </span>
+                  ) : null}
+                  {businessData.website ? (
+                    <span className="badge badge-info">Has website</span>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="user-detail-hero__actions">
+                <button
+                  type="button"
+                  className="btn-primary"
+                  onClick={() => setEditModalOpen(true)}
+                >
+                  <FiEdit2 size={16} aria-hidden />
+                  Edit business
+                </button>
+                <button
+                  type="button"
+                  className="btn-ghost"
+                  onClick={() => router.push("/pages/statistics")}
+                >
+                  View stats
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-5">
-            <h1 className="text-[16px] font-[700] text-[#75818D]">
-              Bio: <span className="ml-1 font-[400] text-[#a0a8b1]">
-                {businessData.Bio || "No bio"}
-              </span>
-            </h1>
-            <h1 className="mt-3 text-[16px] font-[700] text-[#75818D]">
-              Description: <span className="ml-1 font-[400] text-[#a0a8b1]">
-                {businessData.Description || "No description"}
-              </span>
-            </h1>
-          </div>
-          <div className="mt-3">
-            <button
-              type="button"
-              className="btn-primary w-[200px]"
-              onClick={() => router.push("/pages/statistics")}
-            >
-              View Business Stats
-            </button>
-          </div>
-        </div>
+          {businessData.Description ? (
+            <p className="user-detail-listings__desc px-5 pb-2 sm:px-6">
+              {businessData.Description}
+            </p>
+          ) : null}
 
-        <div
-          className="mt-0 flex flex-wrap gap-8 border-b p-4 sm:gap-[100px] sm:p-5"
-          style={{ borderColor: "var(--color-border)" }}
-        >
-        <div>
-          <h1 className="text-[16px] font-[700] text-[#75818D]">
-            Name: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData.BusinessName}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Email: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData.Email}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Phone: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData["Phone Number"]}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Status: <span className={`font-[400] px-5 py-2 text-white rounded-lg ml-1 ${
-              businessData.Status === "Active" ? "bg-[#06B64C]" : "bg-[#C7233F]"
-            }`}>
-              {businessData.Status}
-            </span>
-          </h1>
-        </div>
-        <div>
-          <h1 className="text-[16px] font-[700] text-[#75818D]">
-            Created: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData["Date Created"] || "N/A"}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Last Update: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData["Last Update"] || "N/A"}
-            </span>
-          </h1>
-          <h1 className="text-[16px] font-[700] text-[#75818D] mt-3">
-            Address: <span className="font-[400] text-[#a0a8b1] ml-1">
-              {businessData.Coordinates || "N/A"}
-            </span>
-          </h1>
-        </div>
-      </div>
+          <div className="user-detail-grid">
+            <MetaCard label="Business name">
+              {businessData.BusinessName || "N/A"}
+            </MetaCard>
+            <MetaCard label="Email">{businessData.Email || "N/A"}</MetaCard>
+            <MetaCard label="Phone number">
+              <span className="inline-flex items-center gap-1.5">
+                <FiPhone size={14} className="opacity-60" aria-hidden />
+                {businessData["Phone Number"] || "N/A"}
+              </span>
+            </MetaCard>
+            <MetaCard label="Category">
+              {businessData.BusinessType || "N/A"}
+            </MetaCard>
+            <MetaCard label="Website">
+              <span className="inline-flex items-center gap-1.5">
+                <FiGlobe size={14} className="opacity-60" aria-hidden />
+                {businessData.website || "N/A"}
+              </span>
+            </MetaCard>
+            <MetaCard label="Address">
+              <span className="inline-flex items-center gap-1.5">
+                <FiMapPin size={14} className="opacity-60" aria-hidden />
+                {businessData.Coordinates || "N/A"}
+              </span>
+            </MetaCard>
+            <MetaCard label="Created">
+              <span className="inline-flex items-center gap-1.5">
+                <FiClock size={14} className="opacity-60" aria-hidden />
+                {formatDate(businessData["Date Created"])}
+              </span>
+            </MetaCard>
+            <MetaCard label="Last update">
+              {formatDate(businessData["Last Update"])}
+            </MetaCard>
+          </div>
+        </section>
 
       {/* Edit Modal */}
       {isEditModalOpen && (
@@ -723,7 +773,15 @@ const BusinessDetails = () => {
 
       {/* Chat Modal */}
 
-      <BusinessTabbar userId={businessData?.user_id} />
+      <section className="user-detail-listings">
+        <div className="user-detail-listings__head">
+          <h3 className="user-detail-listings__title">Business listings</h3>
+          <p className="user-detail-listings__desc">
+            Browse and manage every listing owned by this business.
+          </p>
+        </div>
+        <BusinessTabbar userId={businessData?.user_id} />
+      </section>
       </div>
     </>
   );

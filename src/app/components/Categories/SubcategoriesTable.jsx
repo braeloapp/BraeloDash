@@ -14,6 +14,7 @@ import {
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import AppLoader from "@/app/components/ux/AppLoader";
 import ActionMenu from "@/app/components/ux/ActionMenu";
+import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 
 const SubcategoriesTable = () => {
   const { id } = useParams();
@@ -21,6 +22,8 @@ const SubcategoriesTable = () => {
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState(null);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const load = async () => {
     try {
@@ -58,23 +61,23 @@ const SubcategoriesTable = () => {
     }
   };
 
-  const removeSubcategory = async (subcategory) => {
-    const confirmed = window.confirm(
-      `Remove subcategory "${subcategory.label || subcategory.key}"?`
-    );
-    if (!confirmed) return;
+  const removeSubcategory = async () => {
+    if (!pendingDelete) return;
     try {
-      setSavingKey(subcategory.key);
+      setDeleting(true);
+      setSavingKey(pendingDelete.key);
       const next = await deleteAdminTaxonomy({
         kind: "subcategory",
-        key: subcategory.key,
+        key: pendingDelete.key,
         parent_key: categoryKey,
       });
       setCategory(next.find((item) => item.key === categoryKey) || null);
       toast.success("Subcategory removed");
+      setPendingDelete(null);
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Failed to remove subcategory"));
     } finally {
+      setDeleting(false);
       setSavingKey(null);
     }
   };
@@ -151,7 +154,7 @@ const SubcategoriesTable = () => {
                           {
                             label: "Delete",
                             danger: true,
-                            onClick: () => removeSubcategory(subcategory),
+                            onClick: () => setPendingDelete(subcategory),
                           },
                         ]}
                       />
@@ -163,6 +166,17 @@ const SubcategoriesTable = () => {
           </table>
         </div>
       )}
+      <ConfirmDeleteDialog
+        visible={Boolean(pendingDelete)}
+        onHide={() => {
+          if (!deleting) setPendingDelete(null);
+        }}
+        onConfirm={removeSubcategory}
+        title={`Remove subcategory "${pendingDelete?.label || pendingDelete?.key || ""}"?`}
+        message="This removes the subcategory from the admin catalog."
+        confirmLabel="Remove"
+        confirmLoading={deleting}
+      />
     </div>
   );
 };
