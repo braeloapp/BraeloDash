@@ -74,8 +74,8 @@ export default function ActionMenu({ items = [], disabled = false, label = "Acti
             <div
               ref={menuRef}
               role="menu"
-              className="menu-panel fixed z-[100] w-44 py-1"
-              style={{ top: coords.top, left: coords.left }}
+              className="menu-panel fixed w-44 py-1"
+              style={{ top: coords.top, left: coords.left, zIndex: 100 }}
             >
               {items.map((item) => (
                 <button

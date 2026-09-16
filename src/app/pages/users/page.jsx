@@ -1,119 +1,94 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import UserHeader from "@/app/components/Users/UserHeader";
 import UserDataTable from "@/app/components/Users/UserDataTable";
 import { getData } from "@/app/API/method";
 import { debounce } from "@/lib/debounce";
 
+const PAGE_SIZE = 10;
+
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [dateFilter, setDateFilter] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+  const [totalRecords, setTotalRecords] = useState(0);
 
-  // Fetch all users
+  const buildParams = useCallback(() => {
+    const params = new URLSearchParams();
+    params.set("page", String(page));
+    params.set("page_size", String(pageSize));
+    if (searchQuery.trim()) params.set("search", searchQuery.trim());
+    if (statusFilter === "active") params.set("is_active", "true");
+    if (statusFilter === "inactive") params.set("is_active", "false");
+    if (dateFilter) params.set("creation_date", dateFilter);
+    if (verificationFilter === "verify-email") params.set("verification", "email");
+    if (verificationFilter === "verify-phone") params.set("verification", "phone");
+    return params.toString();
+  }, [page, pageSize, searchQuery, statusFilter, dateFilter, verificationFilter]);
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getData(`/admin-panel/users?${buildParams()}`);
+      const payload = response?.data || {};
+      setUsers(payload.results || []);
+      setTotalRecords(Number(payload.count) || (payload.results || []).length);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      setUsers([]);
+      setTotalRecords(0);
+    } finally {
+      setLoading(false);
+    }
+  }, [buildParams]);
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await getData("/admin-panel/users");
-        setUsers(response.data.results || []);
-        setFilteredUsers(response.data.results || []);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  // Apply all filters
-  useEffect(() => {
-    let result = [...users];
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
-      result = result.filter(user => 
-        user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    // Apply status filter
-    if (statusFilter) {
-      result = result.filter(user => {
-        if (statusFilter === "active") return user.is_active;
-        if (statusFilter === "inactive") return !user.is_active;
-        return true;
-      });
-    }
-    
-    // Apply date filter
-    if (dateFilter) {
-      result = result.filter(user => {
-        const userDate = new Date(user.created_at).toISOString().split('T')[0];
-        return userDate === dateFilter;
-      });
-    }
-    
-    // Apply verification filter
-    if (verificationFilter) {
-      result = result.filter(user => {
-        if (verificationFilter === "verify-email") return user.is_email_verified;
-        if (verificationFilter === "verify-phone") return user.is_phone_verified;
-        return true;
-      });
-    }
-    
-    setFilteredUsers(result);
-  }, [users, searchQuery, statusFilter, dateFilter, verificationFilter]);
-
-  // Debounced search handler
-  const handleSearch = debounce((query) => {
-    setSearchQuery(query);
-  }, 500);
-
-  // Status filter handler
-  const handleStatusChange = (status) => {
-    setStatusFilter(status);
-  };
-
-  // Date filter handler
-  const handleDateChange = (date) => {
-    setDateFilter(date);
-  };
-
-  // Verification filter handler
-  const handleVerificationChange = (status) => {
-    setVerificationFilter(status);
-  };
+  const handleSearch = useCallback(
+    debounce((query) => {
+      setPage(1);
+      setSearchQuery(query);
+    }, 500),
+    []
+  );
 
   return (
     <div className="page-shell">
-      <UserHeader 
+      <UserHeader
         onSearch={handleSearch}
-        onStatusChange={handleStatusChange}
-        onDateChange={handleDateChange}
-        onVerificationChange={handleVerificationChange}
-        data={filteredUsers} // Pass filtered data for export
+        onStatusChange={(status) => {
+          setPage(1);
+          setStatusFilter(status);
+        }}
+        onDateChange={(date) => {
+          setPage(1);
+          setDateFilter(date);
+        }}
+        onVerificationChange={(status) => {
+          setPage(1);
+          setVerificationFilter(status);
+        }}
+        data={users}
       />
       <div className="p-4">
-        <UserDataTable 
-          data={filteredUsers} 
-          loading={loading} 
-          onRefresh={() => {
-            setLoading(true);
-            getData("/admin-panel/users")
-              .then(response => {
-                setUsers(response.data.results || []);
-                setFilteredUsers(response.data.results || []);
-              })
-              .catch(console.error)
-              .finally(() => setLoading(false));
+        <UserDataTable
+          data={users}
+          loading={loading}
+          totalRecords={totalRecords}
+          first={(page - 1) * pageSize}
+          rows={pageSize}
+          onPageChange={(event) => {
+            setPage(Math.floor(event.first / event.rows) + 1);
+            setPageSize(event.rows);
           }}
+          onRefresh={fetchUsers}
         />
       </div>
     </div>

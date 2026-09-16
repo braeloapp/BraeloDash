@@ -8,20 +8,32 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { postData } from "@/app/API/method";
-import Image from "next/image";
 import AppLoader from "@/app/components/ux/AppLoader";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 
 const DELETE_API_URL = "/admin-panel/user/deactivate";
 const REACTIVATE_API_URL = "/admin-panel/user/reactivate";
 
-export default function UserTable({ data, loading, onRefresh }) {
+export default function UserTable({
+  data,
+  loading,
+  onRefresh,
+  totalRecords,
+  first = 0,
+  rows = 10,
+  onPageChange,
+}) {
   const [selectedRows, setSelectedRows] = useState([]);
   const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
+  const [localFirst, setLocalFirst] = useState(first);
+  const [localRows, setLocalRows] = useState(rows);
   const router = useRouter();
   const toastId = useRef(null);
+
+  const isServerPaged = typeof onPageChange === "function";
+  const tableFirst = isServerPaged ? first : localFirst;
+  const tableRows = isServerPaged ? rows : localRows;
 
   // Custom Paginator Styling
   const paginatorStyles = `
@@ -123,8 +135,12 @@ export default function UserTable({ data, loading, onRefresh }) {
   };
 
   const onPage = (event) => {
-    setFirst(event.first);
-    setRows(event.rows);
+    if (isServerPaged) {
+      onPageChange(event);
+      return;
+    }
+    setLocalFirst(event.first);
+    setLocalRows(event.rows);
   };
   
   const handleViewProfile = (rowData) => {
@@ -145,67 +161,39 @@ export default function UserTable({ data, loading, onRefresh }) {
     }
   };
 
-  const ActionButton = (rowData) => (
-    <div className="flex gap-2">
-      <Image
-        src="/g3.png"
-        alt=""
-        title="View user profile"
-        width={24}
-        height={24}
-        onClick={() => handleViewProfile(rowData)} 
-        className="cursor-pointer hover:opacity-80 transition"
-      />
-      {rowData.is_active ? (
-        <Image
-          src="/g2.png"
-          alt="deactivate"
-          title="Deactivate user"
-          width={24}
-          height={24}
-          onClick={() => confirmDelete(rowData)}
-          className="cursor-pointer hover:opacity-80 transition"
-        />
-      ) : (
-        <button
-          type="button"
-          title="Reactivate user"
-          onClick={() => reactivateUser(rowData)}
-          className="btn-table"
-        >
-          Reactivate
-        </button>
-      )}
-    </div>
-  );
-
-  const StatusCheck = (rowData) => {
+  const renderStatus = (rowData) => {
     const statusClasses = rowData.is_active
       ? "bg-[#06B64C] text-white p-1 rounded-lg text-center text-xs"
       : "bg-[#C7233F] text-white p-1 rounded-lg text-center text-xs";
     return <div className={statusClasses}>{rowData.is_active ? "Active" : "Inactive"}</div>;
   };
 
-  const CheckVerification = (rowData) => {
+  const renderEmailVerified = (rowData) => {
     const statusClasses = rowData.is_email_verified
       ? "text-[#5D86C2] text-xs"
       : "text-[#C7233F] text-xs";
-    return <div className={statusClasses}>{rowData.is_email_verified ? "Verified" : "Unverified"}</div>;
+    return (
+      <div className={statusClasses}>
+        {rowData.is_email_verified ? "Verified" : "Unverified"}
+      </div>
+    );
   };
 
-  const PhoneVerification = (rowData) => {
+  const renderPhoneVerified = (rowData) => {
     const statusClasses = rowData.is_phone_verified
       ? "text-[#5D86C2] text-xs"
       : "text-[#C7233F] text-xs";
-    return <div className={statusClasses}>{rowData.is_phone_verified ? "Verified" : "Unverified"}</div>;
+    return (
+      <div className={statusClasses}>
+        {rowData.is_phone_verified ? "Verified" : "Unverified"}
+      </div>
+    );
   };
 
-  const RoleDisplay = (rowData) => {
+  const renderRole = (rowData) => {
     const isAdmin =
-      (rowData?.is_staff === true && rowData?.is_superuser === true) ||
       rowData?.is_staff === true ||
       rowData?.is_superuser === true ||
-      rowData?.role === true ||
       String(rowData?.role || "").toLowerCase() === "admin" ||
       String(rowData?.role || "").toLowerCase() === "super_admin";
 
@@ -215,6 +203,30 @@ export default function UserTable({ data, loading, onRefresh }) {
       </span>
     );
   };
+
+  const renderActions = (rowData) => (
+    <div className="flex items-center justify-end" data-col="user-actions">
+      <ActionMenu
+        label="User actions"
+        items={[
+          {
+            label: "View",
+            onClick: () => handleViewProfile(rowData),
+          },
+          rowData.is_active
+            ? {
+                label: "Deactivate",
+                danger: true,
+                onClick: () => confirmDelete(rowData),
+              }
+            : {
+                label: "Reactivate",
+                onClick: () => reactivateUser(rowData),
+              },
+        ]}
+      />
+    </div>
+  );
 
 
   return (
@@ -229,8 +241,10 @@ export default function UserTable({ data, loading, onRefresh }) {
             value={data}
             dataKey="id"
             paginator
-            first={first}
-            rows={rows}
+            lazy={isServerPaged}
+            first={tableFirst}
+            rows={tableRows}
+            totalRecords={isServerPaged ? totalRecords : undefined}
             onPage={onPage}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -240,15 +254,20 @@ export default function UserTable({ data, loading, onRefresh }) {
             className="p-datatable-striped"
             emptyMessage="No users found"
           >
-            <Column header="Actions" body={ActionButton} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
             <Column header="ID" field="id" headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
             <Column header="Email" field="email" headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
             <Column header="Full Name" field="name" headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
-            <Column header="Status" body={StatusCheck} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
-            <Column header="Email Verified" body={CheckVerification} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
-            <Column header="Phone Verified" body={PhoneVerification} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
+            <Column header="Status" body={renderStatus} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
+            <Column header="Email Verified" body={renderEmailVerified} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
+            <Column header="Phone Verified" body={renderPhoneVerified} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
             <Column header="Date Created" field="created_at" headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
-            <Column header="Role" body={RoleDisplay} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
+            <Column header="Role" body={renderRole} headerStyle={getHeaderStyle()} bodyStyle={getBodyStyle()} />
+            <Column
+              header="Actions"
+              body={renderActions}
+              headerStyle={getHeaderStyle()}
+              bodyStyle={{ ...getBodyStyle(), minWidth: "4.5rem", width: "4.5rem" }}
+            />
           </DataTable>
 
           <ConfirmDeleteDialog

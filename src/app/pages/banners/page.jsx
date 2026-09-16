@@ -4,15 +4,16 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { getBodyStyle, getHeaderStyle } from "@/app/components/Users/UserData";
 import { useRouter } from "next/navigation";
-import { getBanData, postData, updateListData } from "@/app/API/method";
-import { getApiErrorMessage } from "@/lib/apiResponse";
+import { getData, postData, updateListData } from "@/app/API/method";
+import { extractResultsList, getApiErrorMessage } from "@/lib/apiResponse";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 
-const BANNER_LIST_ENDPOINT = "/auth/business/banner";
+const BANNER_LIST_ENDPOINT = "/admin-panel/banner";
 const BANNER_DELETE_ENDPOINT = "/admin-panel/business/banner/delete";
 
 export default function BannerManagement() {
@@ -35,6 +36,17 @@ export default function BannerManagement() {
       border-radius: 20px;
       padding: 10px 10px;
       justify-content: flex-end;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
+    }
+
+    .banner-paginator .p-paginator-pages {
+      display: inline-flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      align-items: center !important;
     }
     
     .banner-paginator .p-paginator-current {
@@ -48,17 +60,19 @@ export default function BannerManagement() {
     .banner-paginator .p-paginator-prev,
     .banner-paginator .p-paginator-next,
     .banner-paginator .p-paginator-last {
-      min-width: 2.5rem;
-      height: 2.5rem;
+      min-width: 2.5rem !important;
+      width: 2.5rem !important;
+      height: 2.5rem !important;
       margin: 0 0.15rem;
       border-radius: 20px;
       border: 1px solid #e5e7eb;
       background: #e5e7eb;
       color: #4b5563;
       transition: all 0.2s;
-      display: flex;
+      display: inline-flex !important;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
     
     .banner-paginator .p-paginator-page:hover,
@@ -98,7 +112,7 @@ export default function BannerManagement() {
   const transformBannerData = (results) =>
     results.map((item) => {
       const mongoId = item.id ?? item._id ?? "";
-      const uid = item.user_id;
+      const uid = item.user_id ?? item.business_id;
       const userIdDisplay = Array.isArray(uid)
         ? uid.join(", ")
         : uid ?? "";
@@ -123,13 +137,8 @@ export default function BannerManagement() {
       setLoading(true);
       setError(null);
 
-      /** No Bearer header — same as pre-change behavior; /auth/business/banner returns full list for unauthenticated GET. */
-      const response = await getBanData(BANNER_LIST_ENDPOINT);
-      if (response.error || response.status !== 200) {
-        throw new Error(response?.error || "Failed to fetch banners");
-      }
-
-      const results = Array.isArray(response.data) ? response.data : [];
+      const response = await getData(BANNER_LIST_ENDPOINT);
+      const results = extractResultsList(response);
       const transformedData = transformBannerData(results);
       setBanners(transformedData);
 
@@ -263,24 +272,20 @@ export default function BannerManagement() {
   };
 
   const actionTemplate = (rowData) => (
-    <div className="flex gap-2">
-      <button
-        type="button"
-        onClick={() => editBanner(rowData)}
-        className="btn-table"
-        disabled={loading}
-      >
-        Edit
-      </button>
-      <button
-        type="button"
-        onClick={() => confirmDelete(rowData)}
-        className="btn-table"
-        disabled={loading || deleteSubmitting}
-      >
-        Delete
-      </button>
-    </div>
+    <ActionMenu
+      disabled={loading || deleteSubmitting}
+      items={[
+        {
+          label: "Edit",
+          onClick: () => editBanner(rowData),
+        },
+        {
+          label: "Delete",
+          danger: true,
+          onClick: () => confirmDelete(rowData),
+        },
+      ]}
+    />
   );
 
   const handleNewListing = () => {

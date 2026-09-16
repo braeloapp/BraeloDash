@@ -9,104 +9,15 @@ import {
   deleteData,
 } from "@/app/API/method";
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
-import { extractResultsList } from "@/lib/apiResponse";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
 import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
-import ListingDetailModal from "./ListingDetailModal";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
-import { Update_data } from "./Data";
 
-const CATEGORY_ENDPOINTS = {
-  "Fashion": "fashion",
-  "Sports & Hobby": "sportshobby",
-  "Furniture": "furniture",
-  "Electronics": "electronics",
-  "Jobs": "jobs",
-  "Vehicles": "vehicles",
-  "Kids": "kids",
-  "Events": "events",
-  "Real Estate": "realestate"
-};
-
-const CoordinatesToAddress = ({ coordinates }) => {
-  const [address, setAddress] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  const getAddressFromCoordinates = async (coords) => {
-    if (!coords || coords.length !== 2 || !window.google) return null;
-    
-    try {
-      const geocoder = new window.google.maps.Geocoder();
-      const latLng = {
-        lat: parseFloat(coords[1]),
-        lng: parseFloat(coords[0])
-      };
-
-      return new Promise((resolve) => {
-        geocoder.geocode({ location: latLng }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            resolve(results[0].formatted_address);
-          } else {
-            resolve(null);
-          }
-        });
-      });
-    } catch (error) {
-      console.error('Geocoding error:', error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    if (!coordinates || coordinates.length !== 2) return;
-
-    const convertToAddress = async () => {
-      setLoading(true);
-      try {
-        const addr = await getAddressFromCoordinates(coordinates);
-        setAddress(addr);
-      } catch (error) {
-        console.error('Error converting coordinates:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    convertToAddress();
-  }, [coordinates]);
-
-  return (
-    <div className="mb-2">
-      <span className="text-sm font-medium text-gray-500">Location: </span>
-      {loading ? (
-        <span className="text-sm text-gray-800">Loading address...</span>
-      ) : address ? (
-        <span className="text-sm text-gray-800">{address}</span>
-      ) : (
-        <span className="text-sm text-gray-800">
-          Coordinates: {coordinates[1]?.toFixed?.(6) || 'N/A'}, {coordinates[0]?.toFixed?.(6) || 'N/A'}
-        </span>
-      )}
-    </div>
-  );
-};
-
-const DetailItem = ({ label, value }) => {
-  const displayValue =
-    typeof value === "object" ? JSON.stringify(value) : value;
-
-  return (
-    <div className="mb-2">
-      <span className="text-sm font-medium text-gray-500">{label}: </span>
-      <span className="text-sm text-gray-800">{displayValue}</span>
-    </div>
-  );
-};
-
-const TotalBusiListing = ({ user_id }) => {
+const Services = () => {
+  // State management
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -121,17 +32,16 @@ const TotalBusiListing = ({ user_id }) => {
     totalPages: 1,
     hasNext: false,
     hasPrev: false,
-    pageSize: 10,
-    totalItems: 0
   });
   const [autocomplete, setAutocomplete] = useState(null);
   const { isLoaded: mapLoaded } = useGoogleMaps();
-  const [currentFormFields, setCurrentFormFields] = useState([]);
+
 
   useEffect(() => {
     fetchData();
 
     return () => {
+      // Clean up image preview URLs
       imagePreviews.forEach((preview) => {
         if (preview.isNew) {
           URL.revokeObjectURL(preview.preview);
@@ -140,44 +50,38 @@ const TotalBusiListing = ({ user_id }) => {
     };
   }, []);
 
+  // Fetch data with pagination
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      if (!user_id) {
-        setData([]);
-        setPagination((prev) => ({ ...prev, totalItems: 0, totalPages: 1, hasNext: false, hasPrev: false }));
-        return;
+      const response = await getData(`/listing/paginate/services?page=${page}`);
+
+      if (response?.data) {
+        setData(
+          response.data.results.map((item) => ({
+            image: item.pictures?.[0] || "/img1.png",
+            icons: ["/g1.png", "/g2.png", "/g3.png"],
+            title: item.title || "No Title",
+            description: `Listing ID ${
+              item?.id?.substring?.(0, 8)?.toUpperCase() || "N/A"
+            } ${
+              item?.created_at
+                ? new Date(item.created_at).toLocaleDateString()
+                : ""
+            }`,
+            price: item.price ? `$${item.price}` : "$0",
+            status: item.is_active ? "active" : "inactive",
+            originalData: item,
+          }))
+        );
+
+        setPagination({
+          currentPage: page,
+          totalPages: Math.ceil(response.data.count / 10),
+          hasNext: !!response.data.next,
+          hasPrev: !!response.data.previous,
+        });
       }
-      const response = await getData(
-        `/admin-panel/business/fetch/listings?user_id=${user_id}&page=${page}`
-      );
-      const listingsArray = extractResultsList(response).filter(
-        (item) => item && typeof item === "object" && !Array.isArray(item)
-      );
-      const totalItems = Number(response?.data?.count ?? listingsArray.length) || 0;
-      const pageSize = Number(response?.data?.page_size ?? 10) || 10;
-
-      setData(
-        listingsArray.map((item) => ({
-          image: item?.pictures?.[0] || "/img1.png",
-          icons: ["/g1.png", "/g2.png", "/g3.png"],
-          title: item.title || "Untitled listing",
-          description: `Listing ID: ${item?.id?.substring?.(0, 8)?.toUpperCase() || item?.listing_id?.substring?.(0, 8)?.toUpperCase() || "N/A"} • ${item?.created_at ? new Date(item.created_at).toLocaleDateString() : ""}`,
-          price: item.price ? `$${parseFloat(item.price).toFixed(2)}` : "",
-          status: item.is_active ? true : false,
-          originalData: item,
-          salary: item.salary_range,
-        }))
-      );
-
-      setPagination({
-        currentPage: page,
-        totalPages: Math.max(1, Math.ceil(totalItems / pageSize)),
-        hasNext: Boolean(response?.data?.next),
-        hasPrev: Boolean(response?.data?.previous) || page > 1,
-        pageSize,
-        totalItems,
-      });
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error(error.response?.data?.message || "Failed to load listings");
@@ -189,6 +93,7 @@ const TotalBusiListing = ({ user_id }) => {
     }
   };
 
+  // Reverse geocode coordinates to address
   const reverseGeocode = async (coordinates) => {
     if (!mapLoaded || !window.google) return;
 
@@ -214,16 +119,26 @@ const TotalBusiListing = ({ user_id }) => {
     }
   };
 
+  // Handle edit click
   const handleEditClick = async (card) => {
     setSelectedCard(card);
     const originalData = card.originalData || {};
 
-    let coordinates = originalData.listing_coordinates || { 
-      type: "Point", 
-      coordinates: [-0.1275862, 51.5072178]
-    };
+    // Parse coordinates
+    let coordinates = { type: "Point", coordinates: [74.284469, 31.4494997] };
+    try {
+      if (originalData.listing_coordinates) {
+        coordinates =
+          typeof originalData.listing_coordinates === "string"
+            ? JSON.parse(originalData.listing_coordinates)
+            : originalData.listing_coordinates;
+      }
+    } catch (e) {
+      console.error("Error parsing coordinates:", e);
+    }
 
-    let address = "";
+    // Get address from coordinates
+    let address = originalData.location || "";
     if (coordinates.coordinates && coordinates.coordinates.length === 2) {
       const geocodedAddress = await reverseGeocode(coordinates.coordinates);
       if (geocodedAddress) {
@@ -231,28 +146,21 @@ const TotalBusiListing = ({ user_id }) => {
       }
     }
 
-    const initialFormData = {
+    setFormData({
       ...originalData,
-      price: originalData.price || "0",
-      keywords: Array.isArray(originalData.keywords) 
-        ? originalData.keywords.join(", ") 
-        : originalData.keywords || "",
+      negotiable: originalData?.negotiable || "NO",
+      condition: originalData?.condition || "USED",
+      category: originalData?.category || "Services",
+      subcategory: originalData?.subcategory || "Cleaning",
+      make: originalData?.make || "",
+      model: originalData?.model || "",
+      year: originalData?.year || "",
+      color: originalData?.color || "",
       listing_coordinates: JSON.stringify(coordinates),
       location: address,
-    };
-
-    const category = originalData.category || "";
-    const formFields = Update_data[category] || [];
-    setCurrentFormFields(formFields);
-
-    formFields.forEach(field => {
-      if (!(field.name in initialFormData)) {
-        initialFormData[field.name] = field.type === 'checkbox' ? false : '';
-      }
     });
 
-    setFormData(initialFormData);
-
+    // Handle image previews
     if (originalData.pictures && originalData.pictures.length > 0) {
       setImagePreviews(
         originalData.pictures.map((pic) => ({
@@ -266,6 +174,7 @@ const TotalBusiListing = ({ user_id }) => {
 
     setIsEditModalOpen(true);
 
+    // Initialize Google Maps autocomplete after a slight delay
     setTimeout(() => {
       if (mapLoaded && typeof window.google !== "undefined") {
         const input = document.getElementById("location-autocomplete");
@@ -305,6 +214,7 @@ const TotalBusiListing = ({ user_id }) => {
     }, 500);
   };
 
+  // Modal handlers
   const handleOpenDetail = (card) => {
     setSelectedCard(card.originalData || card);
     setIsDetailModalOpen(true);
@@ -333,6 +243,7 @@ const TotalBusiListing = ({ user_id }) => {
     setSelectedCard(null);
   };
 
+  // Form handlers
   const handleFormChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -342,7 +253,7 @@ const TotalBusiListing = ({ user_id }) => {
   };
 
   const isValidImage = (file) => {
-    const MAX_SIZE = 5 * 1024 * 1024;
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
     const validTypes = ["image/jpeg", "image/png", "image/gif"];
 
     if (!validTypes.includes(file.type)) {
@@ -393,19 +304,14 @@ const TotalBusiListing = ({ user_id }) => {
     });
   };
 
-  const getCategoryEndpoint = (category) => {
-    const normalizedCategory = category?.toLowerCase()?.trim();
-    return CATEGORY_ENDPOINTS[normalizedCategory] || normalizedCategory || "listings";
-  };
-
+  // API operations
   const handleUpdateListing = async (e) => {
     e.preventDefault();
     if (!selectedCard) return;
 
     try {
       setIsUpdating(true);
-      const listingId = selectedCard.originalData?.listing_id || selectedCard.listing_id;
-      console.log("Listing ID:", listingId);
+      const listingId = selectedCard.originalData?.id || selectedCard.id;
 
       if (!listingId) {
         toast.error("Invalid listing ID");
@@ -414,15 +320,36 @@ const TotalBusiListing = ({ user_id }) => {
 
       const form = new FormData();
 
-      currentFormFields.forEach(field => {
-        const value = formData[field.name] || "";
-        form.append(field.name, value);
-      });
+      // Append all form data
+      form.append("category", formData.category || "Services");
+      form.append("subcategory", formData.subcategory || "Cleaning");
+      form.append("title", formData.title || "");
+      form.append("description", formData.description || "");
+      form.append("location", formData.location || "");
+      form.append("make", formData.make || "");
+      form.append("model", formData.model || "");
+      form.append("year", formData.year || "");
+      form.append("color", formData.color || "");
+      form.append("price", String(formData.price || 0));
+      form.append("negotiable", formData.negotiable || "NO");
+      form.append("condition", formData.condition || "USED");
+      form.append(
+        "listing_coordinates",
+        formData.listing_coordinates ||
+          '{"type":"Point","coordinates":[74.284469,31.4494997]}'
+      );
 
-      if (formData.listing_coordinates) {
-        form.append("listing_coordinates", formData.listing_coordinates);
+      // Handle keywords
+      if (formData.keywords) {
+        form.append(
+          "keywords",
+          Array.isArray(formData.keywords)
+            ? formData.keywords.join(",")
+            : formData.keywords
+        );
       }
 
+      // Handle images
       imagePreviews.forEach((img, index) => {
         if (img.isNew) {
           form.append(`pictures`, img.file);
@@ -431,10 +358,7 @@ const TotalBusiListing = ({ user_id }) => {
         }
       });
 
-      const category = formData.category || selectedCard.originalData?.category || "";
-      const categoryEndpoint = getCategoryEndpoint(category);
-      
-      await updateListData(`/admin-panel/${categoryEndpoint}/${listingId}`, form, {
+      await updateListData(`/admin-panel/services/${listingId}`, form, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -469,9 +393,9 @@ const TotalBusiListing = ({ user_id }) => {
 
     try {
       const form = new FormData();
-      form.append('listing_id', listingData.listing_id || '');
-      form.append('category', listingData.category || '');
-      console.log("Form data for deletion:", form.get("listing_id"), form.get("category"));
+      form.append("listing_id", listingData.id || "");
+      form.append("category", "Services");
+
       await deleteData("/admin-panel/delete", form);
 
       await fetchData(pagination.currentPage);
@@ -484,22 +408,17 @@ const TotalBusiListing = ({ user_id }) => {
   };
 
   const handleToggleStatus = async (card, nextActive) => {
-    const original = card.originalData || {};
-    const listingId = original.listing_id || original.id;
-    const categoryLabel = (original.category || "").trim();
+    const od = card.originalData || {};
+    const listingId = od.listing_id || od.id;
     if (!listingId) {
       toast.error("Invalid listing ID");
       return;
     }
-    if (!categoryLabel) {
-      toast.error("Missing listing category");
-      return;
-    }
     try {
       setIsUpdating(true);
-      await postListingFlipStatus(listingId, nextActive, categoryLabel);
+      await postListingFlipStatus(listingId, nextActive, "Services");
       toast.success(nextActive ? "Listing activated" : "Listing deactivated");
-      patchListingCardActive(setData, listingId, nextActive, "boolean");
+      patchListingCardActive(setData, listingId, nextActive, "string");
       await fetchData(pagination.currentPage);
     } catch (error) {
       toast.error(
@@ -510,75 +429,43 @@ const TotalBusiListing = ({ user_id }) => {
     }
   };
 
-  const renderFormField = (field) => {
-    switch (field.type) {
-      case "select":
-        return (
-          <select
-            name={field.name}
-            value={formData[field.name] || ""}
-            onChange={handleFormChange}
-            required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-          >
-            <option value="">Select {field.label}</option>
-            {field.options.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        );
-      case "textarea":
-        return (
-          <textarea
-            name={field.name}
-            value={formData[field.name] || ""}
-            onChange={handleFormChange}
-            required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-            rows={3}
-          />
-        );
-      case "checkbox":
-        return (
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              name={field.name}
-              checked={formData[field.name] || false}
-              onChange={handleFormChange}
-              className="h-4 w-4 text-[#CD9403] focus:ring-[#CD9403] border-gray-300 rounded"
-            />
-            <label className="ml-2 block text-sm text-gray-700">
-              {field.label}
-            </label>
-          </div>
-        );
-      case "datetime-local":
-        return (
-          <input
-            type="datetime-local"
-            name={field.name}
-            value={formData[field.name] || ""}
-            onChange={handleFormChange}
-            required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-          />
-        );
-      default:
-        return (
-          <input
-            type={field.type}
-            name={field.name}
-            value={formData[field.name] || ""}
-            onChange={handleFormChange}
-            required={field.required}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
-          />
-        );
-    }
-  };
+  // Form fields configuration
+  const formFields = [
+    { name: "title", label: "Title", type: "text", required: true },
+    {
+      name: "description",
+      label: "Description",
+      type: "textarea",
+      required: true,
+    },
+    { name: "make", label: "Make", type: "text", required: true },
+    { name: "model", label: "Model", type: "text", required: true },
+    { name: "year", label: "Year", type: "number", required: true },
+    { name: "color", label: "Color", type: "text", required: true },
+    { name: "price", label: "Price", type: "number", required: true },
+    {
+      name: "negotiable",
+      label: "Negotiable",
+      type: "select",
+      options: ["YES", "NO"],
+      required: true,
+    },
+    {
+      name: "condition",
+      label: "Condition",
+      type: "select",
+      options: ["NEW", "USED", "REFURBISHED"],
+      required: true,
+    },
+    {
+      name: "keywords",
+      label: "Keywords (comma separated)",
+      type: "text",
+      required: false,
+    },
+    { name: "category", label: "Category", type: "text", required: true },
+    { name: "subcategory", label: "Subcategory", type: "text", required: true },
+  ];
 
   if (loading) {
     return <AppLoader />;
@@ -587,6 +474,28 @@ const TotalBusiListing = ({ user_id }) => {
   return (
     <>
       <div className="space-y-4">
+        {/* Pagination Controls */}
+        {/* <div className="flex justify-between items-center">
+          <button
+            onClick={() => fetchData(pagination.currentPage - 1)}
+            disabled={!pagination.hasPrev || loading}
+            className={`px-4 py-2 rounded-md ${pagination.hasPrev && !loading ? 'bg-[#CD9403] text-white hover:bg-[#b37f02]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">
+            Page {pagination.currentPage} of {pagination.totalPages}
+          </span>
+          <button
+            onClick={() => fetchData(pagination.currentPage + 1)}
+            disabled={!pagination.hasNext || loading}
+            className={`px-4 py-2 rounded-md ${pagination.hasNext && !loading ? 'bg-[#CD9403] text-white hover:bg-[#b37f02]' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+          >
+            Next
+          </button>
+        </div> */}
+
+        {/* Vehicle Listings */}
         {data.length === 0 ? (
           <ListingEmptyState />
         ) : (
@@ -598,11 +507,10 @@ const TotalBusiListing = ({ user_id }) => {
                 icons={card.icons}
                 price={card.price}
                 title={card.title}
-                salary={card.salary}
                 description={card.description}
                 toggle={
                   <CardToggle
-                    status={card.status === true}
+                    status={card.status === "active"}
                     onToggle={(next) => handleToggleStatus(card, next)}
                     disabled={isUpdating}
                   />
@@ -617,63 +525,108 @@ const TotalBusiListing = ({ user_id }) => {
           </div>
         )}
 
-        {data.length > 0 && (
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm text-gray-600">
-            Showing {(pagination.currentPage - 1) * pagination.pageSize + 1} to {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)} of {pagination.totalItems} entries
+        {/* Detail Modal */}
+        {isDetailModalOpen && (
+          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center border-b p-4">
+                <h2 className="text-xl font-semibold">Vehicle Details</h2>
+                <button
+                  onClick={handleCloseDetailModal}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-6">
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium mb-2">
+                    {selectedCard?.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {selectedCard?.description}
+                  </p>
+                  <p className="text-xl font-bold text-[#CD9403] mb-4">
+                    {selectedCard?.price ? selectedCard.price : "Price not set"}
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedCard?.make && (
+                      <DetailItem label="Make" value={selectedCard.make} />
+                    )}
+                    {selectedCard?.model && (
+                      <DetailItem label="Model" value={selectedCard.model} />
+                    )}
+                    {selectedCard?.year && (
+                      <DetailItem label="Year" value={selectedCard.year} />
+                    )}
+                    {selectedCard?.color && (
+                      <DetailItem label="Color" value={selectedCard.color} />
+                    )}
+                    {selectedCard?.condition && (
+                      <DetailItem
+                        label="Condition"
+                        value={selectedCard.condition}
+                      />
+                    )}
+                    {selectedCard?.location && (
+                      <DetailItem
+                        label="Location"
+                        value={selectedCard.location}
+                      />
+                    )}
+                    {selectedCard?.negotiable && (
+                      <DetailItem
+                        label="Negotiable"
+                        value={selectedCard.negotiable}
+                      />
+                    )}
+                    {selectedCard?.listing_coordinates && (
+                      <CoordinatesDetail
+                        coordinates={
+                          typeof selectedCard.listing_coordinates === "string"
+                            ? JSON.parse(selectedCard.listing_coordinates)
+                            : selectedCard.listing_coordinates
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {selectedCard?.pictures && selectedCard.pictures.length > 0 && (
+                  <div>
+                    <h4 className="text-md font-medium mb-2">Images</h4>
+                    <div className="flex flex-wrap gap-4">
+                      {selectedCard.pictures.map((img, index) => (
+                        <img
+                          key={index}
+                          src={img}
+                          alt={`Vehicle ${index}`}
+                          className="w-32 h-32 object-cover rounded-md border"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-
-          <div className="flex space-x-2 items-center">
-            <button
-              onClick={() => fetchData(pagination.currentPage - 1)}
-              disabled={!pagination.hasPrev || loading}
-              className={`p-3 rounded-md ${pagination.hasPrev && !loading ? 'bg-gray-300 text-gray-800 hover:bg-gray-400' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-            >
-              <img src="/left.png" alt="" />
-            </button>
-
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => fetchData(page)}
-                className={`w-8 h-8 rounded-full text-sm font-medium transition-colors
-                  ${page === pagination.currentPage
-                    ? 'bg-yellow-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'}`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button
-              onClick={() => fetchData(pagination.currentPage + 1)}
-              disabled={!pagination.hasNext || loading}
-              className={`p-3 rounded-md ${pagination.hasNext && !loading ? 'bg-gray-300 text-gray-800 hover:bg-gray-400' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
-            >
-              <img src="/right.png" alt="" />
-            </button>
-          </div>
-        </div>
         )}
-
-        <ListingDetailModal
-          open={isDetailModalOpen}
-          listing={selectedCard}
-          onClose={handleCloseDetailModal}
-        />
 
         <ConfirmDeleteDialog
           visible={isDeleteModalOpen}
           onHide={handleCloseDeleteModal}
           onConfirm={handleDeleteListing}
-          title="Are you sure you want to delete this listing?"
+          title="Are you sure you want to delete this vehicle listing?"
         />
 
+        {/* Edit Modal */}
         {isEditModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="fixed -inset-[250px] z-50 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Edit Listing</h2>
+                <h2 className="text-xl font-semibold">Edit Vehicle Listing</h2>
                 <button
                   onClick={handleCloseEditModal}
                   className="text-gray-500 hover:text-gray-700"
@@ -684,9 +637,10 @@ const TotalBusiListing = ({ user_id }) => {
               </div>
 
               <form onSubmit={handleUpdateListing} className="p-6">
+                {/* Image Upload Section */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Listing Images
+                    Vehicle Images
                   </label>
                   <div className="flex flex-wrap gap-4 mb-4">
                     {imagePreviews.map((img, index) => (
@@ -732,12 +686,13 @@ const TotalBusiListing = ({ user_id }) => {
                     />
                   </label>
                   <p className="mt-1 text-xs text-gray-500">
-                    Upload high-quality images of your listing (max 10 images)
+                    Upload high-quality images of your vehicle (max 10 images)
                   </p>
                 </div>
 
+                {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {currentFormFields.map((field) => (
+                  {formFields.map((field) => (
                     <div key={field.name} className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {field.label}
@@ -745,10 +700,53 @@ const TotalBusiListing = ({ user_id }) => {
                           <span className="text-red-500">*</span>
                         )}
                       </label>
-                      {renderFormField(field)}
+
+                      {field.type === "select" ? (
+                        <select
+                          name={field.name}
+                          value={formData[field.name] || ""}
+                          onChange={handleFormChange}
+                          required={field.required}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                        >
+                          <option value="">Select {field.label}</option>
+                          {field.options.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.type === "textarea" ? (
+                        <textarea
+                          name={field.name}
+                          value={formData[field.name] || ""}
+                          onChange={handleFormChange}
+                          required={field.required}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                          rows={3}
+                        />
+                      ) : field.type === "checkbox" ? (
+                        <input
+                          type="checkbox"
+                          name={field.name}
+                          checked={formData[field.name] || false}
+                          onChange={handleFormChange}
+                          className="h-4 w-4 text-[#CD9403] focus:ring-[#CD9403] border-gray-300 rounded"
+                        />
+                      ) : (
+                        <input
+                          type={field.type}
+                          name={field.name}
+                          value={formData[field.name] || ""}
+                          onChange={handleFormChange}
+                          required={field.required}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-[#CD9403] focus:border-[#CD9403]"
+                        />
+                      )}
                     </div>
                   ))}
 
+                  {/* Location Field with Autocomplete */}
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Location
@@ -769,7 +767,8 @@ const TotalBusiListing = ({ user_id }) => {
                     </p>
                   </div>
 
-                  {formData.listing_coordinates && (
+                  {/* Display Coordinates */}
+                  {/* {formData.listing_coordinates && (
                     <div className="mb-4 col-span-full">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Coordinates
@@ -784,7 +783,7 @@ const TotalBusiListing = ({ user_id }) => {
                         </pre>
                       </div>
                     </div>
-                  )}
+                  )} */}
                 </div>
 
                 <div className="flex justify-end space-x-3 mt-6 border-t pt-4">
@@ -834,6 +833,52 @@ const TotalBusiListing = ({ user_id }) => {
             </div>
           </div>
         )}
+        {data.length > 0 && (
+          <div className="flex justify-end items-center mt-4">
+            <div className="flex space-x-2 items-center justify-ends">
+              {/* Prev Button */}
+              <button
+                onClick={() => fetchData(pagination.currentPage - 1)}
+                disabled={!pagination.hasPrev || loading}
+                className={`p-3 rounded-md ${
+                  pagination.hasPrev && !loading
+                    ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <img src="/left.png" alt="" />
+              </button>
+              {Array.from(
+                { length: pagination.totalPages },
+                (_, i) => i + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  onClick={() => fetchData(page)}
+                  className={`w-8 h-8 rounded-full text-sm font-medium transition-colors
+                    ${
+                      page === pagination.currentPage
+                        ? "bg-yellow-600 text-white"
+                        : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                    }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchData(pagination.currentPage + 1)}
+                disabled={!pagination.hasNext || loading}
+                className={`p-3 rounded-md ${
+                  pagination.hasNext && !loading
+                    ? "bg-gray-300 text-gray-800 hover:bg-gray-400"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                <img src="/right.png" alt="" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <ToastContainer
@@ -851,4 +896,68 @@ const TotalBusiListing = ({ user_id }) => {
   );
 };
 
-export default TotalBusiListing;
+const CoordinatesDetail = ({ coordinates }) => {
+  const [address, setAddress] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (
+      coordinates?.coordinates &&
+      coordinates.coordinates.length === 2 &&
+      window.google
+    ) {
+      setLoading(true);
+      const geocoder = new window.google.maps.Geocoder();
+      const latLng = {
+        lat: coordinates.coordinates[1],
+        lng: coordinates.coordinates[0],
+      };
+
+      geocoder.geocode({ location: latLng }, (results, status) => {
+        setLoading(false);
+        if (status === "OK" && results[0]) {
+          setAddress(results[0].formatted_address);
+        }
+      });
+    }
+  }, [coordinates]);
+
+  return (
+    <div className="col-span-full mb-4">
+      <div className="text-sm font-medium text-gray-700 mb-1">
+        Location Details
+      </div>
+      <div className="bg-gray-50 p-3 rounded-md">
+        {/* <div className="mb-2">
+          <span className="font-medium">Coordinates:</span> [
+          {coordinates?.coordinates?.[0]?.toFixed(6) || 'N/A'}, {coordinates?.coordinates?.[1]?.toFixed(6) || 'N/A'}]
+        </div> */}
+        {loading ? (
+          <div className="text-gray-500 italic">Loading address...</div>
+        ) : address ? (
+          <div>
+            <span className="font-medium">Address:</span> {address}
+          </div>
+        ) : (
+          <div className="text-gray-500 italic">
+            Could not determine address
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const DetailItem = ({ label, value }) => {
+  const displayValue =
+    typeof value === "object" ? JSON.stringify(value) : value;
+
+  return (
+    <div className="mb-2">
+      <span className="text-sm font-medium text-gray-500">{label}: </span>
+      <span className="text-sm text-gray-800">{displayValue}</span>
+    </div>
+  );
+};
+
+export default Services;

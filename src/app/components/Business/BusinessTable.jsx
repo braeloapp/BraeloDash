@@ -15,11 +15,16 @@ const BusinessTable = ({
   loading, 
   selectedBusinesses, 
   onSelectionChange,
-  onRefresh
+  onRefresh,
+  totalRecords,
+  first = 0,
+  rows = 10,
+  onPageChange,
 }) => {
   const router = useRouter();
   const [businessToDeactivate, setBusinessToDeactivate] = useState(null);
   const [deactivating, setDeactivating] = useState(false);
+  const isServerPaged = typeof onPageChange === "function";
 
   const handleViewProfile = (rowData) => {
     const businessId = rowData.documentId || rowData.ID || rowData.id;
@@ -196,15 +201,17 @@ const BusinessTable = ({
           value={data}
           dataKey="ID"
           paginator
-          rows={10}
+          lazy={isServerPaged}
+          first={first}
+          rows={rows}
+          totalRecords={isServerPaged ? totalRecords : undefined}
+          onPage={isServerPaged ? onPageChange : undefined}
           loading={loading}
           selection={selectedBusinesses}
           onSelectionChange={onSelectionChange}
           tableStyle={{ width: "100%" }}
-         // paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
           paginatorClassName="business-paginator m-5"
-          //rowsPerPageOptions={[5, 10, 20, 50]}
           className="p-datatable-striped"
           emptyMessage="No businesses found"
         >

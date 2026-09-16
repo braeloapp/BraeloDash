@@ -23,6 +23,14 @@ const ListingTabbar = ({ userId }) => {
         : "border-transparent text-[#ACB6BE] hover:text-[#78828A]"
     }`;
 
+  if (!userId) {
+    return (
+      <p className="px-5 py-8 text-sm text-brand-muted">
+        Owner user id is missing, so listings cannot be loaded.
+      </p>
+    );
+  }
+
   return (
     <div className="mt-2">
       <div

@@ -36,8 +36,9 @@ const AllTickets = () => {
   const [replySending, setReplySending] = useState(false);
 
   const [selectedTicket, setSelectedTicket] = useState(null);
-  const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
+  const [page, setPage] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [error, setError] = useState(null);
@@ -52,8 +53,9 @@ const AllTickets = () => {
   );
 
   useEffect(() => {
-    fetchSupportRequests();
-  }, []);
+    loadTickets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, rows]);
 
   const showToast = (message, type = "success") => {
     toast[type](message, {
@@ -67,71 +69,56 @@ const AllTickets = () => {
     });
   };
 
-  const fetchSupportRequests = async () => {
+  const loadTickets = async ({
+    email = searchEmail,
+    status = statusFilter,
+    date = creationDate,
+    pageNum = page,
+    pageSize = rows,
+  } = {}) => {
     try {
       setLoading(true);
-      const response = await getData(API_URL);
-      const rows = extractResultsList(response);
+      const params = new URLSearchParams();
+      params.set("page", String(pageNum));
+      params.set("page_size", String(pageSize));
+      if (email) params.append("search_email", email);
+      if (status && status !== "All") params.append("request_status", status);
+      if (date) params.append("creation_date", formatDateForAPI(date));
 
-      if (rows.length > 0) {
-        const formattedRequests = rows.map((request) => ({
-          ...request,
-          created_at: formatDate(request.created_at),
-          updated_at: formatDate(request.updated_at),
-        }));
-        setRequests(formattedRequests);
-        setFilteredRequests(formattedRequests);
-      } else {
-        setRequests([]);
-        setFilteredRequests([]);
-        showToast("No support tickets found", "info");
-      }
+      const hasFilters = Boolean(email || (status && status !== "All") || date);
+      const url = `${hasFilters ? SEARCH_API_URL : API_URL}?${params.toString()}`;
+      const response = await getData(url);
+      const list = extractResultsList(response);
+      const count = Number(response?.data?.count ?? list.length);
+      const formattedRequests = list.map((request) => ({
+        ...request,
+        created_at: formatDate(request.created_at),
+        updated_at: formatDate(request.updated_at),
+      }));
+      setRequests(formattedRequests);
+      setFilteredRequests(formattedRequests);
+      setTotalRecords(count);
     } catch (error) {
       const errorMsg =
         error.response?.data?.message || "Failed to fetch support tickets";
       setError(errorMsg);
       showToast(errorMsg, "error");
+      setFilteredRequests([]);
+      setTotalRecords(0);
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchSupportRequests = async () => loadTickets();
 
   const fetchFilteredTickets = async (
     email = "",
     status = "All",
     date = ""
   ) => {
-    try {
-      setLoading(true);
-
-      const params = new URLSearchParams();
-
-      if (email) params.append("search_email", email);
-      if (status !== "All") params.append("request_status", status);
-      if (date) params.append("creation_date", formatDateForAPI(date));
-
-      const response = await getData(`${SEARCH_API_URL}?${params.toString()}`);
-      const rows = extractResultsList(response);
-
-      if (rows.length > 0) {
-        const formattedRequests = rows.map((request) => ({
-          ...request,
-          created_at: formatDate(request.created_at),
-          updated_at: formatDate(request.updated_at),
-        }));
-        setFilteredRequests(formattedRequests);
-      } else {
-        setFilteredRequests([]);
-        showToast("No matching tickets found", "info");
-      }
-    } catch (error) {
-      const errorMsg =
-        error.response?.data?.message || "Failed to search tickets";
-      setError(errorMsg);
-      showToast(errorMsg, "error");
-    } finally {
-      setLoading(false);
-    }
+    setPage(1);
+    await loadTickets({ email, status, date, pageNum: 1 });
   };
 
   const formatDate = (dateString) => {
@@ -241,7 +228,7 @@ const AllTickets = () => {
   };
 
   const onPage = (event) => {
-    setFirst(event.first);
+    setPage(Math.floor(event.first / event.rows) + 1);
     setRows(event.rows);
   };
 
@@ -378,7 +365,9 @@ const AllTickets = () => {
       <DataTable
         value={filteredRequests}
         paginator
-        first={first}
+            lazy
+            totalRecords={totalRecords}
+        first={(page - 1) * rows}
         rows={rows}
         onPage={onPage}
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import TotalBusiListing from "./TotalListing";
-import ActiveBusiListing from "./ActiveLsiting";
-import InactiveBusiListing from "./InactiveListing";
+import TotalBusiListing from "./TotalBusiListing";
+import ActiveBusiListing from "./ActiveBusiListing";
+import InactiveBusiListing from "./InactiveBusiListing";
 
 const TABS = [
   { id: 1, label: "Total Listings" },
@@ -11,8 +11,16 @@ const TABS = [
   { id: 3, label: "Inactive Listings" },
 ];
 
-const BusinessTabbar = ({ businessId }) => {
+const BusinessTabbar = ({ userId }) => {
   const [activeButton, setActiveButton] = useState(1);
+
+  if (!userId) {
+    return (
+      <p className="px-5 py-4 text-sm text-brand-muted">
+        Business owner id is missing — listings cannot be loaded.
+      </p>
+    );
+  }
 
   const buttonClasses = (index) =>
     `whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-semibold transition duration-300 ${
@@ -43,9 +51,9 @@ const BusinessTabbar = ({ businessId }) => {
         ))}
       </div>
       <div className="mt-4 px-3 sm:px-5" role="tabpanel">
-        {activeButton === 1 && <TotalBusiListing user_id={businessId} />}
-        {activeButton === 2 && <ActiveBusiListing user_id={businessId} />}
-        {activeButton === 3 && <InactiveBusiListing user_id={businessId} />}
+        {activeButton === 1 && <TotalBusiListing user_id={userId} />}
+        {activeButton === 2 && <ActiveBusiListing user_id={userId} />}
+        {activeButton === 3 && <InactiveBusiListing user_id={userId} />}
       </div>
     </div>
   );

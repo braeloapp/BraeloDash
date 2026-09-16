@@ -9,10 +9,12 @@ import {
   deleteData,
 } from "@/app/API/method";
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
+import { extractResultsList } from "@/lib/apiResponse";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
 import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
+import ListingDetailModal from "./ListingDetailModal";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 import { Update_data } from "./Data";
@@ -141,34 +143,44 @@ const SaveListing = ({ user_id }) => {
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getData(
-        `/admin-panel/get-save?user_id=${user_id}`
-      );
-      if (response?.data) {
-        const listingsArray = Object.values(response.data);
-        
-        setData(
-          listingsArray.map((item) => ({
-            image: item.pictures?.[0] || "/img1.png",
-            icons: ["/g1.png", "/g2.png", "/g3.png"],
-            title: item.title || "No Title",
-            description: `Listing ID: ${item?.id?.substring?.(0, 8)?.toUpperCase() || "N/A"} • ${item?.created_at ? new Date(item.created_at).toLocaleDateString() : ""}`,
-            price: item.price ? `$${parseFloat(item.price).toFixed(2)}` : "",
-            status: item.is_active ? true : false,
-            originalData: item,
-            salary: item.salary_range
-          }))
-        );
-
-        setPagination({
-          currentPage: page,
-          totalPages: Math.ceil(listingsArray.length / 10),
-          hasNext: listingsArray.length > page * 10,
-          hasPrev: page > 1,
-          pageSize: 10,
-          totalItems: listingsArray.length
-        });
+      if (!user_id) {
+        setData([]);
+        setPagination((prev) => ({ ...prev, currentPage: 1, totalPages: 1, hasNext: false, hasPrev: false, totalItems: 0 }));
+        return;
       }
+      const response = await getData(
+        `/admin-panel/get-save?user_id=${user_id}&offset=${(page - 1) * 10}&limit=10`
+      );
+      const listingsArray = extractResultsList(response).filter(
+        (item) => item && typeof item === "object" && !Array.isArray(item)
+      );
+      const pageSize = 10;
+      const totalItems = listingsArray.length;
+      // Backend dict pages are sliced by offset/limit; if we got a full page,
+      // assume there may be more.
+      const maybeMore = listingsArray.length >= pageSize;
+
+      setData(
+        listingsArray.map((item) => ({
+          image: item?.pictures?.[0] || "/img1.png",
+          icons: ["/g1.png", "/g2.png", "/g3.png"],
+          title: item.title || "Untitled listing",
+          description: `Listing ID: ${String(item?.id || item?.listing_id || "").substring(0, 8).toUpperCase() || "N/A"} • ${item?.created_at ? new Date(item.created_at).toLocaleDateString() : ""}`,
+          price: item.price ? `$${parseFloat(item.price).toFixed(2)}` : "",
+          status: Boolean(item.is_active),
+          originalData: item,
+          salary: item.salary_range,
+        }))
+      );
+
+      setPagination({
+        currentPage: page,
+        totalPages: maybeMore ? page + 1 : Math.max(1, page),
+        hasNext: maybeMore,
+        hasPrev: page > 1,
+        pageSize,
+        totalItems: maybeMore ? page * pageSize + 1 : (page - 1) * pageSize + totalItems,
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error(error.response?.data?.message || "Failed to load listings");
@@ -647,100 +659,11 @@ const SaveListing = ({ user_id }) => {
         </div>
         )}
 
-        {isDetailModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-center border-b p-4">
-                <h2 className="text-xl font-semibold">Listing Details</h2>
-                <button
-                  onClick={handleCloseDetailModal}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="p-6">
-                <div className="mb-6">
-                  <h3 className="text-lg font-medium mb-2">
-                    {selectedCard?.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Listing ID: {selectedCard?.id?.substring?.(0, 8)?.toUpperCase() || "N/A"} • 
-                    {selectedCard?.created_at
-                      ? ` Created: ${new Date(selectedCard.created_at).toLocaleDateString()}`
-                      : ""}
-                  </p>
-                  <p className="text-xl font-bold text-[#CD9403] mb-4">
-                    {selectedCard?.price
-                      ? `$${parseFloat(selectedCard.price).toFixed(2)}`
-                      : "Price not set"}
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedCard?.category && (
-                      <DetailItem
-                        label="Category"
-                        value={selectedCard.category}
-                      />
-                    )}
-                    {selectedCard?.subcategory && (
-                      <DetailItem
-                        label="Subcategory"
-                        value={selectedCard.subcategory}
-                      />
-                    )}
-                    {selectedCard?.keywords && (
-                      <DetailItem
-                        label="Keywords"
-                        value={Array.isArray(selectedCard.keywords) 
-                          ? selectedCard.keywords.join(", ") 
-                          : selectedCard.keywords}
-                      />
-                    )}
-                    {selectedCard?.listing_coordinates && (
-                      <CoordinatesToAddress 
-                        coordinates={
-                          typeof selectedCard.listing_coordinates === "string"
-                            ? JSON.parse(selectedCard.listing_coordinates)?.coordinates
-                            : selectedCard.listing_coordinates?.coordinates
-                        }
-                      />
-                    )}
-                    <DetailItem
-                      label="From Business"
-                      value={selectedCard?.from_business ? "Yes" : "No"}
-                    />
-                    <DetailItem
-                      label="Status"
-                      value={selectedCard?.is_active ? "Active" : "Inactive"}
-                    />
-                    <DetailItem
-                      label="Clicks"
-                      value={selectedCard?.listing_clicks || 0}
-                    />
-                  </div>
-                </div>
-
-                {selectedCard?.pictures && selectedCard.pictures.length > 0 && (
-                  <div>
-                    <h4 className="text-md font-medium mb-2">Images</h4>
-                    <div className="flex flex-wrap gap-4">
-                      {selectedCard.pictures.map((img, index) => (
-                        <img
-                          key={index}
-                          src={img}
-                          alt={`Listing ${index}`}
-                          className="w-32 h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <ListingDetailModal
+          open={isDetailModalOpen}
+          listing={selectedCard}
+          onClose={handleCloseDetailModal}
+        />
 
         <ConfirmDeleteDialog
           visible={isDeleteModalOpen}

@@ -31,7 +31,6 @@ const BusinessDetails = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const businessId = searchParams.get("id");
-  const [isChatModalOpen, setChatModalOpen] = useState(false);
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [businessData, setBusinessData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -286,35 +285,6 @@ const BusinessDetails = () => {
   };
 
   // Chat Modal Component
-  const ChatModal = ({ isOpen, onClose, businessEmail }) => {
-    if (!isOpen) return null;
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-        <div className="bg-white p-6 rounded shadow-lg w-96">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Contact Business</h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              <FaTimes />
-            </button>
-          </div>
-          <div className="mb-4">
-            <p>Send an email to: <strong>{businessEmail}</strong></p>
-          </div>
-          <div className="flex justify-end">
-            <a
-              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(businessEmail)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              Open Gmail
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   if (loading) {
     return (
@@ -387,14 +357,6 @@ const BusinessDetails = () => {
             </h2>
           </div>
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setChatModalOpen(true)}
-              className="btn-primary"
-            >
-              <img src="/a7.png" alt="" />
-              Chat
-            </button>
             <button
               type="button"
               onClick={() => setEditModalOpen(true)}
@@ -760,13 +722,8 @@ const BusinessDetails = () => {
       )}
 
       {/* Chat Modal */}
-      <ChatModal 
-        isOpen={isChatModalOpen}
-        onClose={() => setChatModalOpen(false)}
-        businessEmail={businessData?.Email}
-      />
 
-      <BusinessTabbar businessId={businessData?.id} />
+      <BusinessTabbar userId={businessData?.user_id} />
       </div>
     </>
   );

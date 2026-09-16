@@ -9,6 +9,7 @@ import {
   FiPackage,
   FiShoppingBag,
   FiSmile,
+  FiTool,
   FiTruck,
   FiWatch,
 } from "react-icons/fi";
@@ -31,6 +32,14 @@ const categories = [
     category: "Real Estate",
     hint: "Homes, land & rentals",
     icon: FiHome,
+  },
+  {
+    name: "Services",
+    slug: "services",
+    endpoint: "services",
+    category: "Services",
+    hint: "Cleaning, repairs, classes & more",
+    icon: FiTool,
   },
   {
     name: "Events",

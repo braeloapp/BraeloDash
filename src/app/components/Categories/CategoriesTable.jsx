@@ -7,8 +7,13 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getHeaderStyle, getBodyStyle } from "../Users/UserData";
-import { fetchAdminTaxonomy, patchAdminTaxonomy } from "@/lib/taxonomy";
+import {
+  deleteAdminTaxonomy,
+  fetchAdminTaxonomy,
+  patchAdminTaxonomy,
+} from "@/lib/taxonomy";
 import { getApiErrorMessage } from "@/lib/apiResponse";
+import ActionMenu from "@/app/components/ux/ActionMenu";
 
 const CategoriesTable = () => {
   const [categories, setCategories] = useState([]);
@@ -46,6 +51,26 @@ const CategoriesTable = () => {
       toast.success("Category updated");
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Failed to update category"));
+    } finally {
+      setSavingKey(null);
+    }
+  };
+
+  const removeCategory = async (category) => {
+    const confirmed = window.confirm(
+      `Remove category "${category.label || category.key}" and its subcategories?`
+    );
+    if (!confirmed) return;
+    try {
+      setSavingKey(category.key);
+      const next = await deleteAdminTaxonomy({
+        kind: "category",
+        key: category.key,
+      });
+      setCategories(next);
+      toast.success("Category removed");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to remove category"));
     } finally {
       setSavingKey(null);
     }
@@ -117,14 +142,23 @@ const CategoriesTable = () => {
         <Column
           header="Actions"
           body={(rowData) => (
-            <button
-              onClick={() =>
-                router.push(`/pages/categories/${encodeURIComponent(rowData.key)}/subcategories`)
-              }
-              className="btn-table"
-            >
-              View
-            </button>
+            <ActionMenu
+              disabled={savingKey === rowData.key}
+              items={[
+                {
+                  label: "View",
+                  onClick: () =>
+                    router.push(
+                      `/pages/categories/${encodeURIComponent(rowData.key)}/subcategories`
+                    ),
+                },
+                {
+                  label: "Delete",
+                  danger: true,
+                  onClick: () => removeCategory(rowData),
+                },
+              ]}
+            />
           )}
           headerStyle={getHeaderStyle()}
           bodyStyle={getBodyStyle()}
