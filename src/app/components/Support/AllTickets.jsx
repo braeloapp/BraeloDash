@@ -12,6 +12,8 @@ import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 import StatusSelect from "@/app/components/ux/StatusSelect";
 import ActionMenu from "@/app/components/ux/ActionMenu";
+import TicketDetailModal from "@/app/components/Support/TicketDetailModal";
+import ListingEditShell from "@/app/components/Listing/ListingEditShell";
 
 const API_URL = "/admin-panel/support";
 const SEARCH_API_URL = "/admin-panel/support/search";
@@ -155,9 +157,9 @@ const AllTickets = () => {
     if (ticketToDelete == null) return;
     try {
       setDeleteInProgress(true);
-      const formData = new FormData();
-      formData.append("feedback_id", ticketToDelete);
-      await deleteData(REPORT_API_URL, formData);
+      await deleteData(REPORT_API_URL, {
+        feedback_id: ticketToDelete,
+      });
       setRequests((prev) => prev.filter((r) => r.id !== ticketToDelete));
       setFilteredRequests((prev) => prev.filter((r) => r.id !== ticketToDelete));
       showToast("Ticket deleted successfully!");
@@ -175,16 +177,23 @@ const AllTickets = () => {
     try {
       setStatusUpdating(true);
 
-      const formData = new FormData();
-      formData.append("feedback_id", rowData.id);
-      formData.append("status", newStatus);
+      const response = await updateData(REPORT_API_URL, {
+        feedback_id: rowData.id,
+        status: newStatus,
+      });
 
-      const response = await updateData(REPORT_API_URL, formData);
+      const okMessage =
+        typeof response?.message === "string"
+          ? response.message
+          : typeof response?.data?.message === "string"
+            ? response.data.message
+            : "";
+      const ok =
+        response?.status === 200 ||
+        response?.status === 201 ||
+        /success/i.test(okMessage);
 
-      if (
-        response.data?.message?.includes("Successfully") ||
-        response.status === 201
-      ) {
+      if (ok || !response?.error) {
         const updatedRequests = requests.map((request) =>
           request.id === rowData.id
             ? { ...request, status: newStatus }
@@ -192,8 +201,15 @@ const AllTickets = () => {
         );
         setRequests(updatedRequests);
         setFilteredRequests(updatedRequests);
-        showToast(response.data.message || "Status updated successfully!");
-      } else if (response.status === 200 || response.status === 201) {
+        showToast(okMessage || "Status updated successfully!");
+      } else {
+        throw new Error(okMessage || "Failed to update status");
+      }
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.message;
+      console.error("Error updating status:", error);
+
+      if (String(errorMsg).includes("Updated Successfully")) {
         const updatedRequests = requests.map((request) =>
           request.id === rowData.id
             ? { ...request, status: newStatus }
@@ -202,22 +218,6 @@ const AllTickets = () => {
         setRequests(updatedRequests);
         setFilteredRequests(updatedRequests);
         showToast("Status updated successfully!");
-      } else {
-        throw new Error(response.data?.message || "Failed to update status");
-      }
-    } catch (error) {
-      const errorMsg = error.response?.data?.message || error.message;
-      console.error("Error updating status:", error);
-
-      if (errorMsg.includes("Updated Successfully")) {
-        const updatedRequests = requests.map((request) =>
-          request.id === rowData.id
-            ? { ...request, status: newStatus }
-            : request
-        );
-        setRequests(updatedRequests);
-        setFilteredRequests(updatedRequests);
-        showToast(errorMsg, "success");
       } else {
         setError(errorMsg);
         showToast(`Status update failed: ${errorMsg}`, "error");
@@ -427,112 +427,73 @@ const AllTickets = () => {
       </DataTable>
       )}
 
-      {/* Details Modal */}
-      {selectedTicket && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-bold mb-4">Ticket Details</h2>
-            <div className="space-y-3">
-              <p>
-                <strong>ID:</strong> {selectedTicket.id}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedTicket.email}
-              </p>
-              <p>
-                <strong>Subject:</strong> {selectedTicket.subject}
-              </p>
-              <p>
-                <strong>Description:</strong> {selectedTicket.description}
-              </p>
-              <p>
-                <strong>Status:</strong> {selectedTicket.status}
-              </p>
-              <p>
-                <strong>Submit Date:</strong> {selectedTicket.created_at}
-              </p>
-              {selectedTicket.updated_at && (
-                <p>
-                  <strong>Last Updated:</strong> {selectedTicket.updated_at}
-                </p>
-              )}
-              {(selectedTicket.replies || []).length > 0 && (
-                <div>
-                  <strong>Replies:</strong>
-                  <ul className="mt-2 space-y-2">
-                    {selectedTicket.replies.map((reply) => (
-                      <li key={reply.id || reply.created_at} className="border rounded p-2">
-                        <p className="text-xs text-gray-500">
-                          {reply.author_type} · {reply.author_name}
-                        </p>
-                        <p>{reply.message}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-            <button
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl"
-              onClick={closeDetailsModalHandler}
-            >
-              &times;
-            </button>
-          </div>
+      <TicketDetailModal
+        open={Boolean(selectedTicket)}
+        ticket={selectedTicket}
+        onClose={closeDetailsModalHandler}
+      />
+
+      <ListingEditShell
+        open={isEmailModalOpen && Boolean(emailUser)}
+        title="Reply to ticket"
+        onClose={() => {
+          if (!replySending) setIsEmailModalOpen(false);
+        }}
+        disabled={replySending}
+      >
+        <p className="mb-4 text-sm text-[var(--color-text-muted)]">
+          {emailUser?.email}
+          {emailUser?.subject ? ` — ${emailUser.subject}` : ""}
+        </p>
+        <label className="field-label" htmlFor="ticket-reply-message">
+          Message
+        </label>
+        <textarea
+          id="ticket-reply-message"
+          value={replyMessage}
+          onChange={(e) => setReplyMessage(e.target.value)}
+          rows={5}
+          className="field-control"
+          placeholder="Write the in-app reply the user will see"
+        />
+        <div className="listing-edit-footer">
+          <button
+            type="button"
+            onClick={() => setIsEmailModalOpen(false)}
+            className="btn-ghost"
+            disabled={replySending}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={replySending || !replyMessage.trim()}
+            onClick={async () => {
+              try {
+                setReplySending(true);
+                await postData("/admin-panel/support/reply", {
+                  ticket_id: emailUser.id,
+                  message: replyMessage.trim(),
+                });
+                showToast("Reply sent");
+                setIsEmailModalOpen(false);
+                setReplyMessage("");
+                fetchSupportRequests();
+              } catch (error) {
+                showToast(
+                  error.response?.data?.message || "Failed to send reply",
+                  "error"
+                );
+              } finally {
+                setReplySending(false);
+              }
+            }}
+            className="btn-primary"
+          >
+            {replySending ? "Sending…" : "Send reply"}
+          </button>
         </div>
-      )}
-      {isEmailModalOpen && emailUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded shadow-lg w-[90%] max-w-md">
-            <h2 className="text-xl font-semibold mb-4">Reply to ticket</h2>
-            <p className="mb-2 text-sm text-gray-600">
-              {emailUser.email} — {emailUser.subject}
-            </p>
-            <textarea
-              value={replyMessage}
-              onChange={(e) => setReplyMessage(e.target.value)}
-              rows={5}
-              className="w-full border border-gray-300 rounded-md p-2 mb-4"
-              placeholder="Write the in-app reply the user will see"
-            />
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setIsEmailModalOpen(false)}
-                className="btn-ghost"
-                disabled={replySending}
-              >
-                Cancel
-              </button>
-              <button
-                disabled={replySending || !replyMessage.trim()}
-                onClick={async () => {
-                  try {
-                    setReplySending(true);
-                    await postData("/admin-panel/support/reply", {
-                      ticket_id: emailUser.id,
-                      message: replyMessage.trim(),
-                    });
-                    showToast("Reply sent");
-                    setIsEmailModalOpen(false);
-                    setReplyMessage("");
-                    fetchSupportRequests();
-                  } catch (error) {
-                    showToast(
-                      error.response?.data?.message || "Failed to send reply",
-                      "error"
-                    );
-                  } finally {
-                    setReplySending(false);
-                  }
-                }}
-                className="btn-primary"
-              >
-                {replySending ? "Sending..." : "Send reply"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </ListingEditShell>
 
       <ConfirmDeleteDialog
         visible={ticketToDelete !== null}

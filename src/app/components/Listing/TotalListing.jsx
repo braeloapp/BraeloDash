@@ -11,6 +11,7 @@ import {
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
 import { extractResultsList } from "@/lib/apiResponse";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
+import { getCategoryEndpoint } from "@/lib/listingCategoryEndpoint";
 import CardToggle from "./CardToggle";
 import ListingCard from "./LisitngCard";
 import ListingEmptyState from "./ListingEmptyState";
@@ -20,17 +21,6 @@ import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import AppLoader from "@/app/components/ux/AppLoader";
 import { Update_data } from "./Data";
 
-const CATEGORY_ENDPOINTS = {
-  "Fashion": "fashion",
-  "Sports & Hobby": "sportshobby",
-  "Furniture": "furniture",
-  "Electronics": "electronics",
-  "Jobs": "jobs",
-  "Vehicles": "vehicles",
-  "Kids": "kids",
-  "Events": "events",
-  "Real Estate": "realestate"
-};
 
 const CoordinatesToAddress = ({ coordinates }) => {
   const [address, setAddress] = useState(null);
@@ -402,10 +392,6 @@ const TotalListing = ({ user_id }) => {
     });
   };
 
-  const getCategoryEndpoint = (category) => {
-    const normalizedCategory = category?.toLowerCase()?.trim();
-    return CATEGORY_ENDPOINTS[normalizedCategory] || normalizedCategory || "listings";
-  };
 
   const handleUpdateListing = async (e) => {
     e.preventDefault();

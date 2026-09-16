@@ -97,11 +97,15 @@ const AdminCard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Prepare update payload
+      // Prepare update payload (API expects `phone`, not `phoneNumber`)
       const updatePayload = {
-        ...formData,
-        ...(password && { password }),
-        ...(previewImage !== "/report.png" && { image: formData.image }),
+        name: formData.name,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        phone: formData.phoneNumber || formData.phone || "",
+        ...(previewImage !== "/report.png" && formData.image
+          ? { image: formData.image }
+          : {}),
       };
 
       // Use postData for creating or updateData for updating

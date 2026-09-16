@@ -45,50 +45,32 @@ const EditUserdetailModal = ({ isOpen, onClose, userData }) => {
       const payload = {
         user_id: formData.user_id,
         name: formData.name,
-        phone_number: formData.phone_number,
-        is_active: formData.is_active,
-        is_email_verified: formData.is_email_verified,
-        is_phone_verified: formData.is_phone_verified,
-        role: formData.role.toLowerCase()
+        phone: formData.phone_number,
       };
 
       if (formData.email !== userData?.email) {
         payload.email = formData.email;
       }
 
-      // Use postData method for API call
-      const response = await postData(
-        "/admin-panel/user/update",
-        payload,
-        localStorage.getItem("token")
-      );
+      const response = await postData("/admin-panel/user/update", payload);
+      const ok =
+        response?.status === 200 ||
+        response?.success === true ||
+        /success/i.test(String(response?.message || ""));
 
-      if (response.success) {
-        toast.success("User updated successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          style: {
-            background: "green",
-            color: "white"
-          }
-        });
-        onClose();
+      if (ok || (response && !response.error)) {
+        toast.success(response?.message || "User updated successfully!");
+        onClose?.();
       } else {
-        toast.error(response.message || "Failed to update user", {
-          theme: "colored"
-        });
+        toast.error(response?.message || response?.error || "Failed to update user");
       }
     } catch (error) {
-      console.error("Error updating user:", error);
-      toast.error(error.message || "An error occurred while updating user", {
-        theme: "colored"
-      });
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          error.message ||
+          "Failed to update user"
+      );
     }
   };
 

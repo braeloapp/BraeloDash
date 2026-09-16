@@ -186,13 +186,14 @@ export default function BannerManagement() {
       const formData = new FormData();
       
       formData.append("banner_id", selectedBanner._id);
-      formData.append("business_email", selectedBanner.business_email);
-      formData.append("business_name", selectedBanner.business_name);
-      formData.append("business_category", selectedBanner.business_category);
-      formData.append("business_subcategory", selectedBanner.business_subcategory);
-      
       if (selectedBanner.business_banner_file) {
         formData.append("business_banner", selectedBanner.business_banner_file);
+      }
+      if (selectedBanner.url || selectedBanner.business_link) {
+        formData.append(
+          "url",
+          selectedBanner.url || selectedBanner.business_link
+        );
       }
 
       await updateListData(

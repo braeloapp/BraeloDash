@@ -193,12 +193,7 @@ const BusinessDetails = () => {
 
       const response = await postBusiData(
         "/admin-panel/business/update",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        formData
       );
 
       if (response.data) {
