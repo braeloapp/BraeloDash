@@ -2,12 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getApiBaseUrl } from "@/lib/apiConfig";
-import { clearAdminSession, getAdminToken, persistAdminSession } from "@/lib/adminAuth";
+import { clearAdminSession, getAdminToken } from "@/lib/adminAuth";
+import { fetchAdminMe } from "@/lib/adminMe";
 import AppLoader from "@/app/components/ux/AppLoader";
 
+/**
+ * Unlock after mount so SSR HTML matches the first client paint.
+ * Token check + /me verify run in the background (no Azure wait on nav).
+ */
 export default function AuthGate({ children }) {
   const router = useRouter();
+  // Always false on first render (server + client) to avoid hydration mismatch.
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -20,32 +25,17 @@ export default function AuthGate({ children }) {
         router.replace("/");
         return;
       }
+
+      // Instant unlock once we know a token exists (client-only).
+      if (!cancelled) setReady(true);
+
       try {
-        const response = await fetch(`${getApiBaseUrl()}/admin-panel/me`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.status === 401 || response.status === 403) {
+        await fetchAdminMe();
+      } catch (error) {
+        if (error?.status === 401 || error?.status === 403) {
           clearAdminSession();
-          router.replace("/");
-          return;
+          if (!cancelled) router.replace("/");
         }
-        if (!response.ok) {
-          setReady(true);
-          return;
-        }
-        const payload = await response.json();
-        const data = payload?.data || payload;
-        persistAdminSession({
-          token,
-          role: data?.role,
-          name: data?.name,
-        });
-        if (!cancelled) setReady(true);
-      } catch {
-        if (!cancelled) setReady(true);
       }
     };
 

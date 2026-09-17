@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,8 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { getData } from "@/app/API/method";
-import { emptyAdminStats, normalizeAdminStats } from "@/lib/adminStats";
+import { useDashboardStats } from "@/app/components/Dashboard/DashboardStatsContext";
+import AppLoader from "@/app/components/ux/AppLoader";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -50,19 +50,15 @@ const options = {
 };
 
 const UserStatistics = () => {
-  const [stats, setStats] = useState(emptyAdminStats());
+  const { stats, loading } = useDashboardStats();
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const response = await getData("/admin-panel/statistics");
-        setStats(normalizeAdminStats(response));
-      } catch (error) {
-        console.error("Error fetching user statistics:", error);
-      }
-    };
-    load();
-  }, []);
+  if (loading) {
+    return (
+      <div className="flex h-96 w-full items-center justify-center">
+        <AppLoader showLabel={false} />
+      </div>
+    );
+  }
 
   const data = {
     labels: stats.growth.labels.length ? stats.growth.labels : ["No data"],
@@ -78,7 +74,7 @@ const UserStatistics = () => {
   };
 
   return (
-    <div className="w-full h-96">
+    <div className="h-96 w-full">
       <Bar data={data} options={options} />
     </div>
   );

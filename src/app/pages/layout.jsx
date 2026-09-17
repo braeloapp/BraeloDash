@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import NavBar from "../components/Navbar";
 import AuthGate from "../components/auth/AuthGate";
+import NavigationProgress from "../components/ux/NavigationProgress";
 
 const Layout = ({ children }) => {
   const [navOpen, setNavOpen] = useState(false);
@@ -18,6 +19,7 @@ const Layout = ({ children }) => {
 
   return (
     <AuthGate>
+      <NavigationProgress />
       <div className="admin-panel admin-shell min-h-dvh">
         <div className="relative flex h-dvh overflow-hidden">
           {navOpen ? (

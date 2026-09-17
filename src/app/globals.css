@@ -2394,3 +2394,19 @@ button.bg-red-600,
   height: auto !important;
   font-size: inherit !important;
 }
+
+@keyframes admin-nav-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(-20%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.admin-nav-progress {
+  animation: admin-nav-progress 420ms ease-out;
+}

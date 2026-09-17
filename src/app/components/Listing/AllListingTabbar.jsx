@@ -1,17 +1,28 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import Vehicles from "./Vehicles";
-import RealState from "./realstate";
-import Services from "./services";
-import Events from "./events";
-import Job from "./job";
-import Electronics from "./electronics";
-import Furniture from "./furniture";
-import Kids from "./kids";
-import Fashion from "./fashion";
-import Sports from "./sport&hobby";
+import AppLoader from "@/app/components/ux/AppLoader";
+
+const panelFallback = (
+  <div className="flex min-h-[240px] items-center justify-center py-10">
+    <AppLoader showLabel={false} />
+  </div>
+);
+
+const Vehicles = dynamic(() => import("./Vehicles"), { loading: () => panelFallback });
+const RealState = dynamic(() => import("./realstate"), { loading: () => panelFallback });
+const Services = dynamic(() => import("./services"), { loading: () => panelFallback });
+const Events = dynamic(() => import("./events"), { loading: () => panelFallback });
+const Job = dynamic(() => import("./job"), { loading: () => panelFallback });
+const Electronics = dynamic(() => import("./electronics"), {
+  loading: () => panelFallback,
+});
+const Furniture = dynamic(() => import("./furniture"), { loading: () => panelFallback });
+const Kids = dynamic(() => import("./kids"), { loading: () => panelFallback });
+const Fashion = dynamic(() => import("./fashion"), { loading: () => panelFallback });
+const Sports = dynamic(() => import("./sport&hobby"), { loading: () => panelFallback });
 
 const TABS = [
   { id: 1, label: "Vehicles", Component: Vehicles },
@@ -77,7 +88,10 @@ const AllListingTabbar = () => {
 
   return (
     <>
-      <div className="listing-tabs-shell border-b" style={{ borderColor: "var(--color-border)" }}>
+      <div
+        className="listing-tabs-shell border-b"
+        style={{ borderColor: "var(--color-border)" }}
+      >
         <button
           type="button"
           className="listing-tabs-nav listing-tabs-nav--prev"

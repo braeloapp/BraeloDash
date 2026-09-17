@@ -2,8 +2,18 @@
 import axios from 'axios';
 import { extractResultsList } from '@/lib/apiResponse';
 import { getApiBaseUrl } from '@/lib/apiConfig';
+import { cachedGet, invalidateGetCache } from '@/lib/apiCache';
 
-const API_BASE_URL = getApiBaseUrl();
+const api = axios.create({
+  timeout: 45000,
+});
+
+function withBase(config = {}) {
+  return {
+    ...config,
+    baseURL: getApiBaseUrl(),
+  };
+}
 
 function authToken() {
   if (typeof window === 'undefined') return null;
@@ -37,9 +47,16 @@ function requestHeaders(data, extra = {}) {
   return { ...jsonHeaders(), ...extra };
 }
 
+function bustListCaches(endpoint = '') {
+  const path = String(endpoint);
+  if (path.includes('/admin-panel/')) {
+    invalidateGetCache('/admin-panel/');
+  }
+}
+
 export const LoginApi = async (endpoint, data) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}${endpoint}`, data);
+    const response = await api.post(endpoint, data, withBase());
     return response.data;
   } catch (error) {
     console.error('POST Error:', error);
@@ -47,12 +64,21 @@ export const LoginApi = async (endpoint, data) => {
   }
 };
 
-export const getData = async (endpoint) => {
+export const getData = async (endpoint, options = {}) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}${endpoint}`, {
-      headers: jsonHeaders(),
-    });
-    return response.data;
+    return await cachedGet(
+      endpoint,
+      async () => {
+        const response = await api.get(endpoint, withBase({
+          headers: jsonHeaders(),
+        }));
+        return response.data;
+      },
+      {
+        ttlMs: options.ttlMs ?? 25_000,
+        bypass: Boolean(options.bypass),
+      }
+    );
   } catch (error) {
     console.error('GET Error:', error);
     throw error;
@@ -61,10 +87,11 @@ export const getData = async (endpoint) => {
 
 export const postData = async (endpoint, data, config = {}) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}${endpoint}`, data, {
+    const response = await api.post(endpoint, data, withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
-    });
+    }));
+    bustListCaches(endpoint);
     return response.data;
   } catch (error) {
     console.error('POST Error:', error);
@@ -74,10 +101,11 @@ export const postData = async (endpoint, data, config = {}) => {
 
 export const updateData = async (endpoint, data, config = {}) => {
   try {
-    const response = await axios.put(`${API_BASE_URL}${endpoint}`, data, {
+    const response = await api.put(endpoint, data, withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
-    });
+    }));
+    bustListCaches(endpoint);
     return response.data;
   } catch (error) {
     console.error('PUT Error:', error);
@@ -87,11 +115,12 @@ export const updateData = async (endpoint, data, config = {}) => {
 
 export const deleteData = async (endpoint, data, config = {}) => {
   try {
-    const response = await axios.delete(`${API_BASE_URL}${endpoint}`, {
+    const response = await api.delete(endpoint, withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
       data,
-    });
+    }));
+    bustListCaches(endpoint);
     return response.data;
   } catch (error) {
     console.error('DELETE Error:', error);
@@ -107,10 +136,11 @@ export const updateListData = async (endpoint, data, config = {}) => {
     } else if (!headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const response = await axios.put(`${API_BASE_URL}${endpoint}`, data, {
+    const response = await api.put(endpoint, data, withBase({
       ...config,
       headers,
-    });
+    }));
+    bustListCaches(endpoint);
     return response.data;
   } catch (error) {
     console.error('PUT Error:', error);
@@ -127,10 +157,11 @@ export const postBusiData = async (endpoint, data, config = {}) => {
     } else if (!headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const response = await axios.post(`${API_BASE_URL}${endpoint}`, data, {
+    const response = await api.post(endpoint, data, withBase({
       ...config,
       headers,
-    });
+    }));
+    bustListCaches(endpoint);
     return response.data;
   } catch (error) {
     console.error('POST Error:', error);
@@ -141,7 +172,7 @@ export const postBusiData = async (endpoint, data, config = {}) => {
 /** GET without auth — used where the API returns a public list (e.g. business banners). */
 export const getBanData = async (endpoint) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}${endpoint}`);
+    const response = await api.get(endpoint, withBase());
     const list = extractResultsList(response.data);
     return {
       data: list,

@@ -12,10 +12,8 @@ import {
   FiUser,
   FiX,
 } from "react-icons/fi";
-import { getApiBaseUrl } from "@/lib/apiConfig";
 import {
   clearAdminSession,
-  persistAdminSession,
   ADMIN_DEFAULT_AVATAR,
 } from "@/lib/adminAuth";
 import { getData } from "@/app/API/method";
@@ -26,6 +24,7 @@ import {
 import { sidebarGroups, sidebarItems } from "./navItems";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import LanguageSwitcher from "@/app/components/ux/LanguageSwitcher";
+import { fetchAdminMe } from "@/lib/adminMe";
 
 const COLLAPSE_KEY = "braelo_admin_sidebar_collapsed";
 
@@ -96,36 +95,21 @@ const Sidebar = ({ open = false, onClose }) => {
   }, [pathname]);
 
   useEffect(() => {
+    const cachedName = localStorage.getItem("admin_name");
+    const cachedRole = localStorage.getItem("admin_role");
+    if (cachedName) setUserName(cachedName);
+    if (cachedRole) setRoleKey(cachedRole === "super_admin" ? "super_admin" : "admin");
+
     const fetchUser = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const cachedName = localStorage.getItem("admin_name");
-      const cachedRole = localStorage.getItem("admin_role");
-      if (cachedName) setUserName(cachedName);
-      if (cachedRole) setRoleKey(cachedRole === "super_admin" ? "super_admin" : "admin");
-
       try {
-        const response = await fetch(`${getApiBaseUrl()}/admin-panel/me`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) return;
-        const data = await response.json();
-        const profile = data?.data || data;
+        const profile = await fetchAdminMe();
+        if (!profile) return;
         setUserName(profile?.name || "Admin");
-        const nextRole =
+        setRoleKey(
           profile?.role === "super_admin" || profile?.is_superuser
             ? "super_admin"
-            : "admin";
-        setRoleKey(nextRole);
-        persistAdminSession({
-          token,
-          role: nextRole,
-          name: profile?.name,
-        });
+            : "admin"
+        );
       } catch {
         /* keep cached */
       }
@@ -135,21 +119,30 @@ const Sidebar = ({ open = false, onClose }) => {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
     const loadUnread = async () => {
       try {
-        const data = await getData("/admin-panel/notifications?page=1");
+        const data = await getData("/admin-panel/notifications?page=1", {
+          ttlMs: 20_000,
+        });
+        if (cancelled) return;
         const results = data?.data?.results || [];
         setUnreadCount(
           results.filter((item) => isNotificationUnread(item)).length
         );
       } catch {
-        setUnreadCount(0);
+        if (!cancelled) setUnreadCount(0);
       }
     };
 
-    loadUnread();
+    // Defer so primary page APIs get the connection slots first.
+    const timer = window.setTimeout(loadUnread, 400);
     window.addEventListener(NOTIFICATIONS_CHANGED, loadUnread);
-    return () => window.removeEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      window.removeEventListener(NOTIFICATIONS_CHANGED, loadUnread);
+    };
   }, []);
 
   useEffect(() => {
