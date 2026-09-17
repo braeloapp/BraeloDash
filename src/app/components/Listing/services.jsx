@@ -1,6 +1,8 @@
 import { useGoogleMaps } from "@/hooks/useGoogleMaps";
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
+import { formatListingPrice } from "@/lib/listingCards";
+
 import "react-toastify/dist/ReactToastify.css";
 import {
   getData,
@@ -72,7 +74,7 @@ const Services = () => {
                 ? new Date(item.created_at).toLocaleDateString()
                 : ""
             }`,
-            price: item.price ? `$${item.price}` : "$0",
+            price: formatListingPrice(item) || "$0",
             status: item.is_active ? "active" : "inactive",
             originalData: item,
           }))

@@ -4,8 +4,9 @@ import { extractResultsList } from '@/lib/apiResponse';
 import { getApiBaseUrl } from '@/lib/apiConfig';
 import { cachedGet, invalidateGetCache } from '@/lib/apiCache';
 
+/** No client timeout — Azure / cold starts must not abort mid-request. */
 const api = axios.create({
-  timeout: 45000,
+  timeout: 0,
 });
 
 /**

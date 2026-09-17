@@ -7,7 +7,8 @@ import {
   postData,
   updateListData,
   deleteData,
-} from "@/app/API/method";
+} from "@/app/API/method"
+import { formatListingPrice } from "@/lib/listingCards";
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
 import { extractResultsList } from "@/lib/apiResponse";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
@@ -156,7 +157,7 @@ const TotalBusiListing = ({ user_id }) => {
           icons: ["/g1.png", "/g2.png", "/g3.png"],
           title: item.title || "Untitled listing",
           description: `Listing ID: ${item?.id?.substring?.(0, 8)?.toUpperCase() || item?.listing_id?.substring?.(0, 8)?.toUpperCase() || "N/A"} • ${item?.created_at ? new Date(item.created_at).toLocaleDateString() : ""}`,
-          price: item.price ? `$${parseFloat(item.price).toFixed(2)}` : "",
+          price: formatListingPrice(item) || "",
           status: item.is_active ? true : false,
           originalData: item,
           salary: item.salary_range,

@@ -16,62 +16,62 @@ export const FormData = {
     ],
     Cars: {
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
         { label: "Number of Doors", name: "number_of_doors", options: ["1/3", "4/5"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Motorcycle: {
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Truck: {
       fields: [{ label: "Load Capacity", type: "number", name: "Load_capacity", required: true }],
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Bike: {
       fields: [{ label: "Type", type: "text", name: "bike_type", required: true }],
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Boat: {
       fields: [{ label: "Length", type: "number", name: "boat_length", required: true }],
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Van: {
       fields: [{ label: "Passenger Capacity", type: "number", name: "passenger_capacity", required: true }],
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
     Scooter: {
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
       ],
     },
@@ -88,9 +88,9 @@ export const FormData = {
         { label: "Rental Duration", type: "text", name: "rental_duration", required: true },
       ],
       chips: [
-        { label: "Transmission", name: "transmission", options: ["Manual", "Automatic"], required: true },
+        { label: "Transmission", name: "transmission", options: ["MANUAL", "AUTOMATIC"], required: true },
         { label: "condition", name: "condition", options: ["NEW", "USED"], required: true },
-        { label: "Purpose", name: "purpose", options: ["Sale", "Rental"], required: true },
+        { label: "Purpose", name: "purpose", options: ["SALE", "RENTAL"], required: true },
         { label: "For Sale", name: "for_sale", options: ["YES", "NO"], required: true },
         { label: "Rentals", name: "rentals", options: ["YES", "NO"], required: true },
         { label: "negotiable", name: "negotiable", options: ["YES", "NO"], required: true },
@@ -213,8 +213,8 @@ export const FormData = {
           label: "Lease Terms",
           name: "lease_terms",
           options: [
-            "DURATION",
-            "RENEWAL"
+            "SHORT-TERM",
+            "LONG-TERM"
           ],
           required: true
         },
@@ -233,7 +233,8 @@ export const FormData = {
           options: [
             "WATER",
             "GAS",
-            "ELECTRICITY"
+            "ELECTRICITY",
+            "WIFI"
           ],
           required: true
         },
@@ -365,8 +366,8 @@ export const FormData = {
           label: "Lease Terms",
           name: "lease_terms",
           options: [
-            "DURATION",
-            "RENEWAL"
+            "SHORT-TERM",
+            "LONG-TERM"
           ],
           required: true
         },
@@ -385,7 +386,8 @@ export const FormData = {
           options: [
             "WATER",
             "GAS",
-            "ELECTRICITY"
+            "ELECTRICITY",
+            "WIFI"
           ],
           required: true
         },
@@ -562,8 +564,8 @@ export const FormData = {
           label: "Lease Terms",
           name: "lease_terms",
           options: [
-            "DURATION",
-            "RENEWAL"
+            "SHORT-TERM",
+            "LONG-TERM"
           ],
           required: true
         },
@@ -582,7 +584,8 @@ export const FormData = {
           options: [
             "WATER",
             "GAS",
-            "ELECTRICITY"
+            "ELECTRICITY",
+            "WIFI"
           ],
           required: true
         },
@@ -720,8 +723,8 @@ export const FormData = {
           label: "Lease Terms",
           name: "lease_terms",
           options: [
-            "DURATION",
-            "RENEWAL"
+            "SHORT-TERM",
+            "LONG-TERM"
           ],
           required: true
         },
@@ -740,7 +743,8 @@ export const FormData = {
           options: [
             "WATER",
             "GAS",
-            "ELECTRICITY"
+            "ELECTRICITY",
+            "WIFI"
           ],
           required: true
         },
@@ -812,12 +816,6 @@ export const FormData = {
           required: true
         },
         {
-          label: "Lease Terms",
-          type: "text",
-          name: "lease_terms",
-          required: true
-        },
-        {
           label: "Parking Availability and Cost",
           type: "text",
           name: "parking_and_cost",
@@ -868,6 +866,15 @@ export const FormData = {
       ],
       chips: [
         {
+          label: "Lease Terms",
+          name: "lease_terms",
+          options: [
+            "SHORT-TERM",
+            "LONG-TERM"
+          ],
+          required: true
+        },
+        {
           label: "Bathroom Type",
           name: "bathroom_type",
           options: [
@@ -900,7 +907,9 @@ export const FormData = {
           name: "pet_policy",
           options: [
             "ALLOWED",
-            "NOT ALLOWED"
+            "NOT ALLOWED",
+            "ADDITIONAL PET FEE",
+            "RESTRICTIONS"
           ],
           required: true
         },
@@ -938,7 +947,8 @@ export const FormData = {
             "MEN ONLY",
             "WOMEN ONLY",
             "COUPLES WELCOME",
-            "SINGLE OCCUPANCY"
+            "SINGLE OCCUPANCY",
+            "NO PREFERENCE"
           ],
           required: true
         },
@@ -1865,6 +1875,7 @@ export const FormData = {
           options: [
             "IN-PERSON",
             "ONLINE",
+            "REMOTELY",
             "BOTH"
           ],
           required: false
@@ -1973,6 +1984,7 @@ export const FormData = {
           options: [
             "IN-PERSON",
             "ONLINE",
+            "REMOTELY",
             "BOTH"
           ],
           required: false
@@ -2167,6 +2179,7 @@ export const FormData = {
           options: [
             "ON-SITE",
             "REMOTE",
+            "REMOTELY",
             "BOTH"
           ],
           required: false
@@ -2343,9 +2356,10 @@ export const FormData = {
           label: "Events Services",
           name: "events_services",
           options: [
+            "PLANNING",
             "CATERING",
             "DECORATION",
-            "ENTERTAINMENT",
+            "COORDINATION",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2426,8 +2440,11 @@ export const FormData = {
           options: [
             "LOCAL",
             "LONG-DISTANCE",
-            "INTERNATIONAL",
-            "OTHER (SPECIFY)"
+            "LOCAL-DISTANCE",
+            "RESIDENTIAL",
+            "COMMERCIAL",
+            "STORAGE",
+            "INTERNATIONALLY"
           ],
           required: false
         },
@@ -2517,7 +2534,9 @@ export const FormData = {
             "VEGETABLES",
             "FRUITS",
             "DAIRY",
-            "MEAT",
+            "FAIR",
+            "LUNCH",
+            "COLONIAL COFFEE",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2614,10 +2633,11 @@ export const FormData = {
           label: "Photography Services",
           name: "photography_services",
           options: [
-            "WEDDING",
-            "EVENT",
+            "WEDDINGS",
+            "CORPORATE",
             "PORTRAIT",
-            "PRODUCT",
+            "COMMERCIAL",
+            "DRONE",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2707,6 +2727,7 @@ export const FormData = {
           options: [
             "RESIDENTIAL",
             "COMMERCIAL",
+            "VIRTUAL",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2796,6 +2817,9 @@ export const FormData = {
           options: [
             "BAKED GOODS",
             "MEALS",
+            "SNACKS",
+            "FOOD PREP",
+            "PERSONAL CHEF",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2804,9 +2828,10 @@ export const FormData = {
           label: "Service Availability",
           name: "service_availability",
           options: [
-            "PICKUP",
             "DELIVERY",
-            "BOTH"
+            "PICKUP",
+            "AT-HOME PREP",
+            "ALL OF THE ABOVE"
           ],
           required: false
         },
@@ -2875,10 +2900,11 @@ export const FormData = {
           label: "Insurance Service",
           name: "insurance_service",
           options: [
+            "HEALTH",
             "AUTO",
             "HOME",
             "LIFE",
-            "HEALTH",
+            "BUSINESS",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -2949,8 +2975,10 @@ export const FormData = {
           name: "homecare_service",
           options: [
             "NURSING",
-            "ELDERLY CARE",
-            "CHILD CARE",
+            "PHYSICAL THERAPY",
+            "COMPANIONSHIP",
+            "PERSONAL CARE",
+            "HOME MAKING",
             "OTHER (SPECIFY)"
           ],
           required: false
@@ -4221,6 +4249,7 @@ export const FormData = {
           options: [
             "HOUR",
             "DAY",
+            "TASK",
             "TASKS"
           ],
           required: false

@@ -7,7 +7,8 @@ import {
   postData,
   updateListData,
   deleteData,
-} from "@/app/API/method";
+} from "@/app/API/method"
+import { formatListingPrice } from "@/lib/listingCards";
 import { patchListingCardActive } from "@/lib/patchListingCardActive";
 import { postListingFlipStatus } from "@/lib/postListingFlipStatus";
 import CardToggle from "./CardToggle";
@@ -219,7 +220,7 @@ const Vehicles = () => {
                 ? new Date(item.created_at).toLocaleDateString()
                 : ""
             }`,
-            price: item.price ? `$${item.price}` : "$0",
+            price: formatListingPrice(item) || "$0",
             status: item.is_active ? "active" : "inactive",
             originalData: item,
           }))
