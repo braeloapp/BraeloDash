@@ -22,6 +22,7 @@ import { postBusiData, getData } from "@/app/API/method";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import AuditHistoryPanel from "@/app/components/Audit/AuditHistoryPanel";
 
 function formatDate(value) {
   if (!value) return "N/A";
@@ -791,6 +792,13 @@ const BusinessDetails = () => {
         </div>
         <BusinessTabbar userId={businessData?.user_id} />
       </section>
+
+      <AuditHistoryPanel
+        targetType="business"
+        targetId={businessId}
+        title="Business history"
+        description="Admin deactivations and related audit events for this business."
+      />
       </div>
     </>
   );

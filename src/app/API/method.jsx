@@ -8,11 +8,23 @@ const api = axios.create({
   timeout: 45000,
 });
 
+/**
+ * Axios drops a relative baseURL when `url` starts with `/`.
+ * Build the final URL from getApiBaseUrl() + endpoint
+ * (absolute Azure/local origin, or `/api-backend` when proxy is enabled).
+ */
+function resolveUrl(endpoint) {
+  const base = (getApiBaseUrl() || "").replace(/\/$/, "");
+  const path = String(endpoint || "").startsWith("/")
+    ? String(endpoint)
+    : `/${endpoint}`;
+  if (!base) return path;
+  if (/^https?:\/\//i.test(base)) return `${base}${path}`;
+  return `${base}${path}`;
+}
+
 function withBase(config = {}) {
-  return {
-    ...config,
-    baseURL: getApiBaseUrl(),
-  };
+  return { ...config };
 }
 
 function authToken() {
@@ -56,7 +68,7 @@ function bustListCaches(endpoint = '') {
 
 export const LoginApi = async (endpoint, data) => {
   try {
-    const response = await api.post(endpoint, data, withBase());
+    const response = await api.post(resolveUrl(endpoint), data, withBase());
     return response.data;
   } catch (error) {
     console.error('POST Error:', error);
@@ -69,7 +81,7 @@ export const getData = async (endpoint, options = {}) => {
     return await cachedGet(
       endpoint,
       async () => {
-        const response = await api.get(endpoint, withBase({
+        const response = await api.get(resolveUrl(endpoint), withBase({
           headers: jsonHeaders(),
         }));
         return response.data;
@@ -87,7 +99,7 @@ export const getData = async (endpoint, options = {}) => {
 
 export const postData = async (endpoint, data, config = {}) => {
   try {
-    const response = await api.post(endpoint, data, withBase({
+    const response = await api.post(resolveUrl(endpoint), data, withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
     }));
@@ -101,7 +113,7 @@ export const postData = async (endpoint, data, config = {}) => {
 
 export const updateData = async (endpoint, data, config = {}) => {
   try {
-    const response = await api.put(endpoint, data, withBase({
+    const response = await api.put(resolveUrl(endpoint), data, withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
     }));
@@ -115,7 +127,7 @@ export const updateData = async (endpoint, data, config = {}) => {
 
 export const deleteData = async (endpoint, data, config = {}) => {
   try {
-    const response = await api.delete(endpoint, withBase({
+    const response = await api.delete(resolveUrl(endpoint), withBase({
       ...config,
       headers: requestHeaders(data, config.headers),
       data,
@@ -136,7 +148,7 @@ export const updateListData = async (endpoint, data, config = {}) => {
     } else if (!headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const response = await api.put(endpoint, data, withBase({
+    const response = await api.put(resolveUrl(endpoint), data, withBase({
       ...config,
       headers,
     }));
@@ -157,7 +169,7 @@ export const postBusiData = async (endpoint, data, config = {}) => {
     } else if (!headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    const response = await api.post(endpoint, data, withBase({
+    const response = await api.post(resolveUrl(endpoint), data, withBase({
       ...config,
       headers,
     }));
@@ -172,7 +184,7 @@ export const postBusiData = async (endpoint, data, config = {}) => {
 /** GET without auth — used where the API returns a public list (e.g. business banners). */
 export const getBanData = async (endpoint) => {
   try {
-    const response = await api.get(endpoint, withBase());
+    const response = await api.get(resolveUrl(endpoint), withBase());
     const list = extractResultsList(response.data);
     return {
       data: list,

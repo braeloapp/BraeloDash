@@ -1,12 +1,10 @@
 /**
- * Admin API origin.
+ * Admin API origin — from Braelo-web `.env.local` only:
+ *   NEXT_PUBLIC_API_URL or NEXT_PUBLIC_API_BASE_URL
  *
- * Set NEXT_PUBLIC_API_URL (or NEXT_PUBLIC_API_BASE_URL) per environment.
- * Local: http://127.0.0.1:8000
- * Staging/production: the same backend host the mobile app uses.
- *
- * In the browser we prefer the same-origin `/api-backend` rewrite
- * (see next.config.mjs) so CORS preflight does not stall every GET.
+ * Browser calls hit that absolute URL by default.
+ * Set NEXT_PUBLIC_API_USE_PROXY=true only if you need the Next.js
+ * same-origin rewrite (`/api-backend` → upstream) for CORS.
  */
 
 export function getUpstreamApiUrl() {
@@ -18,9 +16,16 @@ export function getUpstreamApiUrl() {
   return fromEnv.replace(/\/$/, "");
 }
 
+function useProxy() {
+  const flag = (process.env.NEXT_PUBLIC_API_USE_PROXY || "")
+    .trim()
+    .toLowerCase();
+  return flag === "1" || flag === "true" || flag === "yes";
+}
+
 export function getApiBaseUrl() {
   const upstream = getUpstreamApiUrl();
-  if (typeof window !== "undefined" && upstream) {
+  if (typeof window !== "undefined" && upstream && useProxy()) {
     return "/api-backend";
   }
   return upstream;

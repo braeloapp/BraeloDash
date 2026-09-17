@@ -15,6 +15,7 @@ const AddNewNotification = () => {
     type: "Notification",
     title: "",
     description: "",
+    audience: "all",
   });
 
   const [messagePreview, setMessagePreview] = useState({
@@ -46,6 +47,7 @@ const AddNewNotification = () => {
       type: "Notification",
       title: "",
       description: "",
+      audience: "all",
     });
 
     setMessagePreview({
@@ -61,11 +63,16 @@ const AddNewNotification = () => {
     const payload = {
       title: messageData.title,
       body: messageData.description,
+      audience: messageData.audience || "all",
     };
 
     try {
       await postData("/admin-panel/notification/send", payload);
-      toast.success("Notification created successfully!");
+      toast.success(
+        messageData.audience === "business"
+          ? "Notification sent to business users!"
+          : "Notification created successfully!"
+      );
       resetForm();
     } catch (err) {
       console.error("Error sending notification:", err);
@@ -102,6 +109,19 @@ const AddNewNotification = () => {
               onChange={handleChange}
               disabled={loading}
             />
+          </div>
+          <div>
+            <label className="field-label">Audience</label>
+            <select
+              className="field-control"
+              name="audience"
+              value={messageData.audience}
+              onChange={handleChange}
+              disabled={loading}
+            >
+              <option value="all">All users (FCM topic)</option>
+              <option value="business">Business users only</option>
+            </select>
           </div>
         </div>
 

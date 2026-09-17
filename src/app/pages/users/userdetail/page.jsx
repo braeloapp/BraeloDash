@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import AuditHistoryPanel from "@/app/components/Audit/AuditHistoryPanel";
 
 function formatDate(value) {
   if (!value) return "N/A";
@@ -328,6 +329,13 @@ const Userdetail = () => {
         </div>
         <ListingTabbar userId={userId} />
       </div>
+
+      <AuditHistoryPanel
+        targetType="user"
+        targetId={userId}
+        title="Account history"
+        description="Moderation, profile edits, and activation changes for this user."
+      />
     </div>
   );
 };

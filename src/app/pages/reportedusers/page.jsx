@@ -12,7 +12,7 @@ import Image from "next/image";
 import PageHeader from "@/app/components/ux/PageHeader";
 import ActionMenu from "@/app/components/ux/ActionMenu";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import { autoTable } from "jspdf-autotable";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const REPORTS_ENDPOINT = "/admin-panel/report/action";
@@ -278,7 +278,7 @@ const ReportedUser = () => {
       report.createdAt
     ]);
     
-    doc.autoTable({
+    autoTable(doc, {
       head: headers,
       body: data,
       startY: 20,

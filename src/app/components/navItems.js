@@ -13,12 +13,6 @@ export const sidebarItems = [
     label: "Business",
   },
   {
-    group: "People",
-    to: "/pages/reportedusers",
-    icon: "/a11.png",
-    label: "Reported Users",
-  },
-  {
     group: "Marketplace",
     to: "/pages/listing",
     icon: "/a4.png",
@@ -37,19 +31,25 @@ export const sidebarItems = [
     label: "Banner",
   },
   {
-    group: "Engagement",
+    group: "Moderation",
+    to: "/pages/reportedusers",
+    icon: "/a11.png",
+    label: "Reported Users",
+  },
+  {
+    group: "Operations",
     to: "/pages/support",
     icon: "/a7.png",
     label: "Support",
   },
   {
-    group: "Engagement",
+    group: "Operations",
     to: "/pages/notifications",
     icon: "/a8.png",
     label: "Notifications",
   },
   {
-    group: "Engagement",
+    group: "Operations",
     to: "/pages/feedback",
     icon: "/fd.svg",
     label: "Feedback",
@@ -62,6 +62,18 @@ export const sidebarItems = [
   },
   {
     group: "Insights",
+    to: "/pages/audit-logs",
+    icon: "/a9.png",
+    label: "Audit Logs",
+  },
+  {
+    group: "Administration",
+    to: "/pages/settings",
+    icon: "/a12.png",
+    label: "Platform Settings",
+  },
+  {
+    group: "Administration",
     to: "/pages/privacypolicy",
     icon: "/a12.png",
     label: "Privacy Policy",
@@ -72,6 +84,8 @@ export const sidebarGroups = [
   "Overview",
   "People",
   "Marketplace",
-  "Engagement",
+  "Moderation",
+  "Operations",
   "Insights",
+  "Administration",
 ];

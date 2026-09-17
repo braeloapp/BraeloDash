@@ -25,8 +25,9 @@ const HalfPieChart = () => {
           data: [
             stats.listings.active || 0,
             stats.listings.inactive || 0,
-            stats.reports.total || 0,
-            stats.support_requests.open || 0,
+            stats.reports.pending || stats.reports.total || 0,
+            (stats.support_requests.open || 0) +
+              (stats.support_requests.in_progress || 0),
           ],
           backgroundColor: ["#06B64C", "#ACB6BE", "#C7233F", "#CD9403"],
           borderWidth: 0,

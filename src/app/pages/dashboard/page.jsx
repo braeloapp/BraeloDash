@@ -5,6 +5,8 @@ import DataChart from "@/app/components/Dashboard/DataChart";
 import HalfPieChart from "@/app/components/Dashboard/HalfPieChart";
 import ActiveUsers from "@/app/components/Dashboard/ActiveUsers";
 import OpsAlerts from "@/app/components/Dashboard/OpsAlerts";
+import PeriodSelector from "@/app/components/Dashboard/PeriodSelector";
+import PeriodKpis from "@/app/components/Dashboard/PeriodKpis";
 import PageHeader from "@/app/components/ux/PageHeader";
 import { DashboardStatsProvider } from "@/app/components/Dashboard/DashboardStatsContext";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
@@ -18,9 +20,11 @@ const Dashboard = () => {
         <PageHeader
           title={t("dashboard.title")}
           description={t("dashboard.description")}
+          actions={<PeriodSelector />}
         />
         <div className="space-y-5 p-4 sm:p-5">
           <OpsAlerts />
+          <PeriodKpis />
           <DashboardCards />
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-7">
