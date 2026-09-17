@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import BackButton from "@/app/components/BackButton";
 import { createAdminTaxonomy, slugifyKey } from "@/lib/taxonomy";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const AddCategory = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
@@ -59,7 +61,7 @@ const AddCategory = () => {
       <div className="page-header mb-4 px-0">
         <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="page-title">Add category</h1>
+          <h1 className="page-title">{t("pages.categories.add")}</h1>
         </div>
       </div>
 

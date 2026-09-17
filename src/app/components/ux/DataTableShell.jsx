@@ -2,6 +2,7 @@
 
 import React from "react";
 import PageState from "./PageState";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function DataTableShell({
   loading = false,
@@ -16,10 +17,12 @@ export default function DataTableShell({
   className = "",
   footer,
 }) {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className={`px-4 py-6 sm:px-5 ${className}`.trim()}>
-        <PageState status="loading" title="Loading..." />
+        <PageState status="loading" title={t("common.loadingEllipsis")} />
       </div>
     );
   }

@@ -5,21 +5,23 @@ import { useRouter } from "next/navigation";
 import AllListingTabbar from "@/app/components/Listing/AllListingTabbar";
 import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const Listing = () => {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <ListingPageChrome
       showBack
-      title="Listings"
-      description="Browse and manage marketplace listings by category — edit, activate, or remove as needed."
+      title={t("pages.listing.title")}
+      description={t("pages.listing.description")}
       actions={
         <Button
           variant="primary"
           onClick={() => router.push("/pages/listing/addlisting")}
         >
-          Add New Listing
+          {t("pages.listing.add")}
         </Button>
       }
     >

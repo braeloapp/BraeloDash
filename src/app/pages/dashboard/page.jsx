@@ -7,14 +7,17 @@ import ActiveUsers from "@/app/components/Dashboard/ActiveUsers";
 import OpsAlerts from "@/app/components/Dashboard/OpsAlerts";
 import PageHeader from "@/app/components/ux/PageHeader";
 import { DashboardStatsProvider } from "@/app/components/Dashboard/DashboardStatsContext";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const Dashboard = () => {
+  const { t } = useLanguage();
+
   return (
     <DashboardStatsProvider>
       <div className="page-shell">
         <PageHeader
-          title="Dashboard"
-          description="Operational overview from live admin statistics — what needs attention now."
+          title={t("dashboard.title")}
+          description={t("dashboard.description")}
         />
         <div className="space-y-5 p-4 sm:p-5">
           <OpsAlerts />

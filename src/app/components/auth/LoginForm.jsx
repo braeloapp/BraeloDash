@@ -8,47 +8,38 @@ import "react-toastify/dist/ReactToastify.css";
 import { LoginApi } from "@/app/API/method";
 import { persistAdminSession } from "@/lib/adminAuth";
 import { validateLoginForm } from "@/lib/loginValidation";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import LanguageSwitcher from "@/app/components/ux/LanguageSwitcher";
+import AppLoader from "@/app/components/ux/AppLoader";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 
-function ImageSection() {
+function HeroPanel({ t }) {
   return (
-    <div className="relative hidden h-full min-h-[100dvh] overflow-hidden md:block">
-      <div className="absolute inset-0 flex items-center justify-end">
-        <Image
-          src="/images/2.png"
-          alt=""
-          className="absolute right-[50px] top-0 h-full max-h-full object-cover"
-          width={500}
-          height={500}
-        />
-        <Image
-          src="/images/3.png"
-          alt=""
-          className="absolute right-[25px] top-0 h-full max-h-full object-cover"
-          width={500}
-          height={500}
-        />
-        <div>
+    <div className="login-hero relative hidden min-h-dvh overflow-hidden md:block">
+      <Image
+        src="/images/1.png"
+        alt=""
+        fill
+        priority
+        className="object-cover object-[center_20%]"
+        sizes="50vw"
+      />
+      <div className="login-hero__veil" aria-hidden />
+      <div className="relative z-[1] flex h-full min-h-dvh flex-col justify-between p-10 lg:p-12">
+        <p className="max-w-[16ch] text-[26px] font-light leading-[1.2] tracking-tight text-white lg:text-[30px]">
+          {t("login.heroTitleLead")}{" "}
+          <span className="font-semibold">{t("login.heroTitleEmph")}</span>{" "}
+          {t("login.heroTitleTail")}
+        </p>
+        <div className="flex items-end justify-between gap-4">
           <Image
-            src="/images/1.png"
-            alt=""
-            className="absolute right-0 top-0 h-full max-h-full rounded-lg object-cover"
-            width={500}
-            height={500}
+            src="/images/white logo.png"
+            alt="Braelo"
+            width={168}
+            height={48}
+            className="h-auto w-[150px] object-contain drop-shadow-sm"
+            priority
           />
-          <h2 className="relative z-50 bottom-52 right-64 w-44 p-0 text-xl text-white">
-            Somos a <span className="font-bold">conexão</span> entre negócios,{" "}
-            <span className="font-semibold">pessoas e sonhos</span>
-          </h2>
-          <div>
-            <Image
-              src="/images/white logo.png"
-              alt="Braelo"
-              className="relative z-50 top-52 right-64"
-              width={180}
-              height={180}
-            />
-          </div>
         </div>
       </div>
     </div>
@@ -61,6 +52,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,63 +93,65 @@ export default function LoginForm() {
             : "admin",
         name: profile?.name,
       });
-      toast.success("Login successful!");
+      toast.success(t("login.success"));
       router.push("/pages/dashboard");
     } catch (error) {
-      toast.error(error.message || "Login failed. Please check your credentials.");
+      toast.error(error.message || t("login.failed"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword((v) => !v);
-  };
-
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="grid min-h-dvh grid-cols-1 bg-white md:grid-cols-12">
-        <div className="col-span-1 flex items-center justify-center px-5 py-10 md:col-span-6 md:px-10">
-          <div className="w-full max-w-[360px] space-y-8">
-            <div className="md:hidden">
-              <div className="mb-8 inline-flex items-center rounded-2xl bg-[#FFCC35] px-4 py-3">
-                <Image
-                  src="/black logo.png"
-                  alt="Braelo"
-                  width={140}
-                  height={36}
-                  className="h-auto w-[132px] object-contain"
-                />
-              </div>
+      <div className="grid min-h-dvh grid-cols-1 bg-white md:grid-cols-2">
+        <div className="relative flex items-center justify-center px-6 py-12 sm:px-10 md:px-14 lg:px-16">
+          <div className="absolute right-5 top-5 sm:right-8 sm:top-8">
+            <LanguageSwitcher variant="light" align="right" />
+          </div>
+
+          <div className="w-full max-w-[400px]">
+            <div className="mb-10 md:hidden">
+              <Image
+                src="/black logo.png"
+                alt="Braelo"
+                width={140}
+                height={36}
+                className="h-auto w-[132px] object-contain"
+                priority
+              />
             </div>
-            <div>
-              <h1 className="text-[28px] font-semibold tracking-tight text-[#232F30]">
-                Braelo Power Admin
+
+            <div className="mb-9">
+              <h1 className="text-[34px] font-semibold leading-[1.08] tracking-[-0.03em] text-[#232F30] sm:text-[40px]">
+                {t("appName")}
               </h1>
-              <p className="mt-2 text-sm text-[#78828A]">
-                Sign in to manage users, listings, and businesses.
+              <p className="mt-3 max-w-[36ch] text-[15px] leading-relaxed text-[#8B949E]">
+                {t("appTagline")}
               </p>
             </div>
+
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
               <div>
                 <label htmlFor="login-email" className="field-label">
-                  Email
+                  {t("login.email")}
                 </label>
                 <input
                   id="login-email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
+                  placeholder={t("login.emailPlaceholder")}
                   autoComplete="username"
-                  className="field-control bg-brand-canvas"
+                  className="field-control"
                   required
                 />
               </div>
+
               <div>
                 <label htmlFor="login-password" className="field-label">
-                  Password
+                  {t("login.password")}
                 </label>
                 <div className="relative w-full">
                   <input
@@ -165,48 +159,61 @@ export default function LoginForm() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
+                    placeholder={t("login.passwordPlaceholder")}
                     autoComplete="current-password"
-                    className="field-control bg-brand-canvas pr-12"
+                    className="field-control pr-12"
                     required
                   />
                   <button
                     type="button"
                     tabIndex={0}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                    }}
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      togglePasswordVisibility();
+                      setShowPassword((v) => !v);
                     }}
-                    className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md p-1.5 text-brand-muted hover:text-brand-ink focus:outline-none"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md p-1.5 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] focus:outline-none"
+                    aria-label={
+                      showPassword
+                        ? t("login.hidePassword")
+                        : t("login.showPassword")
+                    }
                     aria-pressed={showPassword}
                   >
                     {showPassword ? (
-                      <FiEyeOff className="h-5 w-5 pointer-events-none" aria-hidden />
+                      <FiEyeOff className="pointer-events-none h-5 w-5" />
                     ) : (
-                      <FiEye className="h-5 w-5 pointer-events-none" aria-hidden />
+                      <FiEye className="pointer-events-none h-5 w-5" />
                     )}
                   </button>
                 </div>
               </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full"
+                className="btn-primary mt-3 w-full !rounded-2xl !py-3.5 text-[15px] font-semibold"
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? (
+                  <>
+                    <AppLoader
+                      size="sm"
+                      full={false}
+                      showLabel={false}
+                      tone="light"
+                    />
+                    <span>{t("login.submitting")}</span>
+                  </>
+                ) : (
+                  t("login.submit")
+                )}
               </button>
             </form>
           </div>
         </div>
 
-        <div className="hidden md:col-span-6 md:block">
-          <ImageSection />
-        </div>
+        <HeroPanel t={t} />
       </div>
     </>
   );

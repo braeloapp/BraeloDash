@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import {
   FiAlertTriangle,
@@ -11,9 +11,51 @@ import {
 import { useDashboardStats } from "./DashboardStatsContext";
 import { KpiSkeleton } from "@/app/components/ux/Skeleton";
 import PageState from "@/app/components/ux/PageState";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const OpsAlerts = () => {
+  const { t } = useLanguage();
   const { stats, loading, error, reload } = useDashboardStats();
+
+  const alerts = useMemo(
+    () => [
+      {
+        id: "reports",
+        label: t("dashboard.reportsPending"),
+        value: stats.reports?.pending ?? 0,
+        href: "/pages/reportedusers",
+        icon: FiAlertTriangle,
+        tone: "danger",
+      },
+      {
+        id: "support",
+        label: t("dashboard.supportOpen"),
+        value:
+          (stats.support_requests?.open || 0) +
+          (stats.support_requests?.in_progress || 0),
+        href: "/pages/support",
+        icon: FiLifeBuoy,
+        tone: "warn",
+      },
+      {
+        id: "users",
+        label: t("dashboard.newUsers7d"),
+        value: stats.users?.new_7d ?? 0,
+        href: "/pages/users",
+        icon: FiUsers,
+        tone: "info",
+      },
+      {
+        id: "listings",
+        label: t("dashboard.activeListings"),
+        value: stats.listings?.active ?? 0,
+        href: "/pages/listing",
+        icon: FiPackage,
+        tone: "ok",
+      },
+    ],
+    [stats, t]
+  );
 
   if (loading) return <KpiSkeleton cards={4} />;
 
@@ -21,47 +63,12 @@ const OpsAlerts = () => {
     return (
       <PageState
         status="error"
-        title="Unable to load operational alerts"
-        description="Live statistics could not be retrieved."
+        title={t("dashboard.loadAlertsError")}
+        description={t("dashboard.loadAlertsErrorDesc")}
         onRetry={reload}
       />
     );
   }
-
-  const alerts = [
-    {
-      id: "reports",
-      label: "Reports pending review",
-      value: stats.reports?.pending ?? 0,
-      href: "/pages/reportedusers",
-      icon: FiAlertTriangle,
-      tone: "danger",
-    },
-    {
-      id: "support",
-      label: "Support tickets open",
-      value: (stats.support_requests?.open || 0) + (stats.support_requests?.in_progress || 0),
-      href: "/pages/support",
-      icon: FiLifeBuoy,
-      tone: "warn",
-    },
-    {
-      id: "users",
-      label: "New users (7 days)",
-      value: stats.users?.new_7d ?? 0,
-      href: "/pages/users",
-      icon: FiUsers,
-      tone: "info",
-    },
-    {
-      id: "listings",
-      label: "Active listings",
-      value: stats.listings?.active ?? 0,
-      href: "/pages/listing",
-      icon: FiPackage,
-      tone: "ok",
-    },
-  ];
 
   const toneClass = {
     danger: "border-[#f3c4cd] bg-[#fff5f7]",

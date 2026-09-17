@@ -1,12 +1,21 @@
+import { Anybody } from "next/font/google";
 import localFont from "next/font/local";
 import ErrorTracking from "./components/ErrorTracking";
+import AppProviders from "./components/AppProviders";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+/**
+ * Anybody (SIL Open Font License 1.1)
+ * Copyright 2020 The Anybody Project Authors
+ * https://github.com/Etcetera-Type-Co/Anybody
+ */
+const anybody = Anybody({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-anybody",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
@@ -14,8 +23,8 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Braelo Admin",
-  description: "Braelo Power Admin Panel",
+  title: "Braelo Admin Panel",
+  description: "Braelo Admin Panel",
 };
 
 export const viewport = {
@@ -29,11 +38,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistSans.className} ${geistMono.variable} antialiased`}
+        className={`${anybody.variable} ${anybody.className} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ErrorTracking />
-        {children}
+        <AppProviders>
+          <ErrorTracking />
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

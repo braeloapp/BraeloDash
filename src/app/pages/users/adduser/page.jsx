@@ -10,8 +10,10 @@ import { postData } from "@/app/API/method";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const AddUser = () => {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const canCreateStaff =
@@ -73,8 +75,8 @@ const AddUser = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <PageHeader
         showBack
-        title="Add User"
-        description="Create a new platform user or staff account."
+        title={t("pages.usersAdd.title")}
+        description={t("pages.usersAdd.description")}
       />
 
       <div className="mx-auto w-full max-w-xl p-4 sm:p-6">

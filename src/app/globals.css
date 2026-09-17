@@ -51,6 +51,11 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
+
+  /* Typography — Anybody (OFL 1.1); Thin = 100 */
+  --font-sans: var(--font-anybody), "Anybody", Arial, Helvetica, sans-serif;
+  --font-display: var(--font-anybody), "Anybody", Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 html,
@@ -61,7 +66,8 @@ body {
 body {
   color: var(--color-text-primary);
   background: var(--color-background);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -148,7 +154,7 @@ input[type="radio"]:focus-visible {
 .admin-panel {
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .admin-panel input,
@@ -369,15 +375,22 @@ input[type="radio"]:focus-visible {
 }
 
 @layer components {
-  /* Typography */
+  /* Typography — Anybody family */
   .page-title {
     @apply text-[20px] font-semibold leading-tight sm:text-[24px];
+    font-family: var(--font-display);
     color: var(--color-text-secondary);
   }
 
   .section-title {
     @apply text-base font-semibold sm:text-lg;
+    font-family: var(--font-display);
     color: var(--color-text-primary);
+  }
+
+  .font-anybody-thin {
+    font-family: var(--font-display);
+    font-weight: 100;
   }
 
   .card-title {
@@ -2215,6 +2228,24 @@ button.bg-red-600,
   .listing-tabs-nav {
     display: none;
   }
+}
+
+/* Premium login */
+.login-hero {
+  background: #1a2024;
+}
+
+.login-hero__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(26, 32, 36, 0.22) 0%,
+      rgba(26, 32, 36, 0.42) 48%,
+      rgba(26, 32, 36, 0.62) 100%
+    );
+  pointer-events: none;
 }
 
 /* Universal Braelo wave loader (matches mobile app) */

@@ -16,6 +16,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 // Categories (API values) and subcategories — keys must match backend expectations
 const categories = [
@@ -118,6 +119,7 @@ const categories = [
 ];
 
 const AddNewBusiness = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState(null);
@@ -419,8 +421,8 @@ const AddNewBusiness = () => {
       />
       <PageHeader
         showBack
-        title="Add New Business"
-        description="Create a business profile with media, contact details, and category."
+        title={t("pages.businessAdd.title")}
+        description={t("pages.businessAdd.description")}
       />
 
       <div className="p-4 sm:p-5">

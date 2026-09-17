@@ -5,8 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import PageHeader from "@/app/components/ux/PageHeader";
 import PageState from "@/app/components/ux/PageState";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function CategoryDetailStub() {
+  const { t } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const id = params?.id;
@@ -19,7 +21,7 @@ function CategoryDetailStub() {
     <div className="page-shell">
       <PageHeader
         showBack
-        title="Category"
+        title={t("pages.categories.detail")}
         description={
           id
             ? `Category key: ${id}`
@@ -28,8 +30,8 @@ function CategoryDetailStub() {
       />
       <PageState
         status="empty"
-        title="Open subcategories for this category"
-        description="This route does not list category details. Use the subcategories view to manage labels under this taxonomy key."
+        title={t("pages.categories.openSubs")}
+        description={t("pages.categories.openSubsDesc")}
         action={
           <Button
             variant="primary"

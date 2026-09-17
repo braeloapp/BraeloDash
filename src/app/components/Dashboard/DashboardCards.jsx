@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import {
   FiBriefcase,
@@ -12,44 +12,57 @@ import {
 import { useDashboardStats } from "./DashboardStatsContext";
 import { KpiSkeleton } from "@/app/components/ux/Skeleton";
 import PageState from "@/app/components/ux/PageState";
-
-const CARDS = [
-  {
-    id: "listings",
-    title: "Total Listings",
-    href: "/pages/listing",
-    icon: FiPackage,
-    getValue: (s) => s.listings.total,
-    getHint: (s) => `${s.listings.active || 0} active`,
-  },
-  {
-    id: "users",
-    title: "Total Users",
-    href: "/pages/users",
-    icon: FiUsers,
-    getValue: (s) => s.users.total,
-    getHint: (s) => `${s.users.active || 0} active`,
-  },
-  {
-    id: "support",
-    title: "Support Requests",
-    href: "/pages/support",
-    icon: FiLifeBuoy,
-    getValue: (s) => s.support_requests.total,
-    getHint: (s) => `${s.support_requests.open || 0} open`,
-  },
-  {
-    id: "businesses",
-    title: "Total Businesses",
-    href: "/pages/business",
-    icon: FiBriefcase,
-    getValue: (s) => s.businesses.total,
-    getHint: (s) => `${s.businesses.active || 0} active`,
-  },
-];
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const DashboardCards = () => {
+  const { t } = useLanguage();
   const { stats, loading, error, reload } = useDashboardStats();
+
+  const cards = useMemo(
+    () => [
+      {
+        id: "listings",
+        title: t("dashboard.totalListings"),
+        href: "/pages/listing",
+        icon: FiPackage,
+        getValue: (s) => s.listings.total,
+        getHint: (s) =>
+          t("dashboard.activeHint", undefined, { count: s.listings.active || 0 }),
+      },
+      {
+        id: "users",
+        title: t("dashboard.totalUsers"),
+        href: "/pages/users",
+        icon: FiUsers,
+        getValue: (s) => s.users.total,
+        getHint: (s) =>
+          t("dashboard.activeHint", undefined, { count: s.users.active || 0 }),
+      },
+      {
+        id: "support",
+        title: t("dashboard.supportRequests"),
+        href: "/pages/support",
+        icon: FiLifeBuoy,
+        getValue: (s) => s.support_requests.total,
+        getHint: (s) =>
+          t("dashboard.openHint", undefined, {
+            count: s.support_requests.open || 0,
+          }),
+      },
+      {
+        id: "businesses",
+        title: t("dashboard.totalBusinesses"),
+        href: "/pages/business",
+        icon: FiBriefcase,
+        getValue: (s) => s.businesses.total,
+        getHint: (s) =>
+          t("dashboard.activeHint", undefined, {
+            count: s.businesses.active || 0,
+          }),
+      },
+    ],
+    [t]
+  );
 
   if (loading) return <KpiSkeleton cards={4} />;
 
@@ -57,8 +70,8 @@ const DashboardCards = () => {
     return (
       <PageState
         status="error"
-        title="Unable to load dashboard metrics"
-        description="Something went wrong while retrieving the latest statistics."
+        title={t("dashboard.loadMetricsError")}
+        description={t("dashboard.loadMetricsErrorDesc")}
         onRetry={reload}
       />
     );
@@ -66,7 +79,7 @@ const DashboardCards = () => {
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      {CARDS.map((card) => {
+      {cards.map((card) => {
         const Icon = card.icon;
         return (
           <Link
@@ -90,7 +103,7 @@ const DashboardCards = () => {
               </div>
             </div>
             <span className="mt-3 inline-flex items-center gap-1 pl-2 text-xs font-medium text-brand-gold opacity-0 transition group-hover:opacity-100">
-              View <FiArrowUpRight size={12} />
+              {t("common.view")} <FiArrowUpRight size={12} />
             </span>
           </Link>
         );

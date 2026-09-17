@@ -4,6 +4,7 @@ import Image from "next/image";
 import BackButton from "../BackButton";
 import { useRouter } from "next/navigation";
 import { utils, writeFileXLSX } from "xlsx";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const UserHeader = ({
   onSearch,
@@ -18,6 +19,7 @@ const UserHeader = ({
     { value: "html", label: "HTML" },
   ];
 
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const router = useRouter();
@@ -139,8 +141,8 @@ const UserHeader = ({
         <div className="flex min-w-0 items-center gap-3">
           <BackButton />
           <div className="min-w-0">
-            <h1 className="page-title">User Overview</h1>
-            <p className="page-desc">Search, filter, and manage platform accounts.</p>
+            <h1 className="page-title">{t("pages.users.title")}</h1>
+            <p className="page-desc">{t("pages.users.description")}</p>
           </div>
         </div>
         <div className="page-actions">
@@ -149,7 +151,7 @@ const UserHeader = ({
             onClick={() => router.push("/pages/users/adduser")}
             className="btn-primary"
           >
-            Add user
+            {t("pages.users.add")}
           </button>
           <div className="relative inline-block">
             <button
@@ -164,7 +166,7 @@ const UserHeader = ({
                 height={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2"
               />
-              <span>Export</span>
+              <span>{t("common.export")}</span>
               <svg
                 className={`ml-2 h-4 w-4 text-brand-faint transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
@@ -205,20 +207,20 @@ const UserHeader = ({
         <select
           onChange={(e) => onStatusChange(e.target.value)}
           className="field-control"
-          aria-label="Filter by status"
+          aria-label={t("pages.users.filterStatus")}
         >
-          <option value="">Select Status</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
+          <option value="">{t("common.selectStatus")}</option>
+          <option value="active">{t("common.active")}</option>
+          <option value="inactive">{t("common.inactive")}</option>
         </select>
 
         <div className="filter-grow relative">
           <input
             type="text"
-            placeholder="Search by name or email"
+            placeholder={t("pages.users.searchPlaceholder")}
             className="field-control pr-10"
             onChange={(e) => onSearch(e.target.value)}
-            aria-label="Search users"
+            aria-label={t("pages.users.searchAria")}
           />
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
             <img src="/Seacrh (1).png" alt="" width={16} height={16} />

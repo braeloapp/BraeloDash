@@ -42,6 +42,7 @@ import {
 import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import ListingCategoryTile from "@/app/components/Listing/ListingCategoryTile";
 import PageState from "@/app/components/ux/PageState";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const CATEGORIES = {
   vehicles: [
@@ -278,6 +279,7 @@ function resolveIcon(subcategoryLabel) {
 }
 
 const Subcategories = () => {
+  const { t } = useLanguage();
   const { slug } = useParams();
   const searchParams = useSearchParams();
   const parentEndpoint = searchParams.get("endpoint");
@@ -295,7 +297,7 @@ const Subcategories = () => {
     <ListingPageChrome
       showBack
       title={`Subcategories for ${titleCategory}`}
-      description="Step 2 of 2 — pick a subcategory to open the listing form."
+      description={t("pages.listingAdd.step2")}
     >
       <div className="mb-4 rounded-xl border border-[#f0e2b3] bg-[#FFF8E8] px-4 py-3 text-sm text-brand-muted">
         Choose the best match under{" "}
@@ -328,8 +330,8 @@ const Subcategories = () => {
       ) : (
         <PageState
           status="empty"
-          title="No subcategories found"
-          description="This category does not have subcategories configured yet."
+          title={t("pages.listingAdd.noSubs")}
+          description={t("pages.listingAdd.noSubsDesc")}
         />
       )}
     </ListingPageChrome>

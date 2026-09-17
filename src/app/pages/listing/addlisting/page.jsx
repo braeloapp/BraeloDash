@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import ListingPageChrome from "@/app/components/Listing/ListingPageChrome";
 import ListingCategoryTile from "@/app/components/Listing/ListingCategoryTile";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const categories = [
   {
@@ -100,11 +101,13 @@ const categories = [
 ];
 
 const Categories = () => {
+  const { t } = useLanguage();
+
   return (
     <ListingPageChrome
       showBack
-      title="Add Listing"
-      description="Step 1 of 2 — choose a category. Next you’ll pick a subcategory and fill the listing form."
+      title={t("pages.listingAdd.title")}
+      description={t("pages.listingAdd.description")}
     >
       <div className="mb-4 rounded-xl border border-[#f0e2b3] bg-[#FFF8E8] px-4 py-3 text-sm text-brand-muted">
         Select the marketplace category that best matches what you are listing.

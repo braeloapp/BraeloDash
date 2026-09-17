@@ -13,11 +13,13 @@ import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
 import ActionMenu from "@/app/components/ux/ActionMenu";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const BANNER_LIST_ENDPOINT = "/admin-panel/banner";
 const BANNER_DELETE_ENDPOINT = "/admin-panel/business/banner/delete";
 
 export default function BannerManagement() {
+  const { t } = useLanguage();
   const [banners, setBanners] = useState([]);
   const [selectedBanner, setSelectedBanner] = useState(null);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
@@ -300,8 +302,8 @@ export default function BannerManagement() {
       <style jsx global>{paginatorStyles}</style>
       <PageHeader
         showBack
-        title="All Banners"
-        description="Manage promotional banners shown across the platform."
+        title={t("pages.banners.title")}
+        description={t("pages.banners.description")}
         actions={
           <Button variant="primary" onClick={handleNewListing}>
             Add Banner

@@ -11,8 +11,10 @@ import {
   fetchAdminTaxonomy,
   slugifyKey,
 } from "@/lib/taxonomy";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const AddsubcategoryForm = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedParent = searchParams.get("parent") || "";
@@ -81,7 +83,7 @@ const AddsubcategoryForm = () => {
       <div className="page-header mb-4 px-0">
         <div className="flex min-w-0 items-center gap-2">
           <BackButton />
-          <h1 className="page-title">Add subcategory</h1>
+          <h1 className="page-title">{t("pages.categories.addSub")}</h1>
         </div>
       </div>
 

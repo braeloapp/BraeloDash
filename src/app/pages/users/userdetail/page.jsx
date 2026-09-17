@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function formatDate(value) {
   if (!value) return "N/A";
@@ -44,6 +45,7 @@ function MetaCard({ label, children }) {
 }
 
 const Userdetail = () => {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
   const userId = searchParams.get("id");
@@ -159,10 +161,10 @@ const Userdetail = () => {
     return (
       <ListingPageChrome
         showBack
-        title="User Details"
-        description="Loading profile…"
+        title={t("pages.userDetail.title")}
+        description={t("pages.userDetail.loading")}
       >
-        <PageState status="loading" title="Loading user data..." />
+        <PageState status="loading" title={t("pages.userDetail.loadingData")} />
       </ListingPageChrome>
     );
   }
@@ -171,12 +173,12 @@ const Userdetail = () => {
     return (
       <ListingPageChrome
         showBack
-        title="User Details"
-        description="Something went wrong."
+        title={t("pages.userDetail.title")}
+        description={t("pages.userDetail.error")}
       >
         <PageState
           status="error"
-          title="Unable to load user"
+          title={t("pages.userDetail.loadError")}
           description={error.message}
           onRetry={() => router.refresh()}
         />
@@ -188,10 +190,10 @@ const Userdetail = () => {
     return (
       <ListingPageChrome
         showBack
-        title="User Details"
-        description="No profile found."
+        title={t("pages.userDetail.title")}
+        description={t("pages.userDetail.empty")}
       >
-        <PageState status="empty" title="No user data available" />
+        <PageState status="empty" title={t("pages.userDetail.emptyData")} />
       </ListingPageChrome>
     );
   }
@@ -204,8 +206,8 @@ const Userdetail = () => {
     <div className="page-shell user-detail-page">
       <PageHeader
         showBack
-        title="User Details"
-        description="Review profile info, export records, and manage this user’s listings."
+        title={t("pages.userDetail.title")}
+        description={t("pages.userDetail.description")}
         actions={
           <ActionMenu
             label="Download"

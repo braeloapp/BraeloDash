@@ -7,8 +7,10 @@ import { getApiErrorMessage } from "@/lib/apiResponse";
 import { useRouter } from "next/navigation";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const AddNewNotification = () => {
+  const { t } = useLanguage();
   const [messageData, setMessageData] = useState({
     type: "Notification",
     title: "",
@@ -84,8 +86,8 @@ const AddNewNotification = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <PageHeader
         showBack
-        title="Create New Notification"
-        description="Compose and publish an announcement to platform users."
+        title={t("pages.notifications.add")}
+        description={t("pages.notifications.addDesc")}
       />
 
       <div className="space-y-5 p-4 sm:p-5">

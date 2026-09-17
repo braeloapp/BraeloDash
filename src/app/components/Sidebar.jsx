@@ -14,7 +14,6 @@ import {
 } from "react-icons/fi";
 import { getApiBaseUrl } from "@/lib/apiConfig";
 import {
-  adminRoleLabel,
   clearAdminSession,
   persistAdminSession,
   ADMIN_DEFAULT_AVATAR,
@@ -25,6 +24,8 @@ import {
   NOTIFICATIONS_CHANGED,
 } from "@/lib/adminNotifications";
 import { sidebarGroups, sidebarItems } from "./navItems";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+import LanguageSwitcher from "@/app/components/ux/LanguageSwitcher";
 
 const COLLAPSE_KEY = "braelo_admin_sidebar_collapsed";
 
@@ -47,12 +48,18 @@ function loadCollapsed() {
 const Sidebar = ({ open = false, onClose }) => {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
   const [collapsed, setCollapsed] = useState({});
   const [accountOpen, setAccountOpen] = useState(false);
   const [userName, setUserName] = useState("Admin");
-  const [roleLabel, setRoleLabel] = useState("Administrator");
+  const [roleKey, setRoleKey] = useState("admin");
   const [unreadCount, setUnreadCount] = useState(0);
   const accountRef = useRef(null);
+
+  const roleLabel =
+    roleKey === "super_admin"
+      ? t("account.superAdmin")
+      : t("account.administrator");
 
   const grouped = useMemo(() => {
     return sidebarGroups
@@ -96,7 +103,7 @@ const Sidebar = ({ open = false, onClose }) => {
       const cachedName = localStorage.getItem("admin_name");
       const cachedRole = localStorage.getItem("admin_role");
       if (cachedName) setUserName(cachedName);
-      if (cachedRole) setRoleLabel(adminRoleLabel(cachedRole));
+      if (cachedRole) setRoleKey(cachedRole === "super_admin" ? "super_admin" : "admin");
 
       try {
         const response = await fetch(`${getApiBaseUrl()}/admin-panel/me`, {
@@ -109,10 +116,14 @@ const Sidebar = ({ open = false, onClose }) => {
         const data = await response.json();
         const profile = data?.data || data;
         setUserName(profile?.name || "Admin");
-        setRoleLabel(adminRoleLabel(profile?.role));
+        const nextRole =
+          profile?.role === "super_admin" || profile?.is_superuser
+            ? "super_admin"
+            : "admin";
+        setRoleKey(nextRole);
         persistAdminSession({
           token,
-          role: profile?.role,
+          role: nextRole,
           name: profile?.name,
         });
       } catch {
@@ -264,7 +275,7 @@ const Sidebar = ({ open = false, onClose }) => {
                           : "text-white/38 group-hover:text-white/58"
                       }`}
                     >
-                      {section.group}
+                      {t(`nav.groups.${section.group}`, section.group)}
                     </span>
                   </span>
                   <FiChevronDown
@@ -331,7 +342,7 @@ const Sidebar = ({ open = false, onClose }) => {
                                 />
                               </span>
                               <span className="admin-sidebar-link__label relative z-[1] truncate tracking-[-0.01em]">
-                                {item.label}
+                                {t(`nav.items.${item.label}`, item.label)}
                               </span>
                               {active ? (
                                 <span
@@ -367,6 +378,9 @@ const Sidebar = ({ open = false, onClose }) => {
               <p className="mt-0.5 truncate text-[11px] text-[#FFCC35]/90">
                 {roleLabel}
               </p>
+              <div className="mt-3">
+                <LanguageSwitcher variant="dark" align="left" />
+              </div>
             </div>
 
             <button
@@ -376,7 +390,7 @@ const Sidebar = ({ open = false, onClose }) => {
               onClick={() => goTo("/pages/adminprofile")}
             >
               <FiUser size={16} />
-              <span>Profile settings</span>
+              <span>{t("account.profile")}</span>
             </button>
 
             <button
@@ -386,7 +400,7 @@ const Sidebar = ({ open = false, onClose }) => {
               onClick={() => goTo("/pages/notifications")}
             >
               <FiBell size={16} />
-              <span className="flex-1 text-left">Notifications</span>
+              <span className="flex-1 text-left">{t("account.notifications")}</span>
               {unreadCount > 0 ? (
                 <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CD9403] px-1.5 text-[10px] font-semibold text-white">
                   {unreadCount > 9 ? "9+" : unreadCount}
@@ -403,7 +417,7 @@ const Sidebar = ({ open = false, onClose }) => {
               onClick={handleLogout}
             >
               <FiLogOut size={16} />
-              <span>Logout</span>
+              <span>{t("account.logout")}</span>
             </button>
           </div>
         ) : null}

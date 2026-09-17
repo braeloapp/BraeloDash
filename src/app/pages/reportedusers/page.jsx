@@ -13,6 +13,7 @@ import PageHeader from "@/app/components/ux/PageHeader";
 import ActionMenu from "@/app/components/ux/ActionMenu";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const REPORTS_ENDPOINT = "/admin-panel/report/action";
 
@@ -87,6 +88,7 @@ function formatReportData(reports) {
 }
 
 const ReportedUser = () => {
+  const { t } = useLanguage();
   // State management
   const [reports, setReports] = useState([]);
   const [first, setFirst] = useState(0);
@@ -402,8 +404,8 @@ const ReportedUser = () => {
     <div className="page-shell">
       <PageHeader
         showBack
-        title="Reported Users"
-        description="Review reports and take moderation actions on flagged accounts."
+        title={t("pages.reported.title")}
+        description={t("pages.reported.description")}
         actions={
           <div className="relative" ref={exportRef}>
             <button

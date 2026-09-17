@@ -7,8 +7,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { getApiErrorMessage } from "@/lib/apiResponse";
 import PageHeader from "@/app/components/ux/PageHeader";
 import Button from "@/app/components/ux/Button";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const AddBanner = () => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     business_banner: null,
     business_name: "",
@@ -77,8 +79,8 @@ const AddBanner = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <PageHeader
         showBack
-        title="Add Banner"
-        description="Upload a banner and attach business details for promotion."
+        title={t("pages.banners.add")}
+        description={t("pages.banners.addDesc")}
       />
 
       <div className="mx-auto w-full max-w-md p-4 sm:p-6">

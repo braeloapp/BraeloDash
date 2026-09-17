@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import BackButton from "../BackButton";
 import Image from "next/image";
 import { utils, writeFileXLSX } from "xlsx";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 const exportOptions = [
   { value: "csv", label: "CSV" },
@@ -31,6 +32,7 @@ const BusinessHeader = ({
   data,
   selectedBusinesses
 }) => {
+  const { t } = useLanguage();
   const [selectedExport, setSelectedExport] = useState(exportOptions[0]);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [status, setStatus] = useState("");
@@ -180,10 +182,8 @@ const BusinessHeader = ({
         <div className="flex min-w-0 items-center gap-3">
           <BackButton />
           <div className="min-w-0">
-            <h1 className="page-title">Business Overview</h1>
-            <p className="page-desc">
-              Search, filter, and manage business accounts on the platform.
-            </p>
+            <h1 className="page-title">{t("pages.business.title")}</h1>
+            <p className="page-desc">{t("pages.business.description")}</p>
           </div>
         </div>
         <div className="page-actions">
@@ -192,7 +192,7 @@ const BusinessHeader = ({
             onClick={handleNewBusiness}
             className="btn-primary"
           >
-            Add Business
+            {t("pages.business.add")}
           </button>
 
           <div className="relative inline-block">
@@ -208,7 +208,7 @@ const BusinessHeader = ({
                 height={18}
                 className="absolute left-3 top-1/2 -translate-y-1/2"
               />
-              <span>Export</span>
+              <span>{t("common.export")}</span>
               <svg
                 className={`ml-2 h-4 w-4 text-brand-faint transition-transform duration-200 ${
                   isExportOpen ? "rotate-180" : ""

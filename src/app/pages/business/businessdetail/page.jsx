@@ -21,6 +21,7 @@ import {
 import { postBusiData, getData } from "@/app/API/method";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function formatDate(value) {
   if (!value) return "N/A";
@@ -63,6 +64,7 @@ const categories = [
 ];
 
 const BusinessDetails = () => {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const businessId = searchParams.get("id");
@@ -318,18 +320,26 @@ const BusinessDetails = () => {
 
   if (loading) {
     return (
-      <ListingPageChrome showBack title="Business Details" description="Loading profile…">
-        <PageState status="loading" title="Loading business data..." />
+      <ListingPageChrome
+        showBack
+        title={t("pages.businessDetail.title")}
+        description={t("pages.businessDetail.loading")}
+      >
+        <PageState status="loading" title={t("pages.businessDetail.loadingData")} />
       </ListingPageChrome>
     );
   }
 
   if (error) {
     return (
-      <ListingPageChrome showBack title="Business Details" description="Something went wrong.">
+      <ListingPageChrome
+        showBack
+        title={t("pages.businessDetail.title")}
+        description={t("pages.businessDetail.error")}
+      >
         <PageState
           status="error"
-          title="Unable to load business"
+          title={t("pages.businessDetail.loadError")}
           description={error.message}
           onRetry={() => router.refresh()}
         />
@@ -339,8 +349,12 @@ const BusinessDetails = () => {
 
   if (!businessData) {
     return (
-      <ListingPageChrome showBack title="Business Details" description="No profile found.">
-        <PageState status="empty" title="No business data available" />
+      <ListingPageChrome
+        showBack
+        title={t("pages.businessDetail.title")}
+        description={t("pages.businessDetail.empty")}
+      >
+        <PageState status="empty" title={t("pages.businessDetail.emptyData")} />
       </ListingPageChrome>
     );
   }
@@ -358,8 +372,8 @@ const BusinessDetails = () => {
       <div className="page-shell user-detail-page">
         <PageHeader
           showBack
-          title="Business Details"
-          description="Review business profile, export records, and manage related listings."
+          title={t("pages.businessDetail.title")}
+          description={t("pages.businessDetail.description")}
           actions={
             <ActionMenu
               label="Download"
