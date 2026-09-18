@@ -61,18 +61,6 @@ export const sidebarItems = [
     label: "Statistics",
   },
   {
-    group: "Insights",
-    to: "/pages/audit-logs",
-    icon: "/a9.png",
-    label: "Audit Logs",
-  },
-  {
-    group: "Administration",
-    to: "/pages/settings",
-    icon: "/a12.png",
-    label: "Platform Settings",
-  },
-  {
     group: "Administration",
     to: "/pages/privacypolicy",
     icon: "/a12.png",

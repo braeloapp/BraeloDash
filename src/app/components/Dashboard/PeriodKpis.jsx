@@ -120,12 +120,6 @@ export default function PeriodKpis() {
         >
           {t("nav.items.Reported Users", "Reported Users")}
         </Link>
-        <Link
-          href="/pages/audit-logs"
-          className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-medium text-brand-ink hover:border-[#f0e2b3]"
-        >
-          {t("nav.items.Audit Logs", "Audit Logs")}
-        </Link>
       </div>
     </div>
   );
