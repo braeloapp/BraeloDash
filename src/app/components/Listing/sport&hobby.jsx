@@ -59,7 +59,10 @@ const Sports = () => {
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getData(`/listing/paginate/sportshobby?page=${page}`);
+      const response = await getData(
+        `/listing/paginate/sportshobby?page=${page}&include_inactive=true`,
+        { bypass: true }
+      );
       
       if (response?.data) {
         setData(

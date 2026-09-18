@@ -140,7 +140,7 @@ export default function BannerManagement() {
       setLoading(true);
       setError(null);
 
-      const response = await getData(BANNER_LIST_ENDPOINT);
+      const response = await getData(BANNER_LIST_ENDPOINT, { bypass: true });
       const results = extractResultsList(response);
       const transformedData = transformBannerData(results);
       setBanners(transformedData);

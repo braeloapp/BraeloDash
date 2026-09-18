@@ -56,7 +56,10 @@ const RealEstate = () => {
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getData(`/listing/paginate/realestate?page=${page}`);
+      const response = await getData(
+        `/listing/paginate/realestate?page=${page}&include_inactive=true`,
+        { bypass: true }
+      );
 
       if (response?.data) {
         setData(

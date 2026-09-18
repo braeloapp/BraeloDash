@@ -23,6 +23,7 @@ import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import AuditHistoryPanel from "@/app/components/Audit/AuditHistoryPanel";
+import { fetchAdminTaxonomy } from "@/lib/taxonomy";
 
 function formatDate(value) {
   if (!value) return "N/A";
@@ -51,18 +52,36 @@ function MetaCard({ label, children }) {
   );
 }
 
-const categories = [
-  {
-    value: "Vehicles",
-    label: "Vehicles",
-    subcategories: ["Cars", "Motorcycles", "Trucks"],
-  },
-  {
-    value: "Restaurants",
-    label: "Restaurants",
-    subcategories: ["Fast Food", "Fine Dining", "Cafe"],
-  },
-];
+function normalizeToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function findCategory(catalog, stored) {
+  const target = normalizeToken(stored);
+  if (!target) return null;
+  return (
+    catalog.find(
+      (item) =>
+        normalizeToken(item.key) === target ||
+        normalizeToken(item.label) === target
+    ) || null
+  );
+}
+
+function findSubcategory(category, stored) {
+  const target = normalizeToken(stored);
+  if (!category || !target) return null;
+  return (
+    (category.subcategories || []).find(
+      (item) =>
+        normalizeToken(item.key) === target ||
+        normalizeToken(item.label) === target
+    ) || null
+  );
+}
 
 const BusinessDetails = () => {
   const { t } = useLanguage();
@@ -71,6 +90,7 @@ const BusinessDetails = () => {
   const businessId = searchParams.get("id");
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [businessData, setBusinessData] = useState(null);
+  const [taxonomy, setTaxonomy] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -106,7 +126,10 @@ const BusinessDetails = () => {
       "Phone Number": data.business_number || data["Phone Number"],
       website: data.business_website || data.website,
       BusinessType: data.business_category || data.BusinessType,
+      Subcategory: data.business_subcategory || data.subcategory || "",
       Status: data.is_active === false ? "Inactive" : (data.Status || "Active"),
+      "Date Created": data.created_at || data["Date Created"] || "",
+      "Last Update": data.updated_at || data["Last Update"] || "",
       Coordinates: data.business_address || data.Coordinates,
       Description: data.business_goals || data.Description,
       business_logo: data.business_logo,
@@ -121,8 +144,8 @@ const BusinessDetails = () => {
       business_email: mapped.Email || "",
       business_website: mapped.website || "",
       business_goals: mapped.Description || "",
-      business_category: mapped.BusinessType || "",
-      business_subcategory: "",
+      business_category: data.business_category || data.BusinessType || "",
+      business_subcategory: data.business_subcategory || data.subcategory || "",
       business_logo: null,
       business_banner: null,
       business_images: [],
@@ -162,6 +185,42 @@ const BusinessDetails = () => {
     loadBusiness();
   }, [businessId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetchAdminTaxonomy()
+      .then((rows) => {
+        if (!cancelled) setTaxonomy(Array.isArray(rows) ? rows : []);
+      })
+      .catch(() => {
+        if (!cancelled) setTaxonomy([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!taxonomy.length) return;
+    setEditForm((prev) => {
+      const category = findCategory(taxonomy, prev.business_category);
+      const subcategory = findSubcategory(category, prev.business_subcategory);
+      const nextCategory = category?.key || prev.business_category;
+      const nextSubcategory =
+        subcategory?.key || prev.business_subcategory || "";
+      if (
+        nextCategory === prev.business_category &&
+        nextSubcategory === prev.business_subcategory
+      ) {
+        return prev;
+      }
+      return {
+        ...prev,
+        business_category: nextCategory,
+        business_subcategory: nextSubcategory,
+      };
+    });
+  }, [taxonomy, businessData]);
+
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -199,23 +258,36 @@ const BusinessDetails = () => {
         formData
       );
 
-      if (response.data) {
+      const saved = response?.data;
+      if (saved && typeof saved === "object") {
+        applyBusiness({
+          ...saved,
+          business_website:
+            saved.business_website || editForm.business_website,
+          business_name: saved.business_name || editForm.business_name,
+          business_address:
+            saved.business_address || editForm.business_address,
+          business_number:
+            saved.business_number || editForm.business_number,
+          business_goals: saved.business_goals || editForm.business_goals,
+          business_category:
+            saved.business_category || editForm.business_category,
+          business_subcategory:
+            saved.business_subcategory || editForm.business_subcategory,
+        });
         toast.success("Business updated successfully!");
-        const updatedData = { 
-          ...businessData, 
-          ...editForm,
-          business_logo: [logoPreview],
-          business_banner: [bannerPreview],
-          business_images: imagesPreview
-        };
-        setBusinessData(updatedData);
-        sessionStorage.setItem("currentBusinessData", JSON.stringify(updatedData));
         setEditModalOpen(false);
       } else {
-        toast.error(response.message || "Failed to update business");
+        toast.error(response?.message || "Failed to update business");
       }
     } catch (error) {
-      toast.error("Error updating business");
+      const apiError =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Error updating business";
+      toast.error(
+        typeof apiError === "string" ? apiError : "Error updating business"
+      );
       console.error("Update error:", error);
     } finally {
       setLoading(false);
@@ -224,7 +296,16 @@ const BusinessDetails = () => {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditForm(prev => ({ ...prev, [name]: value }));
+    setEditForm((prev) => {
+      if (name === "business_category" && value !== prev.business_category) {
+        return {
+          ...prev,
+          business_category: value,
+          business_subcategory: "",
+        };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
   const handleFileChange = (e, field) => {
@@ -604,15 +685,23 @@ const BusinessDetails = () => {
                     name="business_category"
                     value={editForm.business_category}
                     onChange={handleEditChange}
-                    className="w-full p-2 border rounded-lg"
+                    className="field-control w-full"
                     required
                   >
                     <option value="">Select category</option>
-                    {categories.map((category) => (
-                      <option key={category.value} value={category.value}>
-                        {category.label}
+                    {taxonomy.map((category) => (
+                      <option key={category.key} value={category.key}>
+                        {category.label || category.key}
                       </option>
                     ))}
+                    {editForm.business_category &&
+                    !taxonomy.some(
+                      (category) => category.key === editForm.business_category
+                    ) ? (
+                      <option value={editForm.business_category}>
+                        {editForm.business_category}
+                      </option>
+                    ) : null}
                   </select>
                 </div>
                 <div>
@@ -623,15 +712,30 @@ const BusinessDetails = () => {
                     name="business_subcategory"
                     value={editForm.business_subcategory}
                     onChange={handleEditChange}
-                    className="w-full p-2 border rounded-lg"
+                    className="field-control w-full"
                     disabled={!editForm.business_category}
+                    required
                   >
                     <option value="">Select subcategory</option>
-                    {editForm.business_category && 
-                      categories.find(c => c.value === editForm.business_category)?.subcategories.map(sub => (
-                        <option key={sub} value={sub}>{sub}</option>
-                      ))
-                    }
+                    {(
+                      findCategory(taxonomy, editForm.business_category)
+                        ?.subcategories || []
+                    ).map((sub) => (
+                      <option key={sub.key} value={sub.key}>
+                        {sub.label || sub.key}
+                      </option>
+                    ))}
+                    {editForm.business_subcategory &&
+                    !(
+                      findCategory(taxonomy, editForm.business_category)
+                        ?.subcategories || []
+                    ).some(
+                      (sub) => sub.key === editForm.business_subcategory
+                    ) ? (
+                      <option value={editForm.business_subcategory}>
+                        {editForm.business_subcategory}
+                      </option>
+                    ) : null}
                   </select>
                 </div>
               </div>

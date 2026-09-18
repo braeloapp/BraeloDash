@@ -65,6 +65,9 @@ function bustListCaches(endpoint = '') {
   if (path.includes('/admin-panel/')) {
     invalidateGetCache('/admin-panel/');
   }
+  if (path.includes('/admin-panel/delete') || path.includes('flip/status')) {
+    invalidateGetCache('/listing/paginate');
+  }
 }
 
 export const LoginApi = async (endpoint, data) => {

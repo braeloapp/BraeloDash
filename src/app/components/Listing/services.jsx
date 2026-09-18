@@ -59,7 +59,10 @@ const Services = () => {
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getData(`/listing/paginate/services?page=${page}`);
+      const response = await getData(
+        `/listing/paginate/services?page=${page}&include_inactive=true`,
+        { bypass: true }
+      );
 
       if (response?.data) {
         setData(

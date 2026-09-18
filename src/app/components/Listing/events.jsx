@@ -58,7 +58,10 @@ const Events = () => {
   const fetchData = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getData(`/listing/paginate/events?page=${page}`);
+      const response = await getData(
+        `/listing/paginate/events?page=${page}&include_inactive=true`,
+        { bypass: true }
+      );
 
       if (response?.data) {
         setData(

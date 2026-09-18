@@ -13,7 +13,7 @@ const exportOptions = [
 ];
 
 const statusOptions = [
-  { value: "", label: "Select Status", disabled: true },
+  { value: "", label: "All" },
   { value: "Active", label: "Active" },
   { value: "Inactive", label: "Inactive" },
 ];
@@ -252,11 +252,7 @@ const BusinessHeader = ({
           aria-label="Filter by status"
         >
           {statusOptions.map((option) => (
-            <option
-              key={option.value}
-              value={option.value}
-              disabled={option.disabled}
-            >
+            <option key={option.label} value={option.value}>
               {option.label}
             </option>
           ))}

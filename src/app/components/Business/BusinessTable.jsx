@@ -10,6 +10,7 @@ import { postData } from "@/app/API/method";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmDeleteDialog from "@/app/components/ConfirmDeleteDialog";
+import ConfirmDialog from "@/app/components/ux/ConfirmDialog";
 import ActionMenu from "@/app/components/ux/ActionMenu";
 
 const BusinessTable = ({
@@ -25,7 +26,9 @@ const BusinessTable = ({
 }) => {
   const router = useRouter();
   const [businessToDeactivate, setBusinessToDeactivate] = useState(null);
+  const [businessToReactivate, setBusinessToReactivate] = useState(null);
   const [deactivating, setDeactivating] = useState(false);
+  const [reactivating, setReactivating] = useState(false);
   const isServerPaged = typeof onPageChange === "function";
 
   const handleViewProfile = (rowData) => {
@@ -65,6 +68,28 @@ const BusinessTable = ({
     }
   };
 
+  const confirmReactivate = async () => {
+    if (businessToReactivate == null) return;
+    try {
+      setReactivating(true);
+      await postData("/admin-panel/business/activate", {
+        user_id: businessToReactivate,
+      });
+      toast.success("Business reactivated successfully");
+      setBusinessToReactivate(null);
+      onRefresh();
+    } catch (error) {
+      console.error("Error reactivating business:", error);
+      toast.error(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Failed to reactivate business"
+      );
+    } finally {
+      setReactivating(false);
+    }
+  };
+
   const statusCheck = (rowData) => {
     const statusClasses = {
       Active: "bg-[#06B64C] text-white p-1 rounded-lg text-center",
@@ -79,26 +104,31 @@ const BusinessTable = ({
     );
   };
 
-  const actionButton = (rowData) => (
-    <ActionMenu
-      label="Business actions"
-      items={[
-        {
-          label: "View",
-          onClick: () => handleViewProfile(rowData),
-        },
-        ...(rowData.Status === "Active"
-          ? [
-              {
+  const actionButton = (rowData) => {
+    const ownerId = rowData.businessId || rowData.user_id;
+    const isActive = rowData.Status === "Active";
+    return (
+      <ActionMenu
+        label="Business actions"
+        items={[
+          {
+            label: "View",
+            onClick: () => handleViewProfile(rowData),
+          },
+          isActive
+            ? {
                 label: "Deactivate",
                 danger: true,
-                onClick: () => openDeactivateDialog(rowData.businessId),
+                onClick: () => openDeactivateDialog(ownerId),
+              }
+            : {
+                label: "Reactivate",
+                onClick: () => setBusinessToReactivate(ownerId),
               },
-            ]
-          : []),
-      ]}
-    />
-  );
+        ]}
+      />
+    );
+  };
 
   const ImageLogo = (rowData) => (
     <div className="w-10 h-10">
@@ -133,6 +163,18 @@ const BusinessTable = ({
         title="Are you sure you want to deactivate this business?"
         confirmLabel="Deactivate"
         confirmLoading={deactivating}
+      />
+      <ConfirmDialog
+        visible={businessToReactivate !== null}
+        onHide={() => {
+          if (!reactivating) setBusinessToReactivate(null);
+        }}
+        onConfirm={confirmReactivate}
+        title="Reactivate this business?"
+        message="The business will show as active again and can take listings."
+        confirmLabel="Reactivate"
+        confirmVariant="primary"
+        confirmLoading={reactivating}
       />
 
       <div className="table-scroll-wrapper">
