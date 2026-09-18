@@ -1,0 +1,631 @@
+BRAELO ADMIN PANEL — COMPLETE DOCUMENTATION
+==========================================
+
+Product: Braelo Admin Panel (web)
+For: Client stakeholders, QA, operations, and onboarding
+Scope: Admin panel only (not the mobile app)
+Date: September 18, 2026
+
+
+1. OVERVIEW
+-----------
+
+The Braelo Admin Panel is a web application used by Braelo staff to operate the marketplace. With it, staff can manage users and businesses, moderate listings and reports, handle support and announcements, and publish legal content.
+
+
+1.1 Who uses it
+
+Administrator
+  - Day-to-day operations: users, listings, support, notifications, and more.
+
+Super Admin
+  - Same access as Administrator.
+  - Can also create other admin accounts when adding users.
+
+
+1.2 How to access
+
+1. Open the Admin Panel website (local or deployed URL).
+2. Sign in with staff email and password.
+3. After login you land on the Dashboard.
+4. Use the left sidebar to move between modules.
+5. Use the bottom account menu for profile, notifications shortcut, language, and logout.
+
+
+1.3 Languages
+
+The panel supports English, Portuguese, and Spanish.
+Language can be changed from the login screen and from the sidebar account menu.
+
+
+1.4 Navigation (current sidebar)
+
+Overview
+  - Dashboard
+
+People
+  - Users
+  - Business
+
+Marketplace
+  - Listing
+  - Categories
+  - Banner
+
+Moderation
+  - Reported Users
+
+Operations
+  - Support
+  - Notifications
+  - Feedback
+
+Insights
+  - Statistics
+
+Administration
+  - Privacy Policy
+
+Account menu (bottom of sidebar, not main nav)
+  - Admin Profile
+  - Notifications shortcut
+  - Language
+  - Logout
+
+
+2. GLOBAL BEHAVIORS
+-------------------
+
+2.1 Authentication
+
+- Login stores a session used for all admin actions.
+- Logout clears the session and returns to Login.
+- All screens under the admin area require a valid session.
+
+
+2.2 Common UI patterns
+
+Search and filters
+  - Used on Users, Business, Reported Users, Support, Feedback.
+
+Pagination
+  - Used on most list screens and listing category tabs.
+
+Export
+  - Users, Business, Reported Users.
+  - PDF/CSV also available on User Detail and Business Detail.
+
+Confirm dialogs
+  - Used before delete, deactivate, and moderation actions.
+
+Success and error messages
+  - Shown after save, delete, and other actions.
+
+Detail and edit popups / modals
+  - Used for listings, banners, support, reports, and profiles.
+
+
+3. LOGIN
+--------
+
+Purpose: Sign staff into the Admin Panel.
+
+What you see on screen
+- Email field
+- Password field
+- Show / hide password
+- Language switcher
+- Branded side panel on desktop
+
+What you can do
+1. Enter email and password.
+2. System checks credentials and starts a session.
+3. On success → go to Dashboard.
+4. On failure → error message; stay on Login.
+
+User flow
+Open Admin Panel → Login → Dashboard
+
+
+4. DASHBOARD
+------------
+
+Purpose: Home screen for operations. Shows live counts, growth for a selected period, and shortcuts to work that needs attention.
+
+What you see on screen
+- Period selector: Today, 7 days, 30 days, 90 days
+- Ops alerts: pending reports, open support, new users (7 days), active listings
+- Period KPIs: new users, new listings, new businesses, pending reports
+- Summary cards: total listings, users, support requests, businesses
+- Platform volume chart: daily growth of listings, users, and businesses
+- Listing and moderation chart: active vs inactive listings, reports, open support
+- User statistics: active, new in 7 days, new today
+- Recent users list with links to profiles
+
+What you can do
+- Change the period to refresh analytics.
+- Click cards or alerts to open Users, Listings, Support, Reported Users, or Business.
+- Retry if metrics fail to load.
+
+User flow
+Login → Dashboard → review alerts → open the relevant module
+
+
+5. PEOPLE — USERS
+-----------------
+
+5.1 Users list
+
+Purpose: Search, filter, and manage all platform accounts.
+
+What you see on screen
+- Add User button
+- Export button
+- Filters: search, active/inactive, creation date, email/phone verification
+- Table with user ID, email, name, status, verification flags, created date, role, and actions
+
+What you can do
+- Search users (updates as you type, with a short delay).
+- Filter by status, date, and verification.
+- View a user profile (User Detail).
+- Deactivate an active account.
+- Reactivate a deactivated account (not for banned accounts).
+- Export results (CSV, Excel, or HTML).
+- Add a new user.
+
+User flow
+Users → filter or search → View profile
+                         → Deactivate or Reactivate
+                         → Export
+                         → Add User
+
+
+5.2 Add User
+
+Purpose: Create a new platform user (or an admin, if you are Super Admin).
+
+Fields
+- Full name
+- Email
+- Phone
+- Password
+- Role: User (always available). Admin is only available when the signed-in person is Super Admin.
+
+User flow
+Users → Add User → fill form → Submit → success message
+
+
+5.3 User Detail
+
+Purpose: Full profile for one account, including that user’s listings.
+
+What you see on screen
+- Avatar, name, email, status chips (active, role, email/phone verified)
+- Phone, created date, updated date, warned/banned flags
+- Edit profile button and modal
+- Listings tabs for that user: Total, Active, Inactive, Saved
+- Account history (staff actions on this user, when available)
+- Download as PDF or CSV
+
+What you can do
+- Edit name, contact, status, and verification flags.
+- Browse and manage that user’s listings (edit, delete, activate/deactivate).
+- Export a profile snapshot.
+
+User flow
+Users → View → Edit profile
+             → Manage user’s listings
+             → Download PDF or CSV
+
+
+6. PEOPLE — BUSINESS
+--------------------
+
+6.1 Business list
+
+Purpose: Directory of business accounts.
+
+What you see on screen
+- Add Business button
+- Export button
+- Filters: search, status, date
+- Table with business identity, contact, category, status, dates, address, logo, and actions
+
+What you can do
+- View business detail.
+- Deactivate a business.
+- Export (CSV, Excel, or HTML).
+- Add a new business.
+
+User flow
+Business → filter → View / Deactivate / Export / Add
+
+
+6.2 Add Business
+
+Purpose: Register a new business profile with media.
+
+Typical fields
+- Business name
+- Logo
+- Address (Google Places)
+- Phone, email, website
+- Goals
+- Category and subcategory
+- Banner and gallery images
+
+User flow
+Business → Add Business → complete form and media → Submit
+
+
+6.3 Business Detail
+
+Purpose: Inspect and edit one business; see its listings.
+
+What you see on screen
+- Profile hero and details (address, contact, category, status)
+- Edit modal for profile and media
+- Listing tabs: Total, Active, Inactive (for the business owner)
+- History when staff actions exist
+- PDF / CSV export
+
+User flow
+Business → View → Edit business
+                → Review listings
+                → Export
+
+
+7. MARKETPLACE — LISTING
+------------------------
+
+7.1 Listing hub
+
+Purpose: Browse all marketplace listings by category and manage them.
+
+Category tabs
+1. Vehicles
+2. Real Estate
+3. Services
+4. Events
+5. Jobs
+6. Electronics
+7. Furniture
+8. Fashion
+9. Kids
+10. Sports and Hobby
+
+What you can do on each listing card
+- View details (full fields, images, price)
+- Edit (category-specific fields)
+- Delete (with confirmation)
+- Activate or deactivate (toggle)
+
+Important: how price is shown
+
+Different categories store money in different fields. The admin panel shows the correct one:
+
+- Most goods → price
+- Services → service fee
+- Events → ticket price
+- Jobs → salary range
+
+User flow
+Listing → pick category tab → view / edit / delete / toggle status
+         → or start Add Listing
+
+
+7.2 Add Listing (3 steps)
+
+Step 1 — Choose category
+  Open Add Listing and pick one of the 10 categories.
+
+Step 2 — Choose subcategory
+  Pick the subcategory for that category.
+
+Step 3 — Fill the listing form
+  Includes:
+  - Common fields: title, description, keywords, location (Google Places), coordinates, negotiable, and more
+  - Category-specific fields and chip selectors (must use values the system accepts; for example Real Estate lease terms are SHORT-TERM or LONG-TERM)
+  - Image upload
+  - From business flag when applicable
+
+  On success: success message, then return to the Listing hub.
+
+User flow
+Listing → Add Listing → Category → Subcategory → Form → Submit → Listing hub
+
+
+8. MARKETPLACE — CATEGORIES
+---------------------------
+
+Purpose: Manage the catalog of categories and subcategories used by the app and admin forms.
+
+8.1 Categories list
+
+What you can do
+- Add Category
+- Add Subcategory
+- See key, label, subcategory count
+- Toggle active / inactive
+- Open subcategories
+- Delete a category (and related children as designed)
+
+8.2 Add Category
+
+Fields
+- Display name
+- Optional key / slug
+- Sort order
+- Active checkbox
+
+8.3 Add Subcategory
+
+Fields
+- Parent category
+- Display name
+- Optional key
+- Sort order
+- Active checkbox
+
+8.4 Subcategories under one category
+
+What you can do
+- List, toggle, and delete subcategories under one parent
+- Add another subcategory for that parent
+
+User flow
+Categories → Add category or subcategory
+           → Open subcategories → toggle or delete
+
+
+9. MARKETPLACE — BANNERS
+------------------------
+
+Purpose: Manage promotional business banners shown in the product.
+
+9.1 Banners list
+
+What you can do
+- See banners (business linkage, image, email, name, category, subcategory)
+- Edit (image and metadata)
+- Delete
+- Add Banner
+
+9.2 Add Banner
+
+Required fields
+- Image
+- Business name
+- Email
+- Category
+- Subcategory
+- URL
+
+User flow
+Banners → Add / Edit / Delete
+
+
+10. MODERATION — REPORTED USERS
+-------------------------------
+
+Purpose: Review and act on user reports filed from the platform.
+
+What you see on screen
+- Filters: status, search, date
+- Table: report ID, reported user, reporter, reason, date, status
+- Detail popup
+- Moderation confirmation with optional notes
+
+What you can do
+- Warn: warn the reported user (repeat warns may escalate per policy)
+- Ban: ban the reported user
+- Ignore: close the report without punitive action
+- Export: CSV, PDF, or HTML
+
+User flow
+Reported Users → filter Pending → open report → Warn / Ban / Ignore
+
+
+11. OPERATIONS — SUPPORT
+------------------------
+
+Purpose: Support / help-request inbox.
+
+What you can do
+- Search by email
+- Filter by status and date
+- Change ticket status
+- Open detail and send an email reply
+- Delete a ticket (with confirmation)
+
+User flow
+Support → find ticket → update status → reply or delete
+
+
+12. OPERATIONS — NOTIFICATIONS
+------------------------------
+
+12.1 Notifications inbox
+
+Purpose: Staff notification inbox and entry point for broadcasts.
+
+What you can do
+- Browse paginated cards (title, body, type, time)
+- Mark read or unread
+- Mark all visible as read
+- Delete
+- Open Add New Notification
+
+12.2 Add Notification
+
+Purpose: Send a broadcast announcement.
+
+Fields
+- Title
+- Audience: All users, or Business users only
+- Description (body), with preview
+
+User flow
+Notifications → review inbox
+              → Add Notification → choose audience → Publish
+
+
+13. OPERATIONS — FEEDBACK
+-------------------------
+
+Purpose: Read-only view of in-app sentiment feedback.
+
+What you can do
+- Filter by reaction (for example Hate through Love)
+- See user, reaction, date, and description
+- No create, edit, or delete (view only)
+
+User flow
+Feedback → filter by reaction → review comments
+
+
+14. INSIGHTS — STATISTICS
+-------------------------
+
+Purpose: Charts for leadership and operations review.
+
+Charts
+- User growth
+- Business statistics
+- Listings by category
+
+Data comes from the same live statistics sources as the Dashboard.
+
+User flow
+Statistics → review charts (optionally after checking Dashboard)
+
+
+15. ADMINISTRATION — PRIVACY POLICY
+-----------------------------------
+
+Purpose: Edit and publish the privacy policy content used by clients.
+
+What you can do
+- Edit title and body
+- Save draft (not public)
+- Publish (available to apps)
+- See draft vs published status and last updated time
+
+User flow
+Privacy Policy → edit → Save draft or Publish
+
+
+16. ADMIN PROFILE
+-----------------
+
+Opened from: Sidebar account menu
+
+Purpose: View and update the signed-in administrator’s own profile.
+
+What you can do
+- View name, role, email, phone, address fields, bio
+- Edit and save profile details
+
+User flow
+Account menu → Profile → Edit → Save
+
+
+17. END-TO-END FLOWS (QUICK GUIDE)
+---------------------------------
+
+Onboard a new consumer user
+1. People → Users → Add User
+2. Later open User Detail to check status or listings
+
+Onboard a business
+1. People → Business → Add Business
+2. Open Business Detail to confirm media and listings
+
+Publish a marketplace listing from admin
+1. Marketplace → Listing → Add Listing
+2. Category → Subcategory → complete form (valid options + image)
+3. Submit → confirm the card under the correct category tab
+
+Moderate a bad actor
+1. Moderation → Reported Users
+2. Open pending report → Warn or Ban (or Ignore)
+3. Optionally deactivate from Users if needed
+
+Reply to a customer
+1. Operations → Support
+2. Open ticket → update status → Reply
+
+Send an announcement
+1. Operations → Notifications → Add New Notification
+2. Choose audience (all users or business users) → Publish
+
+Update legal copy
+1. Administration → Privacy Policy
+2. Edit → Publish when ready for apps
+
+
+18. FULL SCREEN LIST
+--------------------
+
+1. Login
+2. Dashboard
+3. Users
+4. Add User
+5. User Detail
+6. Business
+7. Add Business
+8. Business Detail
+9. Listing hub
+10. Add Listing — choose category
+11. Add Listing — choose subcategory
+12. Add Listing — form
+13. Categories
+14. Add Category
+15. Add Subcategory
+16. Subcategories
+17. Banners
+18. Add Banner
+19. Reported Users
+20. Support
+21. Notifications
+22. Add Notification
+23. Feedback
+24. Statistics
+25. Privacy Policy
+26. Admin Profile
+
+
+19. ITEMS REMOVED FROM THE SIDEBAR (NOT IN CLIENT NAV)
+------------------------------------------------------
+
+These are not shown in the main menu for client operations:
+
+- Global Search
+- Blocks
+- AI Ops
+- Audit Logs
+- Platform Settings
+
+
+20. WEEKEND REVIEW CHECKLIST
+----------------------------
+
+Use this while clicking through the live admin:
+
+[ ] Login and language switch
+[ ] Dashboard periods and alert links
+[ ] Users: search, filter, detail, deactivate/reactivate, add user
+[ ] Business: list, detail, add, deactivate
+[ ] Listing: each category tab; edit, delete, toggle; add listing wizard
+[ ] Categories and subcategories create/update/delete
+[ ] Banners add, edit, delete
+[ ] Reported Users moderation actions
+[ ] Support reply and status
+[ ] Notifications inbox and broadcast (all / business)
+[ ] Feedback filters
+[ ] Statistics charts
+[ ] Privacy Policy draft and publish
+[ ] Admin Profile edit
+
+
+END OF BRAELO ADMIN PANEL DOCUMENTATION

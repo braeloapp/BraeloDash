@@ -25,6 +25,16 @@ const geistMono = localFont({
 export const metadata = {
   title: "Braelo Admin Panel",
   description: "Braelo Admin Panel",
+  icons: {
+    icon: [
+      { url: "/braelo-icon.png", type: "image/png", sizes: "192x192" },
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/favicon-16.png", type: "image/png", sizes: "16x16" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/braelo-icon.png", type: "image/png" }],
+    shortcut: ["/braelo-icon.png"],
+  },
 };
 
 export const viewport = {
